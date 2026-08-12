@@ -2,6 +2,8 @@
 
 Use this reference when designing or restructuring a workspace. CCA converges on upstream conventions; it does not make its preferred implementation mandatory for every compatible project.
 
+Read `methods.md` when the request involves PARA, Zettelkasten, BASB/CODE, second brains/PKM, or composition among human methods, LLM Wiki, ICM, and ordinary projects.
+
 ## Compatibility states
 
 - **Native-compatible**: CCA can consume an ICM workspace, LLM Wiki, or ordinary project without structural migration.
@@ -9,6 +11,8 @@ Use this reference when designing or restructuring a workspace. CCA converges on
 - **CCA-conformant**: the workspace intentionally adopts the CCA specification.
 
 Never call an upstream workspace CCA-conformant merely because it can be read by CCA tooling.
+
+PARA, Zettelkasten, and BASB/CODE are method overlays, not additional native compatibility states.
 
 ## ICM: full profile vs derived patterns
 
@@ -44,6 +48,8 @@ The upstream ICM `_core/CONVENTIONS.md` is canonical for ICM semantics. The work
 
 CCA may prefer Mermaid for its own explanatory diagrams, but it must not replace an output format that the active upstream profile explicitly requires.
 
+A native ICM root may be nested inside a broader CCA/PARA/client workspace. The outer boundary may organize where it lives but must not rewrite the native ICM internals merely for uniformity.
+
 ## Portable root guidance
 
 `AGENTS.md` is CCA's preferred portable cross-agent guidance file where useful.
@@ -59,6 +65,8 @@ CCA may prefer Mermaid for its own explanatory diagrams, but it must not replace
 For native LLM Wiki compatibility, discover the implementation's own schema first. The core behavior is durable sources plus maintained synthesis that compounds across sessions.
 
 CCA may optionally harden a knowledge workspace with `raw/`, `wiki/`, `wiki/index.md`, `log.md`, frontmatter, provenance fields, contradiction sections, and lifecycle states. Those are CCA choices, not universal LLM Wiki requirements.
+
+When Zettelkasten, PARA, or another human method is present beside maintained synthesis, determine authority before writing. Do not silently reinterpret human-authored reference notes as agent-maintained wiki content.
 
 ## CCA file roles
 
@@ -82,17 +90,20 @@ Roles classify function; they do not mandate locations.
 - Select exact sections when a full reference is unnecessary.
 - Stable constraints belong in canonical reference/config files, not copied into every router.
 - Previous outputs are artifacts, not authoritative quality templates.
+- Infer ordinary filesystem semantics when safe; do not create a giant manifest merely to restate obvious paths.
 - If a task needs excessive unrelated context, improve routing before increasing prompt size.
 
 ## Agent Skills discipline
 
-A bundled skill must stand alone as a package:
+CCA's first-party Agent Skills are distributed as a suite of focused capabilities. Package portability means implementation paths remain local to each skill package; it does not mean every skill must be a sensible unrelated product when installed alone.
 
 - valid `SKILL.md` frontmatter;
 - compact activation-time instructions;
 - skill-local `references/`, `assets/`, and `scripts/` loaded progressively;
-- relative paths that remain inside the skill package;
-- no required sibling skill or repository-global file for core execution.
+- implementation file paths remain inside the skill package;
+- never reach into a sibling skill directory or repository-global implementation file by relative path;
+- semantic delegation to another installed capability is valid, for example `Use cca-lint to validate the selected profile`;
+- `cca-architect` coordinates compound architecture work but is not a mandatory gateway for an already-clear lint, ingest, query, sync, or scaffold request.
 
 ## Fresh-agent walk test
 
@@ -100,7 +111,7 @@ The CCA walk test supplements profile-specific validation; it does not replace I
 
 A structured workspace should let a fresh agent:
 
-1. **Orient** — identify the workspace and applicable instruction scope.
+1. **Orient** — identify the workspace, applicable instruction scope, native profile, and relevant method boundaries.
 2. **Act** — perform one representative operation using routed files.
 3. **Report** — state what changed, what remains, and what is missing or ambiguous.
 
