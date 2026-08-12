@@ -6,8 +6,11 @@
 workspaces/workspace-builder/stages/*/output/*
 !workspaces/workspace-builder/stages/*/output/.gitkeep
 
-# Claude Code local settings
+# Third-Party vendor local settings
+.agents/
 .claude/
+.opencode/
+.pi/
 
 # Node dependencies
 node_modules/
@@ -22,6 +25,7 @@ desktop.ini
 *.swo
 *~
 .vscode/settings.json
+.obsidian/
 
 # Environment files
 .env
@@ -36,7 +40,6 @@ __pycache__/
 *.pyc
 
 # Keep stage outputs out of history by default — they are per-run products.
-# Uncomment to version them (ICM practice: commit after each run for a
-# versioned pipeline history):
+# Uncomment to version them (ICM practice: commit after each run for a versioned pipeline history):
 # stages/*/output/*
 # !stages/*/.gitkeep
