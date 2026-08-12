@@ -1,6 +1,6 @@
 # CONTEXT.md — topic-research routing
 
-> Root task router for the worked example.
+> Root task router for the worked hybrid example. The two pipeline stages intentionally use ICM-derived contracts; this repository example does not claim the complete native ICM profile.
 
 ## Task routing
 
@@ -9,7 +9,7 @@
 | Make this week's brief | Run `stages/01-collect/` per its contract, then `stages/02-brief/` after human review |
 | Add a source | Follow the example's knowledge conventions: preserve the source, update relevant maintained pages and navigation, then record the operation |
 | Ask about the topic | Read `wiki/index.md`, then relevant synthesis, then source evidence only as needed |
-| Check health | Validate ICM stage invariants, routing links, knowledge provenance, and this example's adopted CCA conventions |
+| Check health | Validate the adopted ICM-derived stage invariants, routing links, knowledge provenance, and this example's adopted CCA conventions |
 
 ## Shared resources
 
