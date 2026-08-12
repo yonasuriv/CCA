@@ -1,91 +1,136 @@
 ---
 name: cca-lint
-description: Health-check a CCA/ICM/LLM Wiki workspace — detects structural problems (dead files, broken links, drifted catalogs, forked adapters, missing contracts) and knowledge problems (contradictions, stale claims, orphan pages, missing provenance, unsupported conclusions), then reports findings with a CCA conformance level (CCA-0/1/2). Use when the user asks to "lint", "health-check", "validate", or "audit" a workspace or wiki, before handing a workspace to someone else, or periodically as knowledge maintenance.
+description: Audit a filesystem-native agent workspace against the correct profile: native ICM compatibility, native LLM Wiki compatibility, or intentional CCA conformance. Use when the user asks to lint, validate, health-check, audit, or verify a workspace before sharing or after structural changes. Separates upstream compatibility failures from optional CCA hardening opportunities and repairs only explicitly authorized, unambiguous issues.
+compatibility: Filesystem read access is required. Write access is optional and used only when repairs are authorized.
 ---
 
 # CCA Lint
 
-Knowledge repositories and routing layers both rot: links break, catalogs
-drift, claims go stale, pages orphan. Lint finds it. Persistent knowledge can
-become persistently wrong — maintenance is not optional.
+Validate the workspace it actually is. Do not fail upstream projects for omitting CCA-specific conventions they never adopted.
 
-Lint **reports and repairs conservatively**. It fixes what is unambiguous
-(broken links, stale dates, missing index entries) and surfaces everything
-else for human decision.
+## 1. Detect the profile
 
-## Structural checks
+Determine one or more applicable profiles from the workspace files and instructions:
 
-1. **Root resolution** — exactly one authoritative root (`AGENTS.md`, else
-   legacy alias); adapters are thin pointers (≲ 15 lines, no restated rules).
-2. **Catalog integrity** — every path referenced in `AGENTS.md`,
-   `CONTEXT.md`, `index.md` exists; every in-scope file on disk is
-   referenced somewhere (no dead files, no unrouted folders).
-3. **Budgets** — root catalog ≲ 800 tokens, routing ≲ 300, contracts < 80
-   lines, reference files < 200 lines. Flag bloat; suggest where content
-   should move.
-4. **Contracts** — every stage folder has a `CONTEXT.md` with Inputs /
-   Process / Outputs; Inputs tables reference real files and sections.
-5. **One-way references** — no circular dependencies between stages or
-   between catalogs.
-6. **Chronicle format** — `log.md` entries match `## [YYYY-MM-DD] op |
-   subject`; file is append-only (no edited history).
+- **ICM native compatibility**
+- **LLM Wiki native compatibility**
+- **CCA conformance**
+- **ordinary project with portable agent guidance**
 
-## Knowledge checks (wikis)
+If detection is ambiguous, report the ambiguity. Do not silently choose the strictest profile.
 
-7. **Provenance** — every source-derived claim links a source; every source
-   in `raw/` has a source page in `wiki/sources/`; every source page lists
-   what it changed.
-8. **Orphans** — pages with no inbound links; concepts mentioned across
-   pages but lacking their own page.
-9. **Contradictions** — claims across pages that conflict without a
-   contradictions section acknowledging it; contradictions sections that
-   newer sources may have resolved.
-10. **Staleness and lifecycle** — pages whose claims predate newer ingested
-    sources on the same topic; `updated:` frontmatter far behind the log's
-    activity; pages or relationships that reality has superseded (roles
-    changed, systems replaced, processes deprecated) but whose `status:`
-    still says active; superseded pages still cited as authoritative by
-    other pages. Recommend `status: superseded` or `archived` — flag, never
-    silently delete.
-11. **Open questions** — index open questions that ingests have since
-    answered (promote to pages) or that suggest sources to seek.
+## 2. Universal structural checks
 
-## Procedure
+These checks apply where relevant regardless of profile:
 
-1. Snapshot disk (folders, files, dates) — truth lives on disk.
-2. Run structural checks 1–6, then knowledge checks 7–11 where a wiki exists.
-3. Repair the unambiguous: broken link targets (if the file moved, repoint),
-   missing index entries, stale `updated:` fields after verifying content.
-4. Compile findings into a report (below). Never silently rewrite claims,
-   resolve contradictions, or delete dead files — those are human decisions.
-5. Append `## [YYYY-MM-DD] lint | Health check` to `log.md` with finding
-   counts and actions taken.
+- referenced paths resolve;
+- canonical rules are not duplicated as divergent authoritative copies;
+- routing files contain routing rather than large bodies of unrelated content;
+- nested instruction scopes are preserved rather than flattened;
+- adapters do not contradict the canonical guidance they route to;
+- files required by an explicitly adopted contract actually exist.
+
+## 3. ICM native compatibility checks
+
+When the workspace claims or exhibits ICM/MWP structure, verify the upstream invariants:
+
+1. Five-layer routing semantics are preserved.
+2. Native Layer 0 `CLAUDE.md` behavior is not broken.
+3. Root and stage `CONTEXT.md` files route context rather than duplicate reference content.
+4. Stage folders use zero-padded lowercase hyphenated names such as `01-collect`.
+5. Every stage contract contains `Inputs`, `Process`, and `Outputs`.
+6. The Inputs table uses the canonical columns `Source | File/Location | Section/Scope | Why`.
+7. Inputs use selective section routing where only part of a reference is needed.
+8. Cross-stage/reference dependencies are one-way.
+9. Each stage writes to its own `output/` handoff surface.
+10. Canonical-source discipline is preserved.
+
+CCA-only wiki metadata is irrelevant to this profile unless the workspace also adopted it.
+
+## 4. LLM Wiki native compatibility checks
+
+Do not require one directory schema. Verify the implementation's own instructions first, then check the core behavior:
+
+1. durable source material/evidence exists or has a defined home;
+2. maintained synthesis persists across sessions;
+3. there is an explicit maintenance procedure for integrating/querying knowledge;
+4. the knowledge base is directly inspectable/editable as files;
+5. the implementation's own links/index/schema resolve and are internally coherent.
+
+Missing CCA frontmatter, `raw/`, `wiki/`, `wiki/index.md`, `log.md`, entity/concept subdirectories, or CCA log syntax are **not** native LLM Wiki failures.
+
+## 5. CCA conformance checks
+
+Only apply requirements the workspace intentionally adopted. Examples include:
+
+- portable `AGENTS.md` routing;
+- CCA file-role classifications;
+- a CCA-hardened knowledge bundle;
+- provenance/lifecycle metadata;
+- CCA maintenance history conventions;
+- the fresh-agent walk test.
+
+Report optional hardening recommendations separately from errors.
+
+## 6. Agent Skills checks
+
+When a `skills/` directory exists, validate each bundled skill independently:
+
+- `SKILL.md` exists;
+- frontmatter contains valid `name` and `description`;
+- directory name and skill name agree;
+- name uses lowercase letters, digits, and hyphens and remains within the current Agent Skills limits;
+- description states purpose and trigger conditions and remains within the current limits;
+- referenced resources are relative and exist inside the skill package;
+- core behavior does not require a sibling skill or repository-global file;
+- detailed resources are progressively disclosed rather than copied wholesale into `SKILL.md`.
+
+## 7. History and append-only claims
+
+A filesystem snapshot alone cannot prove that a file has never been rewritten.
+
+- Validate current log syntax only if the active profile defines one.
+- Claim append-only history only when version-control/history evidence is actually available and inspected.
+- Otherwise report history immutability as **not verified**, not passed.
+
+## 8. Repairs
+
+Default lint behavior is report-only unless the user asked for remediation.
+
+When remediation is authorized, automatically repair only changes whose intent is unambiguous, such as a catalog path that clearly points to a uniquely renamed file. Do not automatically:
+
+- delete files;
+- resolve semantic contradictions;
+- rename an upstream-native structure into a CCA preference;
+- merge competing instruction files without reviewing unique content;
+- fabricate missing provenance or metadata.
 
 ## Report format
 
+```text
+# Lint report — [workspace]
+
+Profiles detected:
+- ICM native compatibility: PASS | FAIL | N/A
+- LLM Wiki native compatibility: PASS | FAIL | N/A
+- CCA conformance: PASS | PARTIAL | N/A
+
+## Compatibility errors
+[Issues that break a claimed upstream/native profile]
+
+## CCA conformance errors
+[Only requirements intentionally adopted by this workspace]
+
+## Hardening opportunities
+[Optional improvements, never presented as upstream failures]
+
+## Verification limits
+[Checks that could not be proven from available evidence]
+
+## Repairs applied
+[Only if explicitly authorized]
 ```
-## Lint report — [workspace] — [date]
-Conformance: CCA-[0/1/2] — [what blocks the next level]
 
-### Errors (repair recommended)      [n]
-### Warnings (human decision needed) [n]
-### Repaired automatically           [n]
-### Suggested next actions
-- [ingest X, create page for Y, run sync, run walk test, …]
-```
+## Production rule
 
-## Conformance levels (for the report)
-
-- **CCA-0 Detectable** — root instruction file + plain-text artifacts.
-- **CCA-1 Conformant** — canonical/aliased root catalog with map and
-  routing; files classifiable into the eight roles; contracts for pipelines;
-  index + log for wikis; thin adapters.
-- **CCA-2 Verified** — CCA-1 plus a passing walk test (fresh agent orients,
-  acts, reports from files alone), clean structural lint, parseable
-  append-only log, provenance on wiki claims.
-
-## Cadence
-
-Suggest lint after bulk ingests, before sharing a workspace, and on a loose
-periodic rhythm for active wikis. Lint is cheap; persistent wrongness is
-expensive.
+A clean lint report means the workspace satisfies the profile it claims. It does not mean CCA has imposed every optional convention it knows about.
