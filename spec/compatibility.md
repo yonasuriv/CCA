@@ -1,107 +1,128 @@
 # Compatibility: ICM ↔ LLM Wiki ↔ CCA
 
-Normative companion to `SPEC.md`. This document defines how the three systems
-map onto each other and what "swappable" concretely means.
+Normative companion to `SPEC.md`. This document defines compatibility boundaries. CCA must preserve upstream validity before applying CCA-specific hardening.
 
-## 1. Concept mapping
+## 1. Compatibility principle
 
-| CCA concept | ICM equivalent | LLM Wiki equivalent |
+CCA distinguishes three states:
+
+- **Native-compatible** — CCA can consume the workspace without structural migration.
+- **CCA-hardened** — optional CCA routing, portability, provenance, or maintenance conventions were added.
+- **CCA-conformant** — the workspace intentionally adopts the CCA specification.
+
+An ICM workspace or LLM Wiki does not become "CCA" merely because CCA can understand it. Compatibility is an acceptance guarantee, not retroactive ownership of upstream semantics.
+
+## 2. Concept mapping
+
+| CCA concept | ICM equivalent | LLM Wiki analogue |
 |---|---|---|
-| Layer 0 catalog (`AGENTS.md`) | Layer 0 `CLAUDE.md` ("Where am I?") | The schema file ("e.g. CLAUDE.md or AGENTS.md") |
-| Layer 1 catalog (`CONTEXT.md`) | Layer 1 `CONTEXT.md` ("Where do I go?") | `index.md` (content-oriented routing) |
-| Layer 2 contract (stage `CONTEXT.md`) | Layer 2 stage contract | Ingest/query/lint procedures in the schema |
-| factory role (`_config/`, `references/`) | Layer 3 reference material | Schema conventions (page formats, linking rules) |
-| source role (`raw/`) | Layer 4 input material (user-provided) | **Raw sources** (immutable) |
-| product role (`output/`) | Layer 4 working artifacts | (per-query answers, before filing back) |
-| synthesis role (`wiki/`) | No equivalent — CCA adds it | **The wiki** (LLM-owned, maintained) |
-| chronicle role (`log.md`) | Git history (implicit) | **log.md** (explicit, append-only) |
-| run operation | Executing a stage per its contract | — |
-| ingest / query / lint operations | — | The three Wiki operations |
-| sync / scaffold operations | icm-template's `icm-sync` / `icm-scaffold` | — |
-| walk test | ICM walk test / workspace validation | "The LLM is a disciplined wiki maintainer" |
+| Portable root guidance (`AGENTS.md`) | Native Layer 0 is `CLAUDE.md` | Schema/instruction file may be chosen by the implementation |
+| Routing (`CONTEXT.md`) | Layer 1 `CONTEXT.md` | Index/schema-defined navigation |
+| Stage contract | Stage `CONTEXT.md` with Inputs / Process / Outputs | Ingest/query/lint procedures defined by the implementation |
+| Factory/reference context | Layer 3 reference material | Stable schema/conventions |
+| Working input/product | Layer 4 working artifacts | Query/ingest working material |
+| Raw evidence | User-provided source material | Raw/source material |
+| Maintained synthesis | No direct ICM equivalent | Core LLM Wiki behavior |
+| Chronicle/log | Git/history may provide this | Optional implementation detail unless adopted by the wiki |
 
-The two parent systems are complementary halves:
+The overlap is semantic, not an excuse to force identical directory trees.
 
-- ICM models **work over time within one run** (stages, handoffs, gates).
-- LLM Wiki models **knowledge over time across runs** (synthesis that compounds).
-- CCA's union: pipelines read from and write into wikis; wikis feed pipelines.
-  `raw/` is stable evidence (Layer 3 behavior); `wiki/` is maintained working
-  knowledge (Layer 4 behavior that persists instead of resetting each run).
+## 3. ICM compatibility profile
 
-## 2. Root file resolution
+CCA claims ICM compatibility only when it preserves the current ICM conventions it uses:
 
-An agent entering any workspace resolves the Layer 0 root in this order:
+1. Five-layer routing architecture.
+2. `CLAUDE.md` as ICM's native Layer 0 entry point.
+3. Root and stage `CONTEXT.md` routing.
+4. Stage contracts with the canonical sections `Inputs`, `Process`, `Outputs`.
+5. ICM's canonical Inputs table shape: `Source | File/Location | Section/Scope | Why`.
+6. Zero-padded, lowercase, hyphenated stage folders such as `01-collect`.
+7. One-way cross-references.
+8. Selective section routing.
+9. One fact, one canonical home.
+10. Human-editable handoffs through each stage's `output/` folder.
 
-1. `AGENTS.md` — canonical (ecosystem standard)
-2. `CLAUDE.md` — ICM legacy alias
-3. `IDENTITY.md` — icm-template legacy alias
-4. `README.md` — last-resort fallback
+CCA extensions must be ignorable by an ICM-only consumer.
 
-Rules:
+### Portable `AGENTS.md` with ICM
 
-- The first file found is authoritative. Lower-precedence files **must not**
-  contradict it.
-- A legacy file may *be* the full catalog (CCA-0/1 acceptable), or a thin
-  adapter pointing to `AGENTS.md` (preferred).
-- Tool-specific files (`GEMINI.md`, `.cursorrules`, `.windsurfrules`,
-  `.github/copilot-instructions.md`) are **adapters only**: a two-to-five-line
-  pointer. Never a fork of the rules. One fact, one home.
+Adding `AGENTS.md` is optional hardening. Do not delete or invalidate a native `CLAUDE.md` merely to satisfy CCA.
 
-## 3. Swap guarantees
+Where both exist:
 
-### 3.1 ICM workspace → CCA
+- Keep substantive guidance canonical in one place.
+- Use tool-supported include/import behavior where available.
+- Otherwise keep the secondary file as a minimal pointer that does not fork rules.
+- Never claim CCA can override a harness's own instruction-discovery precedence.
 
-An ICM workspace is CCA-0 as-is. To reach CCA-1:
+## 4. LLM Wiki compatibility profile
 
-1. Add `AGENTS.md` as the root catalog (use the template in
-   `skills/cca-architect/assets/templates/AGENTS.md`).
-2. Reduce `CLAUDE.md` to an adapter: "Read `AGENTS.md`; it is authoritative."
-3. Everything else — `CONTEXT.md` files, stage folders, `_config/`, `output/`
-   conventions — is already conformant. Stage contracts are CCA contracts
-   unchanged.
+Karpathy's LLM Wiki is intentionally an idea pattern: the agent and user build the specifics together. Therefore CCA native compatibility must preserve that flexibility.
 
-### 3.2 LLM Wiki → CCA
+Core compatibility checks should focus on behavior rather than one folder schema:
 
-An LLM Wiki is CCA-0 as-is. To reach CCA-1:
+- There is durable source material/evidence.
+- There is maintained synthesis that compounds across sessions rather than being rebuilt from scratch for every query.
+- The agent has explicit maintenance behavior for incorporating new material and keeping the synthesis useful.
+- The human can inspect and edit the knowledge base directly.
 
-1. Add `AGENTS.md` as the root catalog. Its directory map lists `raw/`,
-   `wiki/`, `wiki/index.md`, `log.md`; its routing rules point "ingest/query/
-   lint" intents at the schema procedures.
-2. Keep `raw/`, `wiki/`, `index.md`, `log.md` exactly as they are.
-3. Schema conventions either stay where they are (catalog links to them) or
-   move into `_config/`; the catalog must point at their home.
+CCA may recommend, but must not attribute to LLM Wiki as mandatory:
 
-### 3.3 CCA → ICM tooling
+- a specific `raw/` / `wiki/` directory taxonomy;
+- `wiki/index.md` as a required path;
+- `log.md` or a specific log syntax;
+- YAML frontmatter fields;
+- entity/concept/source/synthesis subdirectories;
+- CCA conformance levels.
 
-CCA workspaces degrade gracefully for ICM-only agents:
+Those are CCA hardening conventions when a workspace chooses them.
 
-- The `CLAUDE.md` adapter routes a Claude-hardcoded agent into the workspace.
-- Stage contracts use ICM's exact Inputs/Process/Outputs format.
-- Numbered stage folders, `references/`, `output/`, and review gates behave
-  identically.
-- CCA-only additions (`raw/`, `wiki/`, `log.md`) are plain folders an ICM
-  agent can simply ignore or read as ordinary reference material.
+## 5. AGENTS.md compatibility profile
 
-### 3.4 CCA → LLM Wiki practice
+CCA uses `AGENTS.md` because it is an existing open convention.
 
-- `raw/`, `wiki/`, `index.md`, `log.md` follow the Wiki pattern verbatim;
-  Obsidian, git tooling, and Wiki-style prompting all work unchanged.
-- The Wiki "schema" lives in `AGENTS.md` + `_config/`, both of which the Wiki
-  pattern already names as valid schema locations.
+- Root `AGENTS.md` may provide portable repository guidance.
+- Nested `AGENTS.md` files are valid and useful; the closest applicable file takes precedence for that subtree under the AGENTS.md convention.
+- CCA must not flatten nested instructions into one global catalog when doing so would destroy scope.
+- `AGENTS.md` has no required heading schema; CCA templates are recommendations, not requirements of the standard.
 
-### 3.5 ICM ↔ LLM Wiki (through CCA)
+## 6. Agent Skills compatibility profile
 
-- Adding a wiki to an ICM workspace: create `raw/`, `wiki/`, `wiki/index.md`,
-  `log.md`; add routing lines to the root catalog; adopt the ingest/query/lint
-  procedures (or install the matching skills). The pipeline stages can then
-  read `wiki/` pages as factory or source context.
-- Adding a pipeline to an LLM Wiki: create `stages/NN_name/` folders with
-  CCA contracts whose Inputs tables point at `wiki/` pages and `raw/` sources.
-  The wiki becomes the pipeline's standing memory.
+Every bundled skill must remain a valid standalone Agent Skills package:
 
-## 4. Non-goals
+- `SKILL.md` contains valid YAML frontmatter with `name` and `description`.
+- Name uses lowercase letters/numbers/hyphens and remains within the current spec limits.
+- Description says what the skill does and when to use it.
+- Detailed material is progressively disclosed through skill-local `references/`, `assets/`, or `scripts/`.
+- File references are relative to the skill root.
+- A skill must not require a sibling skill or repository-global file merely to execute its core behavior.
 
-- CCA does not translate *behavioral quality* across models. Structure is
-  portable; how a given model performs inside that structure is empirical.
-- CCA does not version-pin ICM or LLM Wiki. It tracks them upstream; where
-  they diverge from this document, file an issue — convergence is the goal.
+Cross-skill suggestions are allowed, but they must be optional: if the sibling skill is absent, the active skill still works or explains the missing optional capability.
+
+## 7. Swap guarantees
+
+### ICM → CCA tooling
+
+CCA tooling must be able to inspect and operate on a native ICM workspace without first renaming stages, rewriting contracts, or replacing `CLAUDE.md`.
+
+Optional hardening may add portable `AGENTS.md` guidance or knowledge capabilities, but the ICM workflow remains valid.
+
+### LLM Wiki → CCA tooling
+
+CCA tooling must accept a legitimate LLM Wiki implementation without requiring CCA's preferred page taxonomy or metadata. It should discover the implementation's own schema/instructions first.
+
+Optional hardening may add portable routing, provenance metadata, indexes, or lifecycle conventions if the user wants them.
+
+### CCA → ICM consumer
+
+The pipeline subset of a CCA-conformant workspace must preserve ICM stage naming, contracts, routing semantics, one-way references, and handoffs so an ICM consumer can ignore CCA-only additions.
+
+### CCA → LLM Wiki practice
+
+A CCA knowledge bundle must preserve the LLM Wiki core idea: persistent, agent-maintained synthesis over durable source material. CCA-specific metadata and maintenance structure must remain implementation choices, not reinterpretations of the upstream pattern.
+
+## 8. Upstream drift
+
+CCA does not freeze upstream behavior. When ICM, LLM Wiki, AGENTS.md, or Agent Skills evolves, verify the primary source and update CCA toward it unless doing so would contradict CCA's core principle of filesystem-native, portable, inspectable context.
+
+See `docs/standards.md` for the tracked upstream surface.
