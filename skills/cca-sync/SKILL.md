@@ -1,61 +1,55 @@
 ---
 name: cca-sync
-description: Keep CCA/ICM routing files accurate by reconciling AGENTS.md, CONTEXT.md, and wiki/index.md with what is actually on disk. Use when the user says "sync the catalogs", "update the routing", "refresh AGENTS.md / the index", after files or folders were added/moved/deleted, or when routing feels stale. Sync reports drift, prunes dead entries, and adds missing ones — it never invents content and never restructures.
+description: Reconcile filesystem-native routing and navigation files with the actual workspace while preserving instruction scope and native ICM, LLM Wiki, or CCA semantics. Use after files move, routing becomes stale, indexes drift, or the user asks to sync AGENTS.md, CONTEXT.md, or knowledge navigation. Updates only catalogs that actually exist or were explicitly requested and never treats CCA-preferred files as mandatory.
+compatibility: Filesystem read/write access to the target workspace. No sibling skill required.
 ---
 
 # CCA Sync
 
-Catalogs point at the filesystem; the filesystem changes; catalogs drift.
-Sync reconciles them. It is the maintenance half of "catalogs point, they do
-not store".
+Sync routing to reality without restructuring the workspace or inventing semantics.
 
-## What syncs
+## Discover scope first
 
-| Catalog | Syncs against |
-|---|---|
-| `AGENTS.md` (or legacy root) | Top-level directory map, routing targets, authority order |
-| `CONTEXT.md` (root and stage-level) | Stages, shared resources, current-state line |
-| `wiki/index.md` | Every page in `wiki/`: existence, one-line summary, updated date, source counts |
-| `log.md` | Never edited — append-only. Sync may append a sync entry. |
+Identify the routing/navigation files that actually govern the workspace:
+
+- root and nested `AGENTS.md` files;
+- native harness instruction files;
+- root/stage `CONTEXT.md` files;
+- wiki indexes/maps/schema files;
+- any explicitly adopted CCA history/catalog conventions.
+
+Do not create missing CCA-preferred catalogs merely because sync knows about them. Creation belongs to an explicit scaffold/hardening request.
 
 ## Procedure
 
-1. **Snapshot disk.** List the actual folders and files: top level,
-   `stages/`, `_config/`, `raw/`, `wiki/` (recursively). Note counts and
-   modification dates.
-2. **Read each catalog.** Extract every entry: path references, routing
-   rows, index lines, resource tables.
-3. **Diff.** Classify each discrepancy:
-   - **Dead entry** — catalog points at something no longer on disk.
-   - **Missing entry** — something on disk matches a catalog's scope but is
-     not listed (new stage, new wiki page, new `_config/` file).
-   - **Stale metadata** — index summaries, dates, or source counts that no
-     longer match the target file. Re-read the target before rewriting its
-     one-liner; never fabricate a summary.
-   - **Forked adapter** — an adapter file carrying substantive rules instead
-     of a pointer. Flag it; repair only with user approval.
-4. **Apply repairs.** Prune dead entries, add missing ones, refresh stale
-   metadata. Preserve each catalog's existing structure, tone, and token
-   budget — sync edits entries, it does not rewrite files.
-5. **Update state lines.** Refresh `CONTEXT.md`'s current-state section
-   (latest stage output, pending reviews) from what is actually in
-   `output/` folders.
-6. **Append a log entry** if a `log.md` exists:
-   `## [YYYY-MM-DD] sync | Catalog reconciliation` with the counts of what
-   changed.
-7. **Report** a compact table: per catalog — entries pruned, added,
-   refreshed; anything that needs a human decision (e.g. a folder nothing
-   routes to: keep, wire in, or flag dead).
+1. **Snapshot relevant disk structure.** Inspect only the directories governed by the catalogs being synchronized.
+2. **Read each catalog in its scope.** Nested `AGENTS.md` files govern their own subtrees; do not flatten their entries into the root.
+3. **Diff references against disk.** Classify:
+   - broken reference — target no longer resolves;
+   - missing routing entry — a newly added item clearly belongs in this catalog's declared scope;
+   - stale descriptive metadata — description/date/count no longer matches the target and can be verified;
+   - scope leak — a parent catalog duplicates or overrides guidance owned by a nearer scoped file;
+   - semantic decision — filesystem evidence alone is insufficient to decide routing.
+4. **Apply only unambiguous repairs authorized by the request.** Preserve file structure, wording style, and native profile semantics.
+5. **Do not infer semantic state from timestamps or folder existence alone.** A file's presence proves existence, not completion, authority, freshness, or correctness unless the workspace explicitly defines that inference.
+6. **Update history only when the active workspace defines a history mechanism and synchronization is supposed to mutate it.** Never invent a `log.md` convention for a native wiki that does not use one.
+7. **Report** changed entries, unresolved semantic decisions, and any optional hardening opportunities separately.
 
-## Rules
+## Production rules
 
-- Truth lives on disk. The catalog is always the thing being corrected.
-- Never invent: every catalog entry after sync must correspond to a real
-  file or folder.
-- Never move, rename, or delete content files — that is restructuring
-  (cca-architect's mode, with an approved migration map).
-- If the same rule text appears in both a catalog and a `_config/` file,
-  keep it in `_config/` and make the catalog point. One fact, one home.
-- Run after: bulk file changes, completed ingests that skipped index
-  updates, stage additions/removals, or any time an agent reports
-  "the routing said X but X isn't there".
+- Disk is authoritative for path existence; workspace contracts/instructions are authoritative for meaning.
+- Never move, rename, merge, or delete content in sync mode.
+- Never fabricate summaries, dates, counts, completion state, or provenance.
+- Preserve ICM's one-way references and selective routing.
+- Preserve nested AGENTS.md scope.
+- Preserve a native LLM Wiki's own index/schema conventions.
+- Do not depend on another CCA skill for core execution.
+
+## Verification
+
+After edits, re-read every changed catalog and verify:
+
+1. all modified path references resolve;
+2. no routing entry was added outside that catalog's declared scope;
+3. no parent/child instruction duplication was introduced;
+4. no native compatibility rule was replaced with a CCA preference.

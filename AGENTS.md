@@ -1,48 +1,44 @@
 # AGENTS.md — CCA repository
 
-> Layer 0 root catalog for this repository. Role: **catalog** — it points at
-> everything and stores almost nothing. If you are an agent entering this repo,
-> this file is your map. Keep it under ~800 tokens when editing.
+> Portable root guidance for contributors and agents working in this repository. Keep this file small; detailed behavior belongs in the canonical spec or the relevant skill.
 
-## What this is
+## What this repository is
 
-CCA (Convergent Context Architecture) — an interoperability and evolution layer for
-filesystem-native agent context. It unifies ICM (Interpretable Context
-Methodology) and the LLM Wiki pattern behind ecosystem standards (AGENTS.md,
-SKILL.md), staying agent-agnostic. This repository contains the specification,
-the skills, and worked examples. It is itself a CCA-conformant workspace.
+CCA is an interoperability and evolution layer for filesystem-native agent context. It builds on ICM / Model Workspace Protocol and LLM Wiki, adopts portable ecosystem conventions such as AGENTS.md and Agent Skills, and prefers convergence over competing conventions.
 
 ## Directory map
 
-| Path | Role | Contents |
-|---|---|---|
-| `spec/` | factory | The canonical specification, compatibility rules, adapter conventions. Normative. |
-| `skills/` | factory | Six agent-agnostic skills (`cca-architect`, `cca-scaffold`, `cca-sync`, `cca-ingest`, `cca-query`, `cca-lint`), each a standard `SKILL.md` package. |
-| `examples/topic-research/` | product (example) | A worked workspace showing a knowledge bundle (raw/wiki) feeding a two-stage pipeline. |
-| `docs/` | factory | Design principles, migration guides. Explanatory, not normative. |
-| `README.md` | catalog | Human-facing entry point. |
-| `LICENSE` | factory | MIT. |
+| Path | Purpose |
+|---|---|
+| `spec/` | Normative CCA specification and compatibility boundaries |
+| `docs/` | Getting started, FAQ, principles, hardening/migration, tracked upstream standards |
+| `skills/` | Six standalone Agent Skills packages implementing CCA operations |
+| `examples/topic-research/` | Worked hybrid: maintained knowledge feeding an ICM-derived pipeline example |
+| `scripts/` | Repository validation/regression tooling |
+| `README.md` | Human-facing overview |
+| `CITATION.cff` | Citation metadata |
 
-## Routing rules
+## Routing
 
-- **Understand the model** → read `spec/SPEC.md` first, then `spec/compatibility.md`.
-- **Build or restructure a workspace** → use `skills/cca-architect/SKILL.md`.
-- **Add CCA to an existing project** → use `skills/cca-scaffold/SKILL.md`.
-- **Fix drift between catalogs and disk** → use `skills/cca-sync/SKILL.md`.
-- **Add a source to a wiki** → use `skills/cca-ingest/SKILL.md`.
-- **Answer questions from a wiki** → use `skills/cca-query/SKILL.md`.
-- **Health-check a workspace** → use `skills/cca-lint/SKILL.md`.
-- **See it working end to end** → walk `examples/topic-research/` top to bottom.
-- **Migrate an ICM workspace or an LLM Wiki** → read `docs/migration.md`.
+- Understand CCA semantics → `spec/SPEC.md`.
+- Check upstream compatibility boundaries → `spec/compatibility.md` and `docs/standards.md`.
+- Start using CCA → `docs/getting-started.md`.
+- Answer common integration questions → `docs/faq.md`.
+- Change a skill → read that skill's `SKILL.md` and only its referenced local resources.
+- Change repository behavior → update the normative spec first, then every affected skill/template/example/doc surface.
+- Validate changes → `python scripts/validate_repo.py`.
 
-## Operating principles
+## Repository invariants
 
-1. Plain text is the interface. Every artifact is a readable, editable file.
-2. Catalogs point; they do not store. Keep routing files small and stable.
-3. One fact, one home. Link, don't duplicate.
-4. Load only the context the current task needs.
-5. Every output is an edit surface for the human.
+1. Native ICM and LLM Wiki compatibility comes before CCA hardening.
+2. Distinguish **native ICM** from **ICM-derived** patterns. A native ICM claim requires the complete applicable current upstream profile and workspace-builder-equivalent acceptance; borrowing stage contracts alone is not enough.
+3. Native ICM preserves current upstream naming, contracts, routing, onboarding, quality gates, and required representations. CCA preferences do not override upstream-required behavior.
+4. LLM Wiki remains implementation-flexible; CCA-specific schemas are labeled optional hardening.
+5. Nested `AGENTS.md` scope is preserved.
+6. Every skill remains standalone and uses only skill-local relative resources for core execution.
+7. One fact, one canonical home. Link instead of duplicating normative rules.
+8. Prefer Mermaid for CCA-owned architecture/routing diagrams and text trees for literal filesystem layouts, except where an upstream profile explicitly requires another representation.
 
-## Authority order in this repo
+## Authority
 
-`spec/` is normative. `skills/` must conform to `spec/`. `examples/` must pass the walk test defined in `spec/SPEC.md`. `docs/` explains but never overrides.
+`spec/` defines CCA. Upstream primary sources define their own standards and override stale CCA descriptions of them. For native ICM, `_core/CONVENTIONS.md` is canonical and the workspace-builder validation stage is the practical acceptance surface for generated workspaces. `skills/`, `examples/`, and `docs/` must be updated toward both.

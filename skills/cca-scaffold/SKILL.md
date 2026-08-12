@@ -1,76 +1,78 @@
 ---
 name: cca-scaffold
-description: Add a CCA context layer to an existing project without restructuring it — generates the AGENTS.md root catalog, CONTEXT.md task routing, and _config/ conventions in place. Use when the user wants to "add CCA/ICM to this project", "make this repo agent-friendly", "set up AGENTS.md", or "give agents orientation in this folder". Supports quick mode (routing only, existing folders untouched) and full mode (adds pipeline stages or a wiki). Works with any agent; emits thin tool adapters (CLAUDE.md, .cursorrules, etc.) on request.
+description: Add the smallest useful CCA-compatible routing layer to an existing repository without restructuring application or knowledge content. Use when the user wants to make a project easier for agents to navigate, add portable AGENTS.md guidance, add lightweight task routing, or introduce optional ICM-derived stages or maintained knowledge while preserving the project's existing structure and native instruction files.
+compatibility: Filesystem read/write access. No sibling skill or vendor-specific runtime required.
 ---
 
 # CCA Scaffold
 
-Give an existing project immediate agent orientation with the smallest
-possible footprint. Two files at the root — `AGENTS.md` and `CONTEXT.md` —
-eliminate the "let me explore your filesystem" wasted turns at the start of
-every session.
+Add context structure in place. Do not reorganize the project unless the user explicitly asks for restructuring.
 
-Scaffold **adds**; it never restructures, renames, or deletes existing
-content. If the user wants reorganization, that is the cca-architect skill's
-restructure mode.
+## First: detect what already exists
 
-## Mode selection
+Survey only enough of the project to understand its current routing:
 
-- **Quick mode (default):** routing and reference only. Use for existing
-  projects whose layout is fine and whose folders should stay untouched.
-- **Full mode:** adds physical structure for new capability — numbered stage
-  folders with contracts (pipeline) or `raw/` + `wiki/` + `log.md`
-  (knowledge). Use when the project has a repeated multi-step workflow or
-  needs accumulating knowledge, and the user agrees.
+- root and nested `AGENTS.md` files;
+- native harness instruction files such as `CLAUDE.md`;
+- root/stage `CONTEXT.md` files;
+- existing wiki/schema instructions;
+- top-level application, documentation, test, and configuration directories.
 
-Ask which mode only if the answer is not obvious from the request.
+Preserve native profiles. An ICM workspace is not a blank project, and an existing LLM Wiki must be interpreted through its own schema before CCA conventions are added.
 
-## Quick mode procedure
+## Modes
 
-1. **Survey the project.** List top-level folders; read any existing
-   instruction files (`README.md`, `CLAUDE.md`, `IDENTITY.md`,
-   `.cursorrules`, …); sample a few key files to learn what the project is
-   and how it is organized. Do not read everything.
-2. **Write `AGENTS.md`** (root catalog, ≲ 800 tokens): what the project is,
-   directory map of what actually exists, routing rules for the 3–6 most
-   common intents, operating principles, authority order. Use the template
-   at `../cca-architect/assets/templates/AGENTS.md` if available; otherwise
-   follow its structure.
-3. **Write `CONTEXT.md`** (task routing, ≲ 300 tokens): intent →
-   folder/procedure table, shared resources, current state.
-4. **Create `_config/`** with starter `conventions.md` (naming, style,
-   review rules observed in the project) and `glossary.md` (domain terms
-   found during the survey). Only include what the survey evidenced — do not
-   invent conventions.
-5. **Handle existing root files.** If `CLAUDE.md` or `IDENTITY.md` already
-   exists and contains real content: merge unique content into `AGENTS.md`,
-   then reduce the legacy file to a thin adapter pointing at `AGENTS.md`.
-   Show the user the before/after of any file you modify.
-6. **Emit adapters on request** for the tools the user names (see the CCA
-   spec's adapter conventions: 2–5 lines, pointer only, never a copy).
-7. **Report**: what was created, what was modified, and the first intent the
-   user should test ("ask the agent to do X and watch it route").
+### Quick mode — default
 
-## Full mode procedure
+Use when the repository layout already works.
 
-Quick mode, plus one or both of:
+1. Build a compact map of the directories and existing instruction scopes.
+2. Add or improve a root `AGENTS.md` only when portable guidance is useful.
+3. Preserve nested `AGENTS.md` scope. Do not flatten subtree-specific instructions into the root.
+4. Add a small root `CONTEXT.md` only when explicit intent-to-context routing materially reduces exploration. It is optional for ordinary coding repositories.
+5. Externalize stable conventions into a dedicated reference/config file only when those conventions already exist and would otherwise be duplicated. Do not invent `_config/` merely to satisfy a template.
+6. If a harness-specific instruction file contains unique rules, preserve them until a safe canonicalization plan is clear. Never erase native behavior just to make `AGENTS.md` canonical on paper.
+7. Report every file created or changed and why it was necessary.
 
-- **Pipeline:** for each stage of the workflow (extract stages from how the
-  user describes the work — typically 2–5), create `stages/NN_name/` with a
-  contract `CONTEXT.md` (Inputs / Process / Outputs, from the stage
-  template), `references/`, and `output/`. Add a routing row per stage.
-- **Wiki:** create `raw/` (with a note that it is immutable), `wiki/` with
-  `overview.md`, `entities/`, `concepts/`, `sources/`, `syntheses/`, and
-  `index.md`; create `log.md` with the init entry. Add ingest/query routing
-  rows.
+### Full mode
 
-Then update `AGENTS.md` and `CONTEXT.md` to route to the new structure.
+Use only when the project actually needs a new capability.
 
-## Rules
+**Pipeline:** add ICM-derived stages using lowercase hyphenated names such as `stages/01-collect/`. Every stage gets a small `CONTEXT.md` with the exact ICM `Inputs` / `Process` / `Outputs` shape and its own `output/` handoff folder.
 
-- Never invent content: every catalog entry must correspond to something on
-  disk or something this run just created.
-- Never overwrite an existing file without showing the user the diff.
-- Keep catalogs within token budgets (root ≲ 800, routing ≲ 300).
-- The result should reach CCA-1 conformance; say so, and name what blocks
-  CCA-2 (usually: the walk test and a lint pass — offer to run them).
+Adding ICM-derived stage contracts to an ordinary repository does **not** by itself make that repository a native ICM workspace. Only claim **ICM native compatibility** after the full applicable ICM profile passes: five-layer routing, native `CLAUDE.md`, root routing, setup/status behavior, questionnaire rules, naming, handoffs, one-way references, selective loading, CONTEXT purity, quality guardrails, and all other applicable current ICM conventions and workspace-builder validation checks.
+
+If the user explicitly requests a complete native ICM workspace, either implement the full current ICM profile in place or use a dedicated architecture workflow if available. Do not label a partial scaffold as fully ICM-compatible.
+
+**Maintained knowledge:** discover whether the project already has a knowledge schema. If not, create the smallest knowledge structure the user needs. A CCA-hardened `raw/`, `wiki/`, `wiki/index.md`, `log.md` layout is an option, not a universal LLM Wiki requirement.
+
+## Change safety
+
+Before writing:
+
+1. Read the target file if it exists.
+2. Preserve unrelated content and native semantics.
+3. For any change that would replace, merge, move, or substantially rewrite existing instructions, present the proposed change or diff and obtain approval unless the user explicitly authorized direct remediation.
+4. Never delete or rename application content in scaffold mode.
+
+## Production rules
+
+- Every routing entry must resolve to something real or something created in the same operation.
+- One fact, one canonical home; pointers are cheaper than duplicated rules.
+- Keep routing compact and load context selectively.
+- Do not assume a universal precedence between `AGENTS.md` and harness-specific instruction files.
+- Do not require another CCA skill to finish this skill's core operation.
+- Do not claim CCA conformance unless the workspace intentionally adopted the relevant CCA profile and was validated against it.
+- Do not claim native ICM compatibility for a repository that merely borrows ICM stage-contract patterns.
+
+## Verification
+
+After scaffolding, simulate a fresh agent:
+
+1. Can it identify the repository and applicable instruction scope?
+2. Can it route one representative task without broad filesystem exploration?
+3. If a pipeline was added, can it execute one stage from the contract alone?
+4. If maintained knowledge was added, can it find the implementation's own navigation/schema instructions?
+5. If native ICM compatibility is claimed, did the complete applicable ICM acceptance surface pass rather than only the stage-contract subset?
+
+Report native compatibility separately from optional CCA hardening opportunities.

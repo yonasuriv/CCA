@@ -1,109 +1,71 @@
 ---
 name: cca-architect
-description: Design any process, idea, or problem into a CCA workspace (filesystem-native agent context), or restructure an existing folder, repo, or vault into one. Use when the user wants to "build a workspace for X", "structure this for agents", "CCA/ICM this", "organize this folder for LLM use", create a knowledge base or wiki for an agent, or migrate an existing ICM workspace or LLM Wiki to the Convergent Context Architecture. Produces agent-agnostic workspaces: AGENTS.md root catalog, CONTEXT.md routing and stage contracts, raw/wiki/output layers, and thin tool adapters.
+description: Design a filesystem-native CCA workspace or restructure an existing folder, repo, ICM workspace, or LLM Wiki without breaking native compatibility. Use when the user wants to build an agent workspace, structure a process for agents, create a persistent knowledge workspace, combine an ICM pipeline with maintained knowledge, or migrate/restructure existing context. Preserves upstream ICM and LLM Wiki semantics, uses AGENTS.md where portable guidance helps, and requires an approved migration map before destructive restructuring.
+compatibility: Filesystem read/write access. No vendor-specific runtime required.
 ---
 
 # CCA Architect
 
-Design workspaces where the folder structure is the agent architecture. One
-agent, reading the right files at the right moment, does the work of a
-multi-agent framework — and a human can open any folder and see exactly what
-state the system is in.
+Design the smallest filesystem structure that makes the work navigable, durable, and agent-agnostic.
 
-Two modes:
+Read [references/core.md](references/core.md) before designing. Read [references/forms.md](references/forms.md) only when choosing a workspace form. Read [references/adapters.md](references/adapters.md) only when a harness-specific adapter is needed. Templates live under `assets/templates/`.
 
-- **Build** — a new workspace from a described workflow or knowledge domain.
-- **Restructure** — an existing folder, repo, ICM workspace, or LLM Wiki into
-  CCA conformance.
+## Compatibility gate
 
-Before either mode, read `references/core.md` for the invariants (layers,
-roles, naming, token discipline). Consult `references/forms.md` when choosing
-or recognizing a workspace form. Copy starter files from `assets/templates/`
-rather than writing them from scratch.
+Before changing structure, identify the current profile:
 
-## Invariants (never violate, in either mode)
+- **Native ICM**: preserve the complete applicable current ICM profile, not only its stage folder shape. This includes native `CLAUDE.md`, five-layer routing, root/stage `CONTEXT.md`, exact stage contracts, setup/status behavior, questionnaire rules, naming, handoffs, selective loading, one-way references, canonical sources, applicable checkpoints/audits/spec/value/shared-constant rules, quality guardrails, and workspace-builder-equivalent validation. See `references/core.md`.
+- **ICM-derived**: another project may borrow numbered stage contracts or output handoffs without claiming to be a full native ICM workspace. Keep that distinction explicit.
+- **Native LLM Wiki**: discover the implementation's own schema and maintenance conventions first. Do not force CCA frontmatter, page taxonomy, log syntax, or directory names onto it.
+- **Ordinary project**: preserve the existing project layout unless the user explicitly wants restructuring.
+- **CCA-conformant**: preserve the CCA specification the workspace intentionally adopted.
 
-1. `AGENTS.md` is the Layer 0 root catalog. Legacy roots (`CLAUDE.md`,
-   `IDENTITY.md`) become thin adapters pointing at it. Never fork content
-   into adapters.
-2. Catalogs point; they do not store. Root ≲ 800 tokens, routing ≲ 300,
-   contracts 200–500 tokens and under 80 lines.
-3. Every file gets exactly one role: catalog, contract, factory, source,
-   synthesis, product, chronicle — or dead (flag it, don't keep it).
-4. One fact, one home. Link, don't duplicate.
-5. `raw/` is immutable. The agent reads and cites sources; it never edits them.
-6. Numbered stage folders encode execution order; each stage has a contract
-   with an Inputs table scoping exactly which files (and sections) it loads.
-7. Plain text only. No binary state, no required databases, no servers.
-8. Every workspace must pass the walk test (below) before delivery.
+Compatibility is acceptance, not ownership. Do not label an upstream workspace CCA-conformant merely because CCA can read it, and do not label a partial ICM-derived scaffold as native ICM-compatible.
 
 ## Build mode
 
-1. **Extract the structure already present in the user's description.**
-   Listen for: the stages (what happens in what order), the human gates
-   (where review matters), what is stable vs per-run (factory vs product),
-   and what is evidence vs derived knowledge (source vs synthesis). Ask only
-   about gaps — never interrogate for information the description implies.
-2. **Pick one form.** Read `references/forms.md` and choose the smallest of:
-   Pipeline, Umbrella, Record library, Knowledge bundle, Context map. Forms
-   compose; a knowledge bundle feeding a pipeline is a common hybrid. If the
-   user's need is pure knowledge accumulation, that is the Knowledge bundle
-   (the LLM Wiki pattern) — do not force stages onto it.
-3. **Scaffold the smallest workspace that carries the form.** Copy templates
-   from `assets/templates/` and fill them from the description:
-   - Root `AGENTS.md` (catalog), root `CONTEXT.md` (routing).
-   - For pipelines: `stages/NN_name/` folders, each with a contract
-     (`CONTEXT.md` template), `references/`, `output/`.
-   - For knowledge: `raw/`, `wiki/` with `index.md`, `log.md`, starter
-     `overview.md`.
-   - `_config/` for stable conventions; `setup/questionnaire.md` for one-time
-     onboarding (configure the factory, not the product).
-4. **Emit adapters on request.** If the user names tools (Claude Code,
-   Cursor, Copilot, Windsurf, Gemini), write thin adapter files per
-   `spec/adapters.md` in the repo root. Two to five lines each.
-5. **Validate with the walk test.** Then report what was built, which form,
-   and the first operation the user should run.
+1. Extract the workflow and knowledge boundaries already implied by the request.
+2. Choose the smallest useful form. Pipelines fit sequential handoffs; knowledge bundles fit persistent synthesis; hybrids are valid when a pipeline consumes or maintains knowledge.
+3. Decide whether a pipeline needs the **full native ICM profile** or only **ICM-derived stage-contract patterns**. Do not silently upgrade one claim into the other.
+4. If the intended result will be contributed to an upstream project, check that upstream repository's current contribution policy before scaffolding. Compatibility does not waive repository-specific contribution requirements. In particular, if the current ICM repository requires contributed workspaces to be created with its `workspace-builder`, follow that process rather than substituting CCA's generator.
+5. Scaffold only the files the selected form/profile actually needs.
+6. For a full native ICM workspace outside any stricter upstream contribution workflow, implement the complete applicable ICM profile from `references/core.md`, preserve native Layer 0 `CLAUDE.md`, and validate against the current upstream convention/validation surface before claiming compatibility.
+7. For ICM-derived pipelines, use `stages/01-name/`, exact ICM contract columns, selective routing, one-way dependencies, and output handoffs, but describe the result as ICM-derived unless the rest of the native profile also passes.
+8. Use `AGENTS.md` for portable guidance when it improves cross-agent routing. Preserve native instruction files required by the target harness/profile.
+9. Add adapters only when needed and only after reading `references/adapters.md`.
+10. Validate the selected native profile first, then run the CCA fresh-agent walk test.
 
 ## Restructure mode
 
-1. **Audit.** Inventory the folder. Classify every file by role: catalog,
-   contract, factory, source, synthesis, product, chronicle, dead. Detect the
-   current root file(s) and any existing conventions (ICM layers, Wiki
-   triad). Read enough content to classify confidently — do not guess from
-   filenames alone.
-2. **Propose a migration map.** A table: file → role → destination → action
-   (keep / move / merge / adapt / flag-dead). Include the new catalogs and
-   contracts to be generated. **Stop here and get explicit approval.** The
-   map is the review gate; never restructure without it.
-3. **Migrate.** Execute the approved map. Preserve all content — moves and
-   merges, no silent deletions. Generate `AGENTS.md`, `CONTEXT.md`, missing
-   stage contracts or wiki triad files. Convert legacy roots to adapters.
-4. **Validate.** Run the walk test. Then run a lint pass (see the cca-lint
-   skill) and fix what it flags. Report before/after structure.
+1. **Audit** the actual folder and read enough content to classify confidently.
+2. **Preserve native semantics** before proposing CCA hardening.
+3. **Propose a migration map**: current path → function/profile → destination → action → compatibility impact.
+4. **Stop for explicit approval** before moves, merges, renames, or deletions.
+5. Apply only the approved map. Preserve content unless deletion was explicitly approved.
+6. Validate native compatibility first, then any intentional CCA conformance.
 
-## The walk test
+## Invariants
 
-The acceptance test for every workspace you build or restructure. Simulate a
-fresh agent with no memory:
+- One fact, one canonical home.
+- Routing files point; they do not become knowledge dumps.
+- Load only context needed for the current operation.
+- A stage has one job and one-way dependencies.
+- Human-editable files are valid handoff surfaces.
+- Never invent a competing convention where an upstream standard already solves the problem.
+- Never require a sibling skill or repository-global file for core execution.
+- Never claim a harness precedence rule you have not verified.
+- Never substitute the CCA walk test for an upstream profile's stricter acceptance criteria.
+- Never use compatibility as a reason to bypass an upstream repository's contribution process.
+- Prefer CCA's own presentation conventions only where they do not override an upstream-required representation.
 
-1. **Orient** — from `AGENTS.md` (+ `CONTEXT.md`) alone, state what the
-   workspace is, which forms it contains, and where things live.
-2. **Act** — perform one real operation (run a stage from its contract,
-   ingest a sample source, or answer a query from the wiki) following only
-   instructions found in files.
-3. **Report** — what was done, what was produced, what happens next, what is
-   missing or broken.
+## Walk test
 
-If any step needs knowledge that exists only in someone's head or in chat
-history, the workspace fails. Fix the files, not the explanation.
+The walk test is a CCA portability check **after** applicable native-profile validation, not a replacement for it.
 
-## Anti-patterns to refuse or repair
+Simulate a fresh agent with no chat memory:
 
-- A root catalog stuffed with content that belongs in `_config/` or `wiki/`.
-- Stage contracts without Inputs tables (agent guesses context → bloat).
-- Pipelines forced onto knowledge-accumulation problems, or wikis forced
-  onto sequential production problems. Match the form to the work.
-- Adapters that restate rules (forks that will drift).
-- `output/` artifacts committed as if they were configuration.
-- Any convention invented where an ecosystem standard exists (use
-  `AGENTS.md`, `SKILL.md`, `CONTEXT.md`, `index.md`, `log.md`).
+1. **Orient**: identify the workspace, active profile/form, and where relevant context lives.
+2. **Act**: perform one representative operation using only routed files and available tools.
+3. **Report**: state what changed, what was produced, what remains, and what is ambiguous or broken.
+
+If required knowledge exists only in chat history or someone's head, fix the durable files rather than explaining around the gap.

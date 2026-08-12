@@ -1,53 +1,45 @@
 ---
 name: cca-query
-description: Answer questions against a CCA/LLM Wiki knowledge base using index-first navigation and cited synthesis, and file valuable answers back into the wiki as new pages so exploration compounds. Use when the user asks questions of a wiki or knowledge workspace ("what do we know about X", "compare A and B", "what contradicts this"), when a workspace has wiki/ and index.md, or when a good answer should be persisted rather than lost to chat history.
+description: Answer questions from a filesystem-native maintained knowledge base using its own navigation and provenance conventions, escalating to source evidence when verification is needed. Use when the user asks what a CCA or LLM Wiki workspace knows, requests a comparison or synthesis, or wants a durable finding incorporated back into maintained knowledge. Preserves native schemas and does not assume fixed wiki/index.md or log.md paths.
+compatibility: Read access to the target knowledge workspace; write access only when persistence is requested or defined by workspace policy.
 ---
 
 # CCA Query
 
-Queries run against the maintained synthesis, not the raw pile. The wiki is
-the compiled knowledge; `raw/` is for evidence and verification. Good answers
-are knowledge too — file them back.
+Query maintained synthesis first; use source evidence when the answer requires verification.
+
+## Discover routing
+
+1. Read the applicable workspace instructions/schema.
+2. Identify the knowledge navigation entry point: index, map, links, search procedure, or another schema-defined router.
+3. Identify how the workspace represents provenance, contradictions, and durable query results.
+4. Preserve the native profile. Do not invent CCA paths when the workspace uses another valid layout.
 
 ## Procedure
 
-1. **Read `wiki/index.md` first.** It is the routing layer: what exists, one
-   line per page. Do not start by searching every file.
-2. **Drill into the relevant pages** the index names. Follow cross-links
-   (concepts → entities → syntheses). Load only what the question needs.
-3. **Inspect sources when required**: when the question hinges on exact
-   wording, numbers, or evidence strength, open the cited source page and,
-   if needed, the raw file. Prefer the wiki's synthesis for orientation and
-   the raw layer for verification.
-4. **Answer with citations.** Name the wiki pages (and sources behind them)
-   that support each part of the answer. If the wiki is silent or
-   contradictory on the question, say so plainly — that is a finding, not a
-   failure. Note it as an open question.
-5. **Decide whether to file the answer back.** File it when the answer
-   produced durable knowledge: a comparison, an analysis, a discovered
-   connection, a resolved contradiction, a timeline. Do not file ephemeral
-   lookups. When in doubt, offer: "worth keeping as a page?"
-   - To file: create the page under the right `wiki/` subfolder
-     (`comparisons/`, `syntheses/`, …) with frontmatter and links to the
-     pages it drew from; update `wiki/index.md`; append a
-     `## [YYYY-MM-DD] query | …` entry to `log.md` naming what was filed.
-6. **Note gaps.** If the question exposed a missing concept page, a stale
-   claim, or thin source coverage, say so and add it to the index's open
-   questions (or suggest an ingest / a lint pass).
+1. **Route before searching broadly.** Use the workspace's index/map/schema to identify relevant synthesis.
+2. **Read the smallest sufficient set of pages.** Follow relevant links rather than loading the whole knowledge base.
+3. **Escalate to evidence when needed.** Inspect cited/source material for exact wording, numbers, dates, disputed claims, or confidence judgments.
+4. **Answer with traceability.** Distinguish maintained synthesis, direct evidence, unresolved contradictions, and your inference.
+5. **Expose gaps.** If the workspace does not contain enough evidence, say what is missing rather than filling the gap from unstated assumptions.
+6. **Persist only when appropriate.** Write the result back only when the user requests it or the workspace explicitly defines query-to-knowledge maintenance as normal behavior. Follow the workspace's existing page/index/history conventions.
 
-## Answer forms
+## Durable answers
 
-Match the artifact to the question: inline answer, a markdown page, a
-comparison table, a timeline. The conversational answer and the filed page
-may differ — the page is written to stand alone for a future reader.
+A result is usually worth persisting when it creates reusable knowledge such as a comparison, timeline, synthesis, resolved relationship, or documented open question. Ephemeral lookups generally should remain conversational.
 
-## Rules
+When persisting:
 
-- Cite wiki pages for synthesis, raw sources for evidence. Never present
-  uncited synthesis as sourced fact.
-- Respect contradictions recorded in pages — report both positions with
-  their dates rather than picking one silently.
-- Keep navigation cheap: index → pages → sources, in that order. Escalate to
-  full-text search only when the index fails.
-- Filing back is what makes exploration compound; skipping it turns the wiki
-  back into stateless retrieval.
+- update the canonical knowledge page where possible;
+- preserve provenance to every source used;
+- update navigation/history only according to the active schema;
+- avoid creating duplicate pages that restate existing canonical knowledge.
+
+## Production rules
+
+- Never present maintained synthesis as direct source evidence.
+- Never silently choose one side of a recorded contradiction.
+- Never fabricate citations or source locations.
+- Do not require `wiki/index.md`, `log.md`, or any CCA-specific taxonomy unless the workspace adopted them.
+- Do not require another CCA skill for core execution.
+- Keep navigation progressive: router → relevant synthesis → evidence only as needed.

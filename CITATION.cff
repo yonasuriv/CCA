@@ -1,0 +1,58 @@
+# Citation File Format (CFF)
+# https://citation-file-format.github.io/
+#
+# Citation File Format Creator & Validator
+# https://citation-file-format.github.io/cff-initializer-javascript
+#
+# About CITATION Files
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files
+
+cff-version: 1.2.0
+title: 'CCA: Convergent Context Architecture'
+message: 'If you use CCA, please cite it using the metadata below.'
+type: software
+authors:
+  - given-names: Jonathan
+    family-names: Di Rico
+repository-code: 'https://github.com/yonasuriv/CCA'
+url: 'https://github.com/yonasuriv/CCA'
+abstract: >-
+  CCA is an agent-agnostic interoperability layer for
+  filesystem-native AI context, designed to make ICM
+  workspaces, LLM Wikis, AGENTS.md, Agent Skills, and
+  existing projects work together without forcing a new
+  convention. It provides shared structure, routing, skills,
+  and compatibility rules so context remains portable across
+  agents, tools, and runtimes.
+keywords:
+  - agnostic
+  - architecture
+  - common
+  - context
+  - convergent
+  - icm
+  - interpretable-context-methodology
+  - knowledge-graph
+  - knowledge-base
+  - llm
+  - memory
+  - tokens
+  - wiki
+license: MIT
+references:
+  - type: generic
+    title: LLM Wiki
+    authors:
+      - family-names: Karpathy
+        given-names: Andrej
+    year: 2026
+    url: 'https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f'
+  - type: article
+    title: 'Interpretable Context Methodology: Folder Structure as Agent Architecture'
+    authors:
+      - family-names: Van Clief
+        given-names: Jake
+      - family-names: McDermott
+        given-names: David
+    year: 2026
+    url: 'https://arxiv.org/abs/2603.16021'

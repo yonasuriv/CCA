@@ -1,139 +1,128 @@
-# Forms: the five workspace shapes
+# Workspace forms
 
-Every CCA workspace is one of five forms — or a composition. Forms recurse:
-a stage can contain a workspace; an umbrella's member can be a full pipeline.
-Choose the smallest form that carries the work. (Forms adapted from
-icm-architect; knowledge bundle aligned with the LLM Wiki pattern.)
+Forms are design heuristics, not compatibility requirements. Choose the smallest shape that improves routing or maintenance. Preserve an existing ICM or LLM Wiki implementation before applying a CCA-preferred form.
 
 ## 1. Pipeline
 
-A production line. Sequential stages, numbered folders, human review gates
-between them.
+Use for sequential work with explicit handoffs and review gates.
 
-```
+First choose whether the user needs a **full native ICM workspace** or only **ICM-derived stage contracts** inside another project.
+
+### ICM-derived pipeline
+
+A minimal derived pipeline may look like:
+
+```text
 workspace/
-├── AGENTS.md  CONTEXT.md
+├── AGENTS.md                 # optional portable guidance
+├── CONTEXT.md                # task router when useful
 ├── stages/
-│   ├── 01_research/   CONTEXT.md  references/  output/
-│   ├── 02_draft/      CONTEXT.md  references/  output/
-│   └── 03_produce/    CONTEXT.md  references/  output/
-├── _config/           voice.md, conventions.md
-└── setup/questionnaire.md
+│   ├── 01-research/
+│   │   ├── CONTEXT.md
+│   │   ├── references/
+│   │   └── output/
+│   ├── 02-draft/
+│   │   ├── CONTEXT.md
+│   │   ├── references/
+│   │   └── output/
+│   └── 03-produce/
+│       ├── CONTEXT.md
+│       ├── references/
+│       └── output/
+└── [stable shared references/configuration]
 ```
 
-Use when: the same multi-step workflow runs repeatedly with different input,
-and a human should review each step's output. Content production, report
-generation, course material, audit procedures.
+This may borrow ICM naming, contracts, selective routing, one-way dependencies, and output handoffs, but it is **not** a native ICM workspace merely because this tree exists.
 
-Failure modes: stages with more than one job; missing Inputs tables; gates
-removed "for speed" until quality drifts.
+### Full native ICM pipeline
+
+When native ICM compatibility is requested, implement the complete applicable current ICM profile: native `CLAUDE.md`, five-layer routing, root and stage contracts, `setup`/`status` behavior, flat all-at-once questionnaire, naming and placeholder rules, tool prerequisites where needed, applicable checkpoints/audits/spec/value/shared-constant patterns, quality guardrails, and workspace-builder-equivalent validation.
+
+Do not reduce that profile to the minimal tree above.
+
+Use pipelines when the same multi-step workflow runs repeatedly and stage boundaries make review or context isolation clearer.
+
+Failure modes: multi-job stages, missing/oversized contracts, downstream-to-upstream back-references, quality rules copied from old outputs instead of canonical references, and partial ICM-derived structures mislabeled as native ICM.
 
 ## 2. Umbrella
 
-A portfolio of pipelines under one root catalog. Shared `_config/` at the
-top; each member workspace is self-contained.
+Use when several independent workspaces share a small amount of top-level guidance.
 
-```
+```text
 org/
-├── AGENTS.md  CONTEXT.md        # routes to members
-├── _config/                     # org-wide conventions
-├── weekly-report/               # a Pipeline
-├── client-onboarding/           # a Pipeline
-└── research-digest/             # a Pipeline
+├── AGENTS.md
+├── CONTEXT.md
+├── shared/
+├── weekly-report/
+├── client-onboarding/
+└── research-digest/
 ```
 
-Use when: several related workflows share conventions and one operator (or
-team) runs all of them.
-
-Failure modes: members depending on each other's internals (keep one-way
-references: members may read shared `_config/`, never sibling `output/`);
-root catalog bloating with member details.
+Members may consume shared canonical references. Avoid coupling members to one another's internal working outputs.
 
 ## 3. Record library
 
-Many same-shaped records — people, clients, projects, sessions — each a
-folder with the same internal structure, plus a catalog that indexes them.
+Use for many same-shaped records such as clients, projects, people, incidents, or sessions.
 
-```
+```text
 clients/
-├── AGENTS.md  CONTEXT.md
-├── _config/record-template/
-├── acme-corp/        overview.md  sessions/  output/
-├── globex/           overview.md  sessions/  output/
-└── index.md                     # every record, one line each
+├── AGENTS.md
+├── index.md
+├── record-template/
+├── acme-corp/
+└── globex/
 ```
 
-Use when: work is per-entity rather than per-run ("prepare for the Acme
-call", "update the Globex file").
-
-Failure modes: records drifting out of shape (enforce the template);
-catalog staleness (sync often).
+Use an index when it materially improves navigation. Do not force a fixed record schema onto an existing project that already has one.
 
 ## 4. Knowledge bundle
 
-A navigable, maintained brain — the LLM Wiki pattern. Immutable sources,
-agent-owned synthesis, index and log.
+Use for maintained knowledge that compounds across sessions.
 
-```
+The LLM Wiki pattern does **not** require one concrete tree. Discover and preserve an existing wiki's own schema.
+
+When starting fresh and the user wants an opinionated CCA-hardened layout, one useful option is:
+
+```text
 brain/
-├── AGENTS.md  CONTEXT.md        # schema + routing
-├── raw/                         # sources, immutable
+├── AGENTS.md
+├── raw/
 ├── wiki/
-│   ├── overview.md
-│   ├── entities/  concepts/  syntheses/
 │   └── index.md
 └── log.md
 ```
 
-Use when: knowledge accumulates over weeks or months and must compound —
-research programs, competitive analysis, personal knowledge, team memory.
-Operations are ingest / query / lint, not staged runs.
+Additional entity/concept/source/synthesis directories and metadata are optional implementation choices.
 
-Failure modes: summaries-per-source instead of integrated pages; lost
-provenance; contradictions silently overwritten; index drift.
+Failure modes: isolated summaries instead of integrated synthesis, invented provenance, silent contradiction overwrite, and indexes that drift from the knowledge they route to.
 
 ## 5. Context map
 
-An organization or domain expressed as a graph of linked files — a partial
-machine-readable model of how the environment operates, maintained for
-orientation rather than production. Model it as nodes and edges: nouns as
-nodes (people, teams, systems, projects, decisions, concepts), verbs as
-edges (owns, uses, depends-on, produces, supersedes). Workflows are
-first-class nodes with their own folders, not prose buried in other
-documents. The graph lives in markdown links and frontmatter — no graph
-database required until scale demands it.
+Use when the primary need is orientation across systems, teams, projects, decisions, workflows, or other linked entities.
 
-```
+```text
 map/
-├── AGENTS.md  CONTEXT.md
-├── areas/       # domains, teams, systems — one page per node
-├── workflows/   # processes as first-class entities (inputs/outputs/owner)
-├── decisions/   # ADRs and why
-├── interfaces/  # how the nodes connect
-└── index.md
+├── AGENTS.md
+├── index.md
+├── areas/
+├── workflows/
+├── decisions/
+└── interfaces/
 ```
 
-Use when: the primary need is orientation — new agents (or humans) must
-quickly learn what exists, who owns it, what depends on what, and which
-artifact is authoritative. Relationship claims carry provenance (current
-docs vs. stale chat message vs. inference) and `status:` frontmatter, so
-superseded structure is archived, not deleted.
-
-Failure modes: duplicating content that belongs in the mapped systems
-(point, don't copy); no owner per node; relationships asserted without
-provenance; accumulating without archival until the map becomes a junk
-drawer.
+Markdown links and lightweight metadata can express relationships without requiring a graph database. Add stronger graph infrastructure only when scale or query needs justify it.
 
 ## Composition
 
-The most common real-world shape is **Knowledge bundle + Pipeline**: the
-wiki accumulates domain knowledge; a pipeline periodically compiles it into
-a product (brief, digest, report). Wire it by having stage contracts list
-`wiki/` pages and `raw/` sources in their Inputs tables, and having the
-pipeline's final stage file its product back into the wiki. See
-`examples/topic-research/` in the CCA repo.
+Forms may compose when the work naturally crosses boundaries. A common example is a maintained knowledge base feeding an ICM-derived pipeline inside a broader CCA workspace. A full native ICM profile is also possible, but must satisfy its complete upstream acceptance surface.
 
-Rule of thumb: if the work is *making the same thing repeatedly*, start from
-Pipeline. If it is *knowing more over time*, start from Knowledge bundle. If
-it is *many of the same thing*, Record library. If it is *several workflows
-under one roof*, Umbrella. If it is *understanding a system*, Context map.
+```mermaid
+flowchart LR
+    S["Durable sources"] --> W["Maintained synthesis"]
+    W --> P1["01-research"]
+    P1 --> P2["02-draft"]
+    P2 --> O["Human-editable output"]
+    O -. "optional knowledge update" .-> W
+```
+
+Do not create the reverse dependency merely for symmetry: pipeline stages may consume canonical knowledge, but shared knowledge should not depend on a downstream stage's internals unless the workspace explicitly defines that maintenance operation.
