@@ -14,22 +14,25 @@ Read [references/core.md](references/core.md) before designing. Read [references
 
 Before changing structure, identify the current profile:
 
-- **Native ICM**: preserve its five layers, `CLAUDE.md`, root/stage `CONTEXT.md`, hyphenated numbered stages, exact Inputs/Process/Outputs contract shape, selective section routing, one-way references, and output handoffs.
+- **Native ICM**: preserve the complete applicable current ICM profile, not only its stage folder shape. This includes native `CLAUDE.md`, five-layer routing, root/stage `CONTEXT.md`, exact stage contracts, setup/status behavior, questionnaire rules, naming, handoffs, selective loading, one-way references, canonical sources, applicable checkpoints/audits/spec/value/shared-constant rules, quality guardrails, and workspace-builder-equivalent validation. See `references/core.md`.
+- **ICM-derived**: another project may borrow numbered stage contracts or output handoffs without claiming to be a full native ICM workspace. Keep that distinction explicit.
 - **Native LLM Wiki**: discover the implementation's own schema and maintenance conventions first. Do not force CCA frontmatter, page taxonomy, log syntax, or directory names onto it.
 - **Ordinary project**: preserve the existing project layout unless the user explicitly wants restructuring.
 - **CCA-conformant**: preserve the CCA specification the workspace intentionally adopted.
 
-Compatibility is acceptance, not ownership. Do not label an upstream workspace CCA-conformant merely because CCA can read it.
+Compatibility is acceptance, not ownership. Do not label an upstream workspace CCA-conformant merely because CCA can read it, and do not label a partial ICM-derived scaffold as native ICM-compatible.
 
 ## Build mode
 
 1. Extract the workflow and knowledge boundaries already implied by the request.
 2. Choose the smallest useful form. Pipelines fit sequential handoffs; knowledge bundles fit persistent synthesis; hybrids are valid when a pipeline consumes or maintains knowledge.
-3. Scaffold only the files the form needs.
-4. For ICM-compatible pipelines, use `stages/01-name/` and the exact ICM contract table shape from the bundled stage template.
-5. Use `AGENTS.md` for portable guidance when it improves cross-agent routing. Preserve native instruction files required by the target harness/profile.
-6. Add adapters only when needed and only after reading `references/adapters.md`.
-7. Validate with a fresh-agent walk test.
+3. Decide whether a pipeline needs the **full native ICM profile** or only **ICM-derived stage-contract patterns**. Do not silently upgrade one claim into the other.
+4. Scaffold only the files the selected form/profile actually needs.
+5. For a full native ICM workspace, implement the complete applicable ICM profile from `references/core.md`, preserve native Layer 0 `CLAUDE.md`, and validate against the current upstream convention/validation surface before claiming compatibility.
+6. For ICM-derived pipelines, use `stages/01-name/`, exact ICM contract columns, selective routing, one-way dependencies, and output handoffs, but describe the result as ICM-derived unless the rest of the native profile also passes.
+7. Use `AGENTS.md` for portable guidance when it improves cross-agent routing. Preserve native instruction files required by the target harness/profile.
+8. Add adapters only when needed and only after reading `references/adapters.md`.
+9. Validate the selected native profile first, then run the CCA fresh-agent walk test.
 
 ## Restructure mode
 
@@ -50,8 +53,12 @@ Compatibility is acceptance, not ownership. Do not label an upstream workspace C
 - Never invent a competing convention where an upstream standard already solves the problem.
 - Never require a sibling skill or repository-global file for core execution.
 - Never claim a harness precedence rule you have not verified.
+- Never substitute the CCA walk test for an upstream profile's stricter acceptance criteria.
+- Prefer CCA's own presentation conventions only where they do not override an upstream-required representation.
 
 ## Walk test
+
+The walk test is a CCA portability check **after** applicable native-profile validation, not a replacement for it.
 
 Simulate a fresh agent with no chat memory:
 
