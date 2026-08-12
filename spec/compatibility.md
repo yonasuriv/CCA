@@ -1,6 +1,6 @@
 # Compatibility: ICM ↔ LLM Wiki ↔ CCA
 
-Normative companion to `SPEC.md`. This document defines compatibility boundaries. CCA must preserve upstream validity before applying CCA-specific hardening.
+Normative companion to `SPEC.md`. This document defines compatibility boundaries. CCA must preserve upstream validity before applying CCA-specific hardening. Method-overlay composition is additionally governed by [`method-composition.md`](method-composition.md).
 
 ## 1. Compatibility principle
 
@@ -13,6 +13,8 @@ CCA distinguishes three states:
 An ICM workspace or LLM Wiki does not become "CCA" merely because CCA can understand it. Compatibility is an acceptance guarantee, not retroactive ownership of upstream semantics.
 
 CCA also distinguishes a **native upstream profile** from **derived use of upstream patterns**. Borrowing part of a convention does not justify claiming full compatibility with that upstream.
+
+PARA, Zettelkasten, and BASB/CODE are **method overlays**, not additional structural compatibility states. CCA may preserve and compose them without claiming a universal native conformance test for them.
 
 ## 2. Concept mapping
 
@@ -61,6 +63,8 @@ Native ICM validation includes, where applicable:
 
 CCA extensions must be ignorable by an ICM-only consumer. If current upstream ICM changes this acceptance surface, CCA must converge toward the current upstream rather than treat this list as frozen authority.
 
+A native ICM root may be nested inside an outer PARA, BASB-guided, coding, client, or CCA workspace. The outer boundary may organize where it lives but must not rewrite its native ICM internals merely for uniformity.
+
 ### ICM-derived patterns
 
 A non-ICM workspace may intentionally borrow ICM constructs such as:
@@ -108,6 +112,8 @@ CCA may recommend, but must not attribute to LLM Wiki as mandatory:
 
 Those are CCA hardening conventions when a workspace chooses them.
 
+An LLM Wiki may live inside a PARA Resources tree, beside Zettelkasten notes, or inside another broader workspace. Its own schema and maintenance instructions remain authoritative within that boundary.
+
 ## 5. AGENTS.md compatibility profile
 
 CCA uses `AGENTS.md` because it is an existing open convention.
@@ -119,18 +125,35 @@ CCA uses `AGENTS.md` because it is an existing open convention.
 
 ## 6. Agent Skills compatibility profile
 
-Every bundled skill must remain a valid standalone Agent Skills package:
+Every bundled CCA skill must remain a valid Agent Skills package:
 
 - `SKILL.md` contains valid YAML frontmatter with `name` and `description`.
 - Name uses lowercase letters/numbers/hyphens and remains within the current spec limits.
 - Description says what the skill does and when to use it.
 - Detailed material is progressively disclosed through skill-local `references/`, `assets/`, or `scripts/`.
-- File references are relative to the skill root.
-- A skill must not require a sibling skill or repository-global file merely to execute its core behavior.
+- File references used for implementation resources are relative to the skill root and do not escape the package.
 
-Cross-skill suggestions are allowed, but they must be optional: if the sibling skill is absent, the active skill still works or explains the missing optional capability.
+CCA's first-party skills are intentionally distributed as a **suite of focused capabilities**. Package portability does not mean every skill must be a sensible unrelated product when installed alone. It means installation paths and sibling filesystem layouts are not part of the capability contract.
 
-## 7. Swap guarantees
+Cross-skill coordination is therefore allowed by **semantic skill name**, for example `Use cca-lint to validate the selected profile`. A skill must not reach into `../cca-lint/`, `../../spec/`, or another sibling/repository-global implementation path to perform that delegation.
+
+`cca-architect` may coordinate compound architecture workflows, but it is not a mandatory gateway for already-clear direct operations such as lint, ingest, query, sync, or scaffold.
+
+## 7. Method-overlay compatibility
+
+PARA, Zettelkasten, BASB/CODE, and similar human methods are composed by boundary preservation rather than native-profile certification.
+
+Rules:
+
+1. Preserve the method's useful local semantics when the workspace declares or clearly uses them.
+2. Do not invent CCA-only metadata merely to restate obvious filesystem organization.
+3. Do not turn overlays into lint profiles unless a concrete machine-facing contract is intentionally adopted in a future CCA revision.
+4. Preserve nested native upstream boundaries even when an outer method organizes them.
+5. Determine write authority before treating human knowledge artifacts, including Zettelkasten notes, as agent-maintained synthesis.
+
+See [`method-composition.md`](method-composition.md) for the normative composition rules and [`../docs/method-composition.md`](../docs/method-composition.md) for the explanatory model.
+
+## 8. Swap guarantees
 
 ### ICM → CCA tooling
 
@@ -154,20 +177,23 @@ If a CCA workspace only borrows ICM stage-contract patterns, it must describe th
 
 A CCA knowledge bundle must preserve the LLM Wiki core idea: persistent, agent-maintained synthesis over durable source material. CCA-specific metadata and maintenance structure must remain implementation choices, not reinterpretations of the upstream pattern.
 
-## 8. Validation precedence
+## 9. Validation precedence
 
 Validation order is:
 
 1. detect the actual native/upstream profile;
 2. validate that profile against its current upstream rules;
-3. validate any intentionally adopted CCA conformance;
-4. run the CCA fresh-agent walk test as a supplemental portability check;
-5. report optional hardening separately.
+3. preserve explicitly declared method overlays without promoting them to native profiles;
+4. validate any intentionally adopted CCA conformance;
+5. run the CCA fresh-agent walk test as a supplemental portability check;
+6. report optional hardening separately.
 
 CCA must not use a successful walk test to waive a failed upstream acceptance check.
 
-## 9. Upstream drift
+## 10. Upstream drift
 
 CCA does not freeze upstream behavior. When ICM, LLM Wiki, AGENTS.md, or Agent Skills evolves, verify the primary source and update CCA toward it unless doing so would contradict CCA's core principle of filesystem-native, portable, inspectable context.
+
+Method overlays should also be revisited if their canonical/public definitions materially change, but they remain separate from the structural upstream standards matrix unless CCA intentionally adopts a concrete compatibility contract.
 
 See `docs/standards.md` for the tracked upstream surface.
