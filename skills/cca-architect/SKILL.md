@@ -27,12 +27,13 @@ Compatibility is acceptance, not ownership. Do not label an upstream workspace C
 1. Extract the workflow and knowledge boundaries already implied by the request.
 2. Choose the smallest useful form. Pipelines fit sequential handoffs; knowledge bundles fit persistent synthesis; hybrids are valid when a pipeline consumes or maintains knowledge.
 3. Decide whether a pipeline needs the **full native ICM profile** or only **ICM-derived stage-contract patterns**. Do not silently upgrade one claim into the other.
-4. Scaffold only the files the selected form/profile actually needs.
-5. For a full native ICM workspace, implement the complete applicable ICM profile from `references/core.md`, preserve native Layer 0 `CLAUDE.md`, and validate against the current upstream convention/validation surface before claiming compatibility.
-6. For ICM-derived pipelines, use `stages/01-name/`, exact ICM contract columns, selective routing, one-way dependencies, and output handoffs, but describe the result as ICM-derived unless the rest of the native profile also passes.
-7. Use `AGENTS.md` for portable guidance when it improves cross-agent routing. Preserve native instruction files required by the target harness/profile.
-8. Add adapters only when needed and only after reading `references/adapters.md`.
-9. Validate the selected native profile first, then run the CCA fresh-agent walk test.
+4. If the intended result will be contributed to an upstream project, check that upstream repository's current contribution policy before scaffolding. Compatibility does not waive repository-specific contribution requirements. In particular, if the current ICM repository requires contributed workspaces to be created with its `workspace-builder`, follow that process rather than substituting CCA's generator.
+5. Scaffold only the files the selected form/profile actually needs.
+6. For a full native ICM workspace outside any stricter upstream contribution workflow, implement the complete applicable ICM profile from `references/core.md`, preserve native Layer 0 `CLAUDE.md`, and validate against the current upstream convention/validation surface before claiming compatibility.
+7. For ICM-derived pipelines, use `stages/01-name/`, exact ICM contract columns, selective routing, one-way dependencies, and output handoffs, but describe the result as ICM-derived unless the rest of the native profile also passes.
+8. Use `AGENTS.md` for portable guidance when it improves cross-agent routing. Preserve native instruction files required by the target harness/profile.
+9. Add adapters only when needed and only after reading `references/adapters.md`.
+10. Validate the selected native profile first, then run the CCA fresh-agent walk test.
 
 ## Restructure mode
 
@@ -54,6 +55,7 @@ Compatibility is acceptance, not ownership. Do not label an upstream workspace C
 - Never require a sibling skill or repository-global file for core execution.
 - Never claim a harness precedence rule you have not verified.
 - Never substitute the CCA walk test for an upstream profile's stricter acceptance criteria.
+- Never use compatibility as a reason to bypass an upstream repository's contribution process.
 - Prefer CCA's own presentation conventions only where they do not override an upstream-required representation.
 
 ## Walk test
