@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use CCA, please cite it using the metadata below."
+title: "CCA: Convergent Context Architecture"
+authors:
+  - name: "yona"
+repository-code: "https://github.com/yonasuriv/CCA"
+url: "https://github.com/yonasuriv/CCA"
+license: MIT
+type: software
