@@ -1,14 +1,26 @@
 # Upstream standards tracked by CCA
 
-CCA converges on existing conventions where they already solve the problem. This file is the maintenance surface for standards that materially constrain CCA. It is not a catalog of every AI standard.
+CCA converges on existing conventions where they already solve the problem. This file is the maintenance surface for standards/upstreams that materially constrain CCA. It is not a catalog of every AI or knowledge-management method.
 
 | Standard / upstream | CCA dependency | Compatibility rule |
 |---|---|---|
 | [AGENTS.md](https://agents.md) | Portable agent instructions and nested directory-scoped guidance | Use `AGENTS.md` as the canonical portable instruction file where the standard is applicable. Respect nearest-file precedence in nested trees. Do not invent a competing portable root filename. |
-| [Agent Skills](https://agentskills.io) | Portable `SKILL.md` packages | Every bundled skill must satisfy the current Agent Skills specification, keep `SKILL.md` compact, use relative self-contained resources, and preserve progressive disclosure. |
+| [Agent Skills](https://agentskills.io) | Portable `SKILL.md` packages | Every bundled skill must satisfy the current Agent Skills specification, keep `SKILL.md` compact, keep implementation file references inside the package, and preserve progressive disclosure. CCA skills may coordinate by semantic skill name without relying on sibling filesystem paths. |
 | [ICM / Model Workspace Protocol](https://github.com/RinDig/Interpretable-Context-Methodology) | Five-layer routing, stage contracts, one-way references, selective section loading, canonical sources, human-editable handoffs, onboarding, quality gates | Preserve ICM shapes and semantics unchanged where CCA claims native ICM compatibility. Treat `_core/CONVENTIONS.md` as the canonical semantic authority and the workspace-builder validation stage as the practical acceptance checklist for generated workspaces. CCA extensions must remain optional to an ICM consumer. |
 | [LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) | Persistent LLM-maintained synthesis over durable source material | Preserve the idea file's intentionally flexible implementation surface. CCA may recommend stronger conventions, but must not mislabel CCA-specific schema, frontmatter, directory, or logging choices as LLM Wiki requirements. |
 | [MCP](https://modelcontextprotocol.io) | Tool/context transport outside the filesystem workspace | Treat MCP as an adjacent runtime/tool protocol, not a CCA replacement or required dependency. Filesystem-native CCA workspaces remain useful without MCP. |
+
+## Adjacent methodologies and influences
+
+CCA also composes with methodologies that shape human organization or knowledge work but do **not** currently define structural CCA compatibility profiles.
+
+| Methodology | Role in CCA | Composition rule |
+|---|---|---|
+| **Building a Second Brain / CODE** | Human knowledge-work lifecycle: Capture, Organize, Distill, Express | Treat as a method overlay. CCA may route the files/workflows participating in the lifecycle but must not claim to implement BASB as a filesystem standard. |
+| **PARA** | Action-oriented organization: Projects, Areas, Resources, Archives | May organize an outer workspace while nested coding projects, ICM roots, LLM Wikis, or other boundaries retain their own semantics. |
+| **Zettelkasten** | Linked idea-development / note method | Preserve addressable linked notes and determine local write authority. Do not silently reinterpret every zettel as agent-maintained wiki synthesis. |
+
+These belong in [`method-composition.md`](method-composition.md), not in the structural compatibility matrix above. If one of these methodologies later publishes a concrete machine-facing contract that CCA intentionally adopts, its status can be reconsidered.
 
 ## ICM compatibility authority
 
@@ -38,6 +50,8 @@ When an upstream convention changes:
 5. Update the spec, affected skills/templates, examples, migration guidance, and this matrix in the same change.
 6. Re-run the relevant upstream-profile acceptance checks before claiming compatibility.
 
+When an adjacent methodology changes materially, update the explanatory composition guidance as needed without silently promoting it into a structural compatibility profile.
+
 ## Compatibility vocabulary
 
 CCA uses these terms deliberately:
@@ -46,5 +60,6 @@ CCA uses these terms deliberately:
 - **ICM-derived**: a non-ICM workspace intentionally borrows selected ICM patterns without claiming the full native ICM profile.
 - **CCA-hardened**: optional CCA conventions were added for stronger portability, routing, provenance, or maintenance.
 - **CCA-conformant**: the workspace intentionally adopts the CCA specification.
+- **Method overlay**: a human organization/knowledge-work method such as PARA, Zettelkasten, or BASB that CCA preserves/composes without treating it as a native structural compatibility profile.
 
 Native compatibility does **not** imply that an ICM workspace or LLM Wiki is itself a CCA workspace, and CCA conformance must never be retroactively imposed on upstream projects.
