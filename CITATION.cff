@@ -44,7 +44,7 @@ references:
     title: LLM Wiki
     authors:
       - family-names: Karpathy
-        given-names: Andrew
+        given-names: Andrej
     year: 2026
     url: 'https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f'
   - type: article
