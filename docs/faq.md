@@ -2,7 +2,7 @@
 
 ## What is CCA?
 
-CCA is an interoperability layer for filesystem-native agent context. It defines shared semantics and maintenance practices that let agents work across ICM-style staged workspaces, LLM Wiki-style persistent knowledge bases, ordinary coding repositories, and hybrids without requiring a proprietary runtime.
+CCA is an interoperability layer for filesystem-native agent context. It defines shared semantics and maintenance practices that let agents work across ICM staged workspaces, LLM Wiki-style persistent knowledge bases, ordinary coding repositories, and hybrids without requiring a proprietary runtime.
 
 It prefers existing standards and upstream conventions over inventing new ones.
 
@@ -14,9 +14,29 @@ It does not provide real-time multi-agent message passing. Tight-loop coordinati
 
 ## Is CCA just ICM with AGENTS.md?
 
-No. ICM is the primary upstream for CCA's staged workflow architecture: layered routing, stage contracts, selective loading, one-way references, canonical sources, and human-editable handoffs.
+No. ICM is the primary upstream for CCA's staged workflow architecture: layered routing, stage contracts, selective loading, one-way references, canonical sources, human-editable handoffs, onboarding, and quality gates.
 
-CCA adds an interoperability layer around those ideas, including agent-agnostic root guidance, portable skills, LLM Wiki compatibility, and cross-form maintenance. Where CCA claims ICM compatibility, it should preserve ICM's native shapes rather than fork them.
+CCA adds an interoperability layer around those ideas, including agent-agnostic root guidance, portable skills, LLM Wiki compatibility, and cross-form maintenance. Where CCA claims native ICM compatibility, it preserves the complete applicable current ICM profile rather than only copying its stage-folder syntax.
+
+## Does CCA conflict with ICM's workspace-builder?
+
+It should not.
+
+The upstream workspace-builder is itself an ICM workspace whose output is a validated ICM workspace. CCA treats upstream `_core/CONVENTIONS.md` as the canonical ICM semantic authority and the workspace-builder's final validation stage as the practical acceptance checklist for generated ICM workspaces.
+
+CCA can provide a different user interaction for architecture/scaffolding, but if the result claims **native ICM compatibility**, it should pass the same applicable upstream acceptance surface.
+
+## Is there an ICM `ACCEPTANCE.md` file CCA follows?
+
+Not in the current upstream repository. The effective acceptance surface is distributed across the canonical `_core/CONVENTIONS.md`, the workspace-builder's `05-validation` stage, and repository-level contribution checks.
+
+CCA's own fresh-agent walk test is supplemental. It does not replace those ICM checks.
+
+## What does “ICM-derived” mean?
+
+A workspace is **ICM-derived** when it borrows useful ICM constructs — for example `stages/01-name/`, stage `CONTEXT.md` contracts, selective routing, one-way dependencies, or output handoffs — without implementing the complete native ICM workspace profile.
+
+This distinction lets ordinary coding repositories reuse good ICM patterns without falsely claiming full ICM interchangeability.
 
 ## Is CCA just an implementation of LLM Wiki?
 
@@ -39,6 +59,8 @@ Agent-specific integration belongs in thin adapters or the agent's own configura
 Do not reorganize the project around CCA by default. Add the smallest routing layer that helps agents understand the existing repository.
 
 Typically that means a useful root `AGENTS.md`, optionally a small `CONTEXT.md` router, and only those stable reference/configuration files that are actually needed. Add pipeline stages or a wiki only if the work benefits from them.
+
+If you add ICM-style stages without implementing the complete ICM profile, call them ICM-derived rather than describing the whole project as native ICM-compatible.
 
 ## Does every CCA workspace need `CONTEXT.md`?
 
@@ -106,9 +128,11 @@ For asynchronous or loose coordination, agents can hand off through durable file
 
 ## How do I know whether a workspace is healthy?
 
-Run `cca-lint` using the correct profile and then perform the walk test: a fresh agent should be able to orient, act, and report state from the files alone.
+Run `cca-lint` using the correct profile.
 
-The lint result must distinguish upstream compatibility findings from optional CCA hardening findings.
+For native ICM, that means the complete applicable current ICM profile and workspace-builder-equivalent acceptance surface. For ICM-derived patterns, validate only what was actually adopted. For LLM Wiki, validate the implementation's maintained-knowledge behavior without forcing CCA's optional schema.
+
+Then perform the CCA walk test: a fresh agent should be able to orient, act, and report state from the files alone. The lint result must distinguish upstream compatibility findings from optional CCA hardening findings.
 
 ## Can CCA evolve without breaking old workspaces?
 
