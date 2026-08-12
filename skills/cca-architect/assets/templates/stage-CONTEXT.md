@@ -1,39 +1,39 @@
 # CONTEXT.md — Stage [NN]: [NAME]
 
-> Layer 2 contract. 200–500 tokens, under 80 lines. This file is the control
-> point: it scopes exactly what the agent loads, does, and writes.
+> Layer 2 contract. Keep this file small. It scopes exactly what the agent loads, does, and writes.
 
 ## Inputs
 
-| Source | File/Location | Section/Scope | Role | Why |
-|---|---|---|---|---|
-| Previous stage | `../0[N-1]_[name]/output/[file].md` | Full file | product | Source material for this stage |
-| [Convention] | `../../_config/[file].md` | [Section name] | factory | [Constraint to internalize] |
-| [Domain knowledge] | `../../wiki/[page].md` | [Section name] | synthesis | [Background to apply] |
-| [Evidence] | `../../raw/[source]` | [Pages/sections] | source | [Evidence to cite] |
+| Source | File/Location | Section/Scope | Why |
+|---|---|---|---|
+| Previous stage | `../0[N-1]-[name]/output/[file].md` | Full file | Source material for this stage |
+| [Convention] | `../../_config/[file].md` | [Section name] | Constraint to apply |
+| [Domain knowledge] | `../../wiki/[page].md` | [Section name] | Background needed for this stage |
+| [Evidence] | `../../raw/[source]` | [Pages/sections] | Evidence to verify or cite |
 
-Load only what this table lists. Do not read other stages' folders.
+Load only what this table lists. Do not read unrelated stages.
 
 ## Process
 
-1. [Read the inputs listed above.]
-2. [Transform: what the agent actually does, in order.]
-3. [Reference any audit or checkpoint below.]
+1. Read the inputs listed above.
+2. Perform this stage's single job.
+3. Run any checkpoint or audit below.
 4. Write output(s) per the Outputs table.
 
 ## Outputs
 
 | Artifact | Location | Format |
 |---|---|---|
-| [name] | `output/[slug]-[name].md` | Markdown with frontmatter (`stage`, `date`, `inputs`) |
+| [name] | `output/[slug]-[name].md` | Markdown |
 
-## Checkpoint (creative stages; delete if linear)
+## Checkpoint
 
-After step [N], pause: present [options / draft direction] and wait for human
-steering before continuing.
+Delete this section for linear stages. For creative work, pause after a complete unit of work and present the decision the human needs to make before continuing.
 
-## Audit (run before writing output; delete if not needed)
+## Audit
 
-- [ ] [Check with an unambiguous pass condition, e.g. "Every claim cites a source from raw/"]
-- [ ] [e.g. "Output follows the structure in _config/[template].md"]
-- [ ] [e.g. "No content from stages other than those in Inputs"]
+Delete this section when not useful.
+
+- [ ] [Check with an unambiguous pass condition]
+- [ ] [Check that required source/reference sections were followed]
+- [ ] [Check that no unlisted context was treated as authoritative]
