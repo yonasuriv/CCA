@@ -41,6 +41,8 @@ CCA distinguishes:
 
 Compatibility is an acceptance guarantee, not a claim that every upstream workspace is itself a CCA workspace.
 
+CCA also distinguishes a **native upstream profile** from **derived use of upstream patterns**. Borrowing an upstream construct does not by itself justify claiming full compatibility with that upstream.
+
 ## 4. Workspace model
 
 A workspace is a folder containing durable files that an agent and human can inspect and edit. Markdown is preferred for prose; JSON/YAML may be used for structured data.
@@ -57,7 +59,7 @@ A workspace may be:
 
 ## 5. Layered context routing
 
-For pipeline-oriented work, CCA adopts ICM's five-layer architecture:
+For pipeline-oriented work, CCA adopts ICM's five-layer architecture when the ICM profile is active:
 
 | Layer | Typical file(s) | Question |
 |---|---|---|
@@ -82,15 +84,21 @@ Rules:
 3. `AGENTS.md` has no required heading schema. CCA templates are recommendations only.
 4. Tool-specific instruction files may coexist when required by a harness.
 5. CCA must not claim it can override a harness's native instruction precedence.
-6. Contradictory copies of the same rule across root/adaptor files are forbidden by the one-fact-one-home principle.
+6. Contradictory copies of the same rule across root/adapter files are forbidden by the one-fact-one-home principle.
+7. In a native ICM workspace, `AGENTS.md` may supplement portability but must not replace or break the native ICM `CLAUDE.md` entry path.
 
 ## 7. ICM pipeline profile
 
-A CCA-conformant pipeline that claims ICM compatibility must preserve current ICM conventions.
+CCA recognizes two different uses of ICM concepts:
+
+- **Native ICM compatibility**: the workspace claims to be an ICM/MWP workspace and must satisfy the complete applicable current upstream ICM profile.
+- **ICM-derived patterns**: another workspace borrows constructs such as numbered stages, stage contracts, selective routing, or output handoffs without claiming the complete ICM profile.
+
+CCA must not call a partial ICM-derived scaffold “native ICM-compatible.”
 
 ### 7.1 Stage naming
 
-Use lowercase, hyphenated, zero-padded stage folders:
+For native ICM and ICM-derived stages that intentionally preserve ICM syntax, use lowercase, hyphenated, zero-padded stage folders:
 
 ```text
 stages/
@@ -99,11 +107,11 @@ stages/
 └── 03-publish/
 ```
 
-Do not introduce underscore variants such as `01_collect` in new ICM-compatible workspaces.
+Do not introduce underscore variants such as `01_collect` while claiming to preserve the current ICM naming convention.
 
 ### 7.2 Stage contracts
 
-Every stage `CONTEXT.md` uses the canonical three sections:
+Every native ICM stage `CONTEXT.md` uses the canonical sections:
 
 ```markdown
 ## Inputs
@@ -128,7 +136,7 @@ Every stage `CONTEXT.md` uses the canonical three sections:
 
 CCA must not add required columns to the ICM Inputs table while claiming the shape is exact. Additional semantics such as CCA file roles may be documented elsewhere or treated as optional metadata.
 
-### 7.3 Pipeline invariants
+### 7.3 Core pipeline invariants
 
 - One stage, one job.
 - One-way cross-references; downstream stages may depend on upstream stages, not vice versa.
@@ -138,6 +146,40 @@ CCA must not add required columns to the ICM Inputs table while claiming the sha
 - Stable rules live in references/configuration, not copied into stage routers.
 - Previous outputs are artifacts, not canonical templates for future quality rules.
 - Shared configurable code values should have one canonical source where applicable.
+
+These invariants are useful outside a native ICM workspace, but using them alone does not establish native ICM compatibility.
+
+### 7.4 Full native ICM acceptance
+
+When CCA creates, modifies, or validates a workspace that **claims native ICM compatibility**, it must validate the complete applicable current upstream ICM convention surface. The canonical semantic authority is upstream ICM `_core/CONVENTIONS.md`; the workspace-builder's validation stage is the practical acceptance checklist for generated workspaces. CCA's own walk test is supplemental and must not replace these upstream checks.
+
+At minimum, native ICM validation must cover the applicable current upstream requirements for:
+
+1. five-layer routing and native Layer 0 `CLAUDE.md`;
+2. one root `CONTEXT.md` and one stage `CONTEXT.md` per stage;
+3. exact stage contract shape and canonical Inputs columns;
+4. lowercase-with-hyphens naming, zero-padded stages, output naming, and `.gitkeep` for intentionally empty persistent folders;
+5. unbroken stage handoffs through per-stage `output/` folders;
+6. cross-reference integrity and an acyclic, one-way dependency graph;
+7. selective section routing and canonical-source discipline;
+8. `CONTEXT.md` purity: routing/process contract, not embedded reference material;
+9. `setup` and `status` trigger behavior as currently defined by ICM;
+10. a flat, all-at-once, system-level setup questionnaire that derives inferable fields and uses sensible defaults/examples;
+11. complete placeholder coverage and valid conditional placeholder blocks where those mechanisms are used;
+12. tool prerequisite/setup/verification guidance when external system tools are required;
+13. bundled skills behavior when the workspace uses that optional ICM pattern;
+14. specification stages that define WHAT/WHEN rather than implementation HOW when applicable;
+15. checkpoints in applicable creative stages;
+16. audits in applicable creative/build stages;
+17. value validation in applicable content-producing stages;
+18. docs-over-outputs discipline;
+19. shared constants in applicable code-producing workspaces;
+20. current ICM quality guardrails for routing/reference size, readable language, formatting, and persistent empty folders;
+21. an end-to-end workspace-builder-equivalent validation before a generated workspace is described as ready or fully native-compatible.
+
+Where current ICM requires a specific representation or trigger output, CCA presentation preferences such as Mermaid do not override that upstream requirement.
+
+If upstream ICM changes these requirements, CCA must converge toward the current upstream rather than freeze this list as a divergent fork.
 
 ## 8. Knowledge profile
 
@@ -236,15 +278,16 @@ Linting must distinguish upstream validity from optional CCA hardening.
 
 At minimum, `cca-lint` supports:
 
-- **ICM native compatibility** — validate ICM layer/stage conventions without requiring CCA wiki metadata.
+- **ICM native compatibility** — validate the complete applicable current ICM profile and workspace-builder-equivalent acceptance surface.
+- **ICM-derived patterns** — validate borrowed ICM constructs without falsely promoting the host repository to native ICM compatibility.
 - **LLM Wiki native compatibility** — validate the core maintained-wiki behavior without imposing one CCA filesystem schema.
 - **CCA conformance** — validate whichever additional CCA conventions the workspace explicitly adopted.
 
 A missing CCA optional convention may be reported as a hardening opportunity, but not as an upstream compatibility failure.
 
-## 14. Walk test
+## 14. CCA walk test
 
-For intentionally structured CCA workspaces, the acceptance test is:
+For intentionally structured CCA workspaces, the CCA portability walk test is:
 
 > A fresh agent with no prior chat memory can orient, perform a representative operation, and report status using the workspace files alone.
 
@@ -254,14 +297,16 @@ For intentionally structured CCA workspaces, the acceptance test is:
 
 If a required decision exists only in chat history or someone's memory, the durable workspace is incomplete.
 
+This walk test is **not** a substitute for profile-specific acceptance. A native ICM claim must also pass the full applicable ICM validation surface; another upstream profile remains governed by its own current rules.
+
 ## 15. Size and context discipline
 
 CCA inherits ICM's preference for small routing files and selective loading.
 
-Guidelines, not universal laws:
+Guidelines, not universal laws outside a profile that makes them normative:
 
 - root routing/instruction files should remain compact;
-- stage `CONTEXT.md` files should remain under ICM's practical size guardrails;
+- native ICM stage `CONTEXT.md` and reference files must respect current ICM guardrails;
 - large reference documents should be split or selectively routed when only sections are needed;
 - available context is not automatically useful context;
 - fix under-specified routing before solving context bloat by simply loading more files.
