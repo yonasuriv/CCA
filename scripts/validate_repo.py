@@ -128,6 +128,11 @@ def validate_markdown_links() -> None:
     for path in sorted(ROOT.rglob("*.md")):
         if ".git" in path.parts:
             continue
+        # Template links intentionally contain placeholders for files that will
+        # exist only after the template is instantiated in a target workspace.
+        if "assets" in path.parts and "templates" in path.parts:
+            continue
+
         text = read(path)
         for target in re.findall(r"\[[^\]]+\]\(([^)]+)\)", text):
             target = target.strip().strip("<>")
