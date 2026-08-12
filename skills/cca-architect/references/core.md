@@ -10,22 +10,39 @@ Use this reference when designing or restructuring a workspace. CCA converges on
 
 Never call an upstream workspace CCA-conformant merely because it can be read by CCA tooling.
 
-## ICM pipeline invariants
+## ICM: full profile vs derived patterns
 
-For an ICM-compatible pipeline preserve:
+Distinguish two cases:
 
-1. five-layer routing;
-2. native Layer 0 `CLAUDE.md` behavior;
-3. root and stage `CONTEXT.md` routing;
-4. stage folders named `01-name`, `02-name`, ...;
-5. exact stage sections `Inputs`, `Process`, `Outputs`;
-6. Inputs columns `Source | File/Location | Section/Scope | Why`;
-7. selective section loading;
-8. one-way references;
-9. one fact, one canonical home;
-10. per-stage `output/` handoffs that humans may edit.
+- **Native ICM / full ICM profile**: the workspace claims ICM/MWP compatibility and therefore must satisfy the complete applicable current ICM convention and validation surface.
+- **ICM-derived patterns**: another workspace borrows useful ICM constructs such as numbered stages, `CONTEXT.md` contracts, or output handoffs without claiming to be a complete native ICM workspace.
 
-Do not add required CCA columns to an ICM contract while calling the contract unchanged.
+Do not use “ICM-compatible” as shorthand for “contains ICM-like stage folders.”
+
+For a **full ICM profile**, preserve and validate all applicable current upstream rules, including:
+
+1. the five-layer routing architecture and native Layer 0 `CLAUDE.md`;
+2. one root `CONTEXT.md` and one stage `CONTEXT.md` per stage;
+3. exact stage contract sections `Inputs`, `Process`, `Outputs` and canonical Inputs columns `Source | File/Location | Section/Scope | Why`;
+4. lowercase-with-hyphens naming, zero-padded stage prefixes, output-artifact naming, and `.gitkeep` for intentionally empty persistent folders;
+5. per-stage `output/` handoffs with an unbroken downstream chain;
+6. one-way dependencies and a cycle-free reference graph;
+7. selective section routing and one canonical home per substantive rule;
+8. `CONTEXT.md` purity: routing/process, not embedded reference material;
+9. `setup` and `status` trigger behavior as defined by current ICM, including a flat all-at-once system-level questionnaire;
+10. complete placeholder coverage and valid conditional placeholder blocks where placeholders are used;
+11. tool prerequisite guides and verification when external system tools are required;
+12. checkpoints for applicable creative stages and audits for applicable creative/build stages;
+13. specification stages that define WHAT/WHEN rather than implementation HOW;
+14. value validation for applicable content-producing stages;
+15. docs-over-outputs discipline: prior products are not authoritative quality templates;
+16. shared constants for configurable values in applicable code-producing workspaces;
+17. current ICM quality guardrails, including routing/reference size limits, readable plain language, and ICM-specific formatting rules;
+18. a clean end-to-end validation equivalent to the current ICM workspace-builder validation stage before claiming the generated workspace is ready.
+
+The upstream ICM `_core/CONVENTIONS.md` is canonical for ICM semantics. The workspace-builder’s validation stage is the practical acceptance checklist for generated ICM workspaces. If either changes, prefer the current upstream over a stale CCA snapshot.
+
+CCA may prefer Mermaid for its own explanatory diagrams, but it must not replace an output format that the active upstream profile explicitly requires.
 
 ## Portable root guidance
 
@@ -35,6 +52,7 @@ Do not add required CCA columns to an ICM contract while calling the contract un
 - `AGENTS.md` has no mandatory CCA heading schema.
 - Do not assume it overrides a harness-specific instruction file; native harness discovery remains authoritative.
 - Keep one substantive source of truth and use pointers/includes rather than duplicated rules.
+- In a native ICM workspace, adding `AGENTS.md` must not replace or break the ICM `CLAUDE.md` entry path.
 
 ## Knowledge invariants
 
@@ -77,6 +95,8 @@ A bundled skill must stand alone as a package:
 - no required sibling skill or repository-global file for core execution.
 
 ## Fresh-agent walk test
+
+The CCA walk test supplements profile-specific validation; it does not replace ICM acceptance or another upstream's own rules.
 
 A structured workspace should let a fresh agent:
 
