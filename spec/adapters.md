@@ -1,73 +1,49 @@
 # Adapter conventions
 
-CCA's canonical root is `AGENTS.md`. Many agent tools read their own
-instruction file. Adapters bridge the two without forking content.
+Adapters bridge a harness's native instruction entry point to shared portable workspace guidance without forking substantive rules.
 
-## The rule
+## Core rule
 
-> An adapter is a pointer, not a copy. Two to five lines. It names the
-> authoritative file and nothing else.
+> **One canonical body of shared guidance; the smallest native bridge necessary for each harness.**
 
-If a tool upgrades to natively read `AGENTS.md`, delete the adapter.
+CCA does not define or override harness instruction precedence. Before creating or changing an adapter, verify the current primary documentation for that harness.
 
-## Reference adapters
+## Preferred order
 
-**`CLAUDE.md`** (Claude Code, and ICM's historical Layer 0):
+1. If the harness natively supports the applicable `AGENTS.md` convention, use it directly and do not add a redundant adapter.
+2. If the harness supports an include/import mechanism, use that to load shared guidance from its native instruction file.
+3. Otherwise use a minimal pointer that tells the harness which shared file to read next.
+4. Keep unique harness-only instructions in the harness-native file only when they genuinely cannot live in shared portable guidance.
 
-```markdown
-# CLAUDE.md
+## ICM compatibility
 
-This workspace follows the Convergent Context Architecture.
-Read `AGENTS.md` in this directory — it is the authoritative root catalog.
-Then read `CONTEXT.md` for task routing.
-```
+ICM uses `CLAUDE.md` as its native Layer 0 entry point. CCA must not delete or invalidate that entry path merely to make `AGENTS.md` appear canonical.
 
-**`GEMINI.md`** (Gemini CLI):
+A CCA-hardened ICM workspace may use `CLAUDE.md` to include or point at shared portable guidance, but the resulting workspace must still behave correctly for an ICM/Claude consumer.
 
-```markdown
-# GEMINI.md
+## Adapter invariants
 
-Read `AGENTS.md` in this directory; it is the authoritative root catalog
-for this workspace. Follow its routing rules.
-```
+- Do not duplicate whole routing tables, policies, or conventions across files.
+- Do not claim one file overrides another unless the target harness actually implements that precedence.
+- Preserve nested instruction scope where the harness/standard supports it.
+- Do not emit adapters for tools the user does not use.
+- Do not freeze tool-specific filenames or syntax into CCA as permanent standards; adapters are compatibility edges and may change as tools evolve.
+- If a tool gains native support for the shared portable convention, remove the now-redundant adapter when safe.
 
-**`.cursorrules`** (Cursor):
+## Detecting drift
 
-```text
-This workspace follows the Convergent Context Architecture. Before acting, read
-AGENTS.md (authoritative root catalog) and CONTEXT.md (task routing). Follow
-their routing and context-loading rules.
-```
+Lint should flag:
 
-**`.windsurfrules`** (Windsurf):
+- contradictory instructions across root files;
+- large adapter files that duplicate shared guidance;
+- stale pointers to files that no longer exist;
+- adapters whose documented syntax no longer matches the target harness;
+- flattening of nested instruction scopes into a single global file.
 
-```text
-Read AGENTS.md first — it is the authoritative root catalog for this
-workspace. Follow its routing rules and load only the context your task needs.
-```
+Repair by preserving unique semantics, choosing one canonical source for shared rules, and using the current native bridge supported by the target harness.
 
-**`.github/copilot-instructions.md`** (GitHub Copilot):
+## Why examples are not normative here
 
-```markdown
-This repository follows the Convergent Context Architecture. Read `AGENTS.md`
-for the directory map and routing rules; read `CONTEXT.md` files for
-stage-specific contracts. `AGENTS.md` is authoritative.
-```
+Tool-specific instruction filenames and import syntax evolve faster than CCA's filesystem semantics. Keeping static copy-paste adapters in the normative specification would make CCA stale by construction.
 
-## Generating adapters
-
-`cca-scaffold` and `cca-architect` offer to emit adapters for the tools the
-user names. When writing one:
-
-1. Keep it under five lines.
-2. Point at `AGENTS.md` by name; call it authoritative.
-3. Never restate rules, directory contents, or conventions — that creates a
-   second home for facts, and two homes drift.
-4. If the tool supports file inclusion/import syntax, prefer that over prose.
-
-## Detecting and repairing forked adapters
-
-`cca-lint` flags adapters that contain substantive rules (heuristic: an
-adapter longer than ~15 lines, or one whose content duplicates sections of
-`AGENTS.md`). Repair by moving the content into the canonical home and
-replacing it with a pointer.
+The `cca-architect` skill therefore bundles only stable adapter principles. When exact syntax matters, verify the current harness documentation at execution time.
