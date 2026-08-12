@@ -26,6 +26,12 @@ The upstream workspace-builder is itself an ICM workspace whose output is a vali
 
 CCA can provide a different user interaction for architecture/scaffolding, but if the result claims **native ICM compatibility**, it should pass the same applicable upstream acceptance surface.
 
+## Can CCA replace workspace-builder when contributing a workspace to the ICM repository?
+
+Not when the current ICM contribution policy requires `workspace-builder`.
+
+Compatibility and contribution policy are different layers. CCA may independently create or maintain a native-compatible ICM workspace for use elsewhere, provided the complete applicable ICM profile passes. But if that workspace is being submitted to the upstream ICM repository, follow that repository's current contribution requirements — including using `workspace-builder` when required — rather than treating CCA compatibility as an exemption.
+
 ## Is there an ICM `ACCEPTANCE.md` file CCA follows?
 
 Not in the current upstream repository. The effective acceptance surface is distributed across the canonical `_core/CONVENTIONS.md`, the workspace-builder's `05-validation` stage, and repository-level contribution checks.
