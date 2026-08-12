@@ -1,95 +1,73 @@
-## CCA Contributing Guidelines
+# Contributing to CCA
 
-Thank you for your interest in contributing to CCA. This document explains how to contribute and where different types of feedback belong.
+CCA has one governing rule: **converge on upstream conventions instead of creating near-compatible forks.**
 
-## Types of Contributions
+## Before changing behavior
 
-### Documentation Improvements
+Identify which surface the change affects:
 
-We welcome improvements to the CCA Documentation — typo fixes, clarity improvements, standards, principles, better examples, and new guides. Documentation lives in the `docs/` directory.
+- ICM / Model Workspace Protocol
+- LLM Wiki
+- AGENTS.md
+- Agent Skills / `SKILL.md`
+- CCA-only semantics
 
-### Visual Improvements
+If an upstream is affected, verify its current primary source before editing. Do not rely on CCA's existing wording as evidence that upstream still behaves the same way.
 
-Whenever possible, use mermaid graphs instead plain-text graphs:
+## Compatibility checklist
 
-```mermaid
-flowchart TB
-    CCA["CCA semantics"]
+A contribution should answer all applicable questions:
 
-    STANDARDS["Portable Standards"]
-    METHODS["Methodologies"]
-    KNOWLEDGE["Knowledge Models"]
+- [ ] Does native ICM still work without structural migration?
+- [ ] Are ICM stages still lowercase, zero-padded, and hyphenated (`01-name`)?
+- [ ] Do ICM stage contracts retain the exact `Inputs` / `Process` / `Outputs` shape and canonical Inputs columns?
+- [ ] Are selective section loading, one-way references, canonical sources, and human-editable output handoffs preserved?
+- [ ] Does native LLM Wiki remain implementation-flexible rather than being forced into CCA's preferred taxonomy/metadata?
+- [ ] Are CCA-specific hardening choices clearly labeled as CCA choices?
+- [ ] Does nested `AGENTS.md` scope remain intact?
+- [ ] Does each skill remain independently portable, with skill-local relative resources and no required sibling/repository-global dependency?
+- [ ] Is a new convention actually necessary, or does an upstream/ecosystem convention already solve it?
 
-    AGENTS["AGENTS.md"]
-    SKILL["SKILL.md"]
-    MCP["MCP"]
+## Documentation structure
 
-    ICM["ICM"]
-    WIKI["LLM Wiki"]
+- `spec/` is normative CCA behavior.
+- `docs/` explains usage, migration/hardening, principles, FAQ, and tracked upstream standards.
+- `skills/` must implement the spec without depending on repository-global files for core execution.
+- `examples/` must be executable evidence of the documented conventions, not illustrative pseudo-state.
 
-    ADAPTERS["Runtime Adapters"]
+When a compatibility rule changes, update the full affected surface in one PR: spec, skills/templates, examples, migration/getting-started/FAQ, and `docs/standards.md` where relevant.
 
-    CLAUDE["Claude"]
-    CODEX["Codex"]
-    GEMINI["Gemini"]
+## Visuals
 
-    CCA --> STANDARDS
-    CCA --> METHODS
-    CCA --> KNOWLEDGE
+Prefer Mermaid for architecture, routing, lifecycle, and dependency diagrams. Use plain-text trees for literal filesystem layouts where a tree is clearer than a graph.
 
-    STANDARDS --> AGENTS
-    STANDARDS --> SKILL
-    STANDARDS --> MCP
+## Skills
 
-    METHODS --> ICM
-    KNOWLEDGE --> WIKI
+Follow the current Agent Skills specification. In particular:
 
-    AGENTS --> ADAPTERS
-    SKILL --> ADAPTERS
-    MCP --> ADAPTERS
-    ICM --> ADAPTERS
-    WIKI --> ADAPTERS
+- `name` must match the skill directory and satisfy current naming limits;
+- `description` must explain both purpose and trigger conditions and remain within the current limit;
+- keep `SKILL.md` compact and progressively disclose detailed material through skill-local resources;
+- use relative references from the skill root;
+- core execution must work if the skill is copied by itself.
 
-    ADAPTERS --> CLAUDE
-    ADAPTERS --> CODEX
-    ADAPTERS --> GEMINI
+## Validation
+
+Run:
+
+```bash
+python scripts/validate_repo.py
 ```
 
-```txt
-                   CCA semantics
-                        │
-        ┌───────────────┼───────────────┐
-        │               │               │
- Portable Standards  Methodologies  Knowledge Models
-        │               │               │
-   ┌────┼─────┐        ICM          LLM Wiki
-   │    │     │
-AGENTS SKILL MCP
- .md    .md   │
-   │    │     │
-   └────┴─────┴───────────────┐
-                              │
-                     Runtime Adapters
-                              │
-                  ┌───────────┼───────────┐
-                Claude      Codex       Gemini
-```
+The validator is a regression gate, not a substitute for upstream review. A passing check means the repository still satisfies the mechanical invariants it knows how to test.
 
-### Bug Reports
+## Proposals
 
-Found a bug in the spec, documentation, or reference library? [Open an issue](https://github.com/yonasuriv/CCA/issues).
+Prefer changes motivated by a real interoperability or maintenance problem. New semantics should explain:
 
-### Proposals, Questions, and Feedback
+1. what breaks without the change;
+2. why an existing upstream convention cannot solve it;
+3. how the change remains optional to consumers that do not need it;
+4. how it degrades when a specific agent/runtime feature is unavailable.
 
-Have a feature request, spec design question, or general feedback? [Start a discussion](https://github.com/yonasuriv/CCA/discussions). We use Discussions for proposals and open-ended conversation, and reserve Issues for concrete bugs and problems.
-
-Proposals should address real implementation challenges you've encountered, not theoretical concerns. Show us the problem you faced and how your proposal addresses it.
-
-If you would like to contribute by submitting a PR, ensure the following check passes:
-
-- [ ] Is it agent agnostic?
-- [ ] If used, would it break ICM principles?
-- [ ] If used, would it break LLM Wiki principles?
-- [ ] If it's a new convention, is it a GenAI/LLM standard?
-
-We maintain a high bar for additions to the spec: it is much easier to add things to a specification than to remove them. Every new feature adds complexity that all implementers must understand and support. When in doubt, leave it out.
+Keep the specification smaller than the implementation possibilities. It is easier to add a necessary rule later than to remove a convention that downstream workspaces already copied.
