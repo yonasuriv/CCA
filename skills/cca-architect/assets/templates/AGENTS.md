@@ -1,46 +1,34 @@
 # AGENTS.md — [WORKSPACE NAME]
 
-> Layer 0 root catalog. Role: **catalog** — point at everything, store almost
-> nothing. Budget ≲ 800 tokens. If this file grows content, move the content
-> to its canonical home and keep a link here.
+> Portable agent guidance. Keep this file compact and scoped to this directory tree. Nested `AGENTS.md` files may add more specific instructions for subtrees.
 
 ## What this is
 
-[One to three sentences: what this workspace produces or knows, and for whom.]
+[One to three sentences: what this workspace produces, maintains, or contains.]
 
 ## Directory map
 
-| Path | Role | Contents |
-|---|---|---|
-| `CONTEXT.md` | catalog | Task routing — given an intent, which stage/folder handles it |
-| `stages/` | contract | [Numbered pipeline stages, if this workspace has a pipeline] |
-| `raw/` | source | [Immutable source evidence, if this workspace has a wiki] |
-| `wiki/` | synthesis | [Agent-maintained knowledge: pages, `index.md`] |
-| `log.md` | chronicle | [Append-only history, if present] |
-| `_config/` | factory | Stable conventions: voice, style, glossary, decisions |
-| `setup/questionnaire.md` | factory | One-time onboarding |
-| `output/` | product | [Per-run deliverables] |
+| Path | Purpose |
+|---|---|
+| `[path]` | [What lives here and when an agent should read it] |
+| `[path]` | [What lives here and when an agent should read it] |
 
-[Delete rows that do not apply. Add rows for workspace-specific folders.]
+List only directories/files that actually exist or are being created now. Do not force pipeline/wiki rows into a workspace that does not need them.
 
 ## Routing rules
 
-- **"[common intent 1]"** → [where to go, e.g. run `stages/01_research/` per its contract]
-- **"[common intent 2]"** → [e.g. read `wiki/index.md`, then relevant pages]
-- **"ingest [source]"** → [follow the ingest procedure: update pages, index, log]
-- **"health check"** → [lint: structure + knowledge checks]
+- **[common intent]** → [smallest relevant router/file/folder]
+- **[common intent]** → [smallest relevant router/file/folder]
+- **[common intent]** → [smallest relevant router/file/folder]
 
-## Operating principles
+## Operating rules
 
-1. Plain text is the interface; every artifact is readable and editable.
-2. Load only the context the current task needs (see `CONTEXT.md` first).
-3. `raw/` is immutable. Cite sources; never edit them.
-4. One fact, one home — link, don't duplicate.
-5. Every output is an edit surface; the human reviews between stages.
+1. Load only context needed for the current task.
+2. Keep one canonical home for substantive rules; link instead of duplicating them.
+3. Preserve native workspace conventions and harness-specific entry points.
+4. Treat human-edited files as authoritative handoffs where the workflow defines them that way.
+5. Do not infer completion, authority, or freshness from file existence alone unless this workspace explicitly defines that rule.
 
-## Authority order
+## Instruction interoperability
 
-`AGENTS.md` (this file) is authoritative. Tool-specific files (`CLAUDE.md`,
-`GEMINI.md`, `.cursorrules`, …) are thin adapters and must never contradict
-it. `_config/` conventions override defaults; stage contracts override
-`_config/` for their stage.
+`AGENTS.md` is portable guidance for agents that support the convention. It does not override a harness's native discovery rules. If this workspace also uses `CLAUDE.md`, `GEMINI.md`, or another tool-specific instruction file, avoid contradictory copies: keep one substantive source of truth and use the smallest safe pointer/include supported by the tool.
