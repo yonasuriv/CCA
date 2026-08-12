@@ -1,61 +1,65 @@
 ---
 name: cca-ingest
-description: Integrate a new source into a CCA/LLM Wiki knowledge base — reads the source, extracts key claims, compares them against existing wiki pages (supports / extends / contradicts / creates), updates entity and concept pages, writes the source summary page, refreshes the index, and appends to the log. Use when the user drops a new document into raw/ or says "ingest this", "process this source", "add this article/paper/transcript to the wiki/knowledge base". Preserves provenance and flags contradictions instead of overwriting.
+description: Integrate new source material into a filesystem-native maintained knowledge base while preserving its native schema, provenance rules, and contradiction handling. Use when the user asks to ingest, process, or incorporate a document, article, paper, transcript, note, or other evidence into an LLM Wiki or CCA knowledge workspace. Discovers the workspace's own maintenance conventions first and never requires a fixed CCA directory taxonomy.
+compatibility: Filesystem read/write access to the target knowledge workspace. No sibling skill required.
 ---
 
 # CCA Ingest
 
-Ingestion is knowledge integration, not summarization. One source may touch
-many pages. The wiki compounds; it does not accumulate isolated summaries.
+Ingestion is integration into maintained knowledge, not one-summary-per-document accumulation.
 
-Preconditions: a knowledge workspace with `raw/`, `wiki/`, `wiki/index.md`,
-and `log.md`. If any are missing, scaffold them first (cca-scaffold, full
-mode) or confirm intent with the user.
+## Discover the knowledge profile first
+
+Before changing anything:
+
+1. Locate the workspace's own instruction/schema files and navigation entry points.
+2. Identify where durable source material lives, where maintained synthesis lives, and how provenance is represented.
+3. Identify the workspace's existing naming, metadata, index, and history conventions.
+4. If the workspace is intentionally CCA-hardened, follow those conventions. If it is a native LLM Wiki implementation, preserve its own schema instead of imposing CCA's preferred layout.
+
+If no maintained-knowledge structure exists, stop and explain what minimum structure is missing. Do not silently invent a full wiki during ingest.
 
 ## Procedure
 
-1. **Read the source** from `raw/` (never modify it). If the user referenced
-   an external document, first place a copy in `raw/` — the wiki cites
-   immutable local evidence, not URLs alone.
-2. **Extract the key claims, entities, and concepts.** Distinguish what the
-   source *says* from what it *implies for existing knowledge*.
-3. **Read `wiki/index.md`** and identify every existing page the source
-   relates to. Read those pages. (At small scale the index suffices; if the
-   wiki has a search tool, use it as well.)
-4. **Compare**, claim by claim, against what the wiki currently holds:
-   - **Supports** — strengthen the existing statement; add the citation.
-   - **Extends** — add the new detail, attributed.
-   - **Contradicts** — do *not* overwrite. Record both positions with dates
-     and sources in the page's contradictions section, and adjust the
-     synthesis to reflect the conflict (e.g. "as of 2026-08, evidence
-     diverges: …").
-   - **Creates** — a genuinely new entity/concept gets a new page from the
-     wiki page templates (entity / concept), with frontmatter.
-5. **Update the touched pages.** Keep prose current (synthesis reflects
-   everything known *now*), bump `updated:` and `sources:` in frontmatter,
-   add cross-links both directions.
-6. **Write the source page** at `wiki/sources/[slug].md` (source template):
-   faithful summary, key claims with locations in the raw file, and a "what
-   this source changed" list linking every touched page.
-7. **Update `wiki/index.md`**: new/changed pages, one-line summaries, dates.
-8. **Append to `log.md`**: `## [YYYY-MM-DD] ingest | [Source title]` with
-   pages touched and contradictions flagged.
-9. **Report to the human**: key takeaways, what changed in the wiki, any
-   contradictions or open questions the source raised, and what to read to
-   verify. Stay available for guidance on what to emphasize — ingestion is
-   supervised by default unless the user asked for batch mode.
+1. **Establish source identity.** Determine the durable source artifact and a stable way to cite it. Do not overwrite source evidence while synthesizing.
+2. **Read the source.** Extract material claims, entities, concepts, dates, relationships, and uncertainty. Keep source statements distinct from your inference.
+3. **Navigate existing synthesis using the workspace's own router/index/schema.** Read only pages relevant to the new material.
+4. **Compare claim by claim:**
+   - **supports** — strengthens existing knowledge;
+   - **extends** — adds compatible detail;
+   - **contradicts** — preserve both positions with source/time context rather than silently replacing one;
+   - **creates** — introduces knowledge not represented yet.
+5. **Update maintained synthesis** according to the workspace's existing page format and provenance policy. Prefer updating canonical pages over creating isolated source summaries when the knowledge belongs on existing pages.
+6. **Update navigation/metadata/history** only where the workspace already defines those mechanisms or the user explicitly adopted a CCA-hardened profile.
+7. **Verify references.** Every newly introduced source-backed assertion that the workspace promises to trace must resolve to the underlying evidence.
+8. **Report** what changed, what evidence was added, which contradictions or uncertainties remain, and which files contain the durable result.
 
-## Batch mode
+## Optional CCA-hardened profile
 
-When the user asks to ingest many sources with less supervision: process one
-source at a time through the full procedure (never merge sources into one
-pass — per-source pages and log entries keep provenance clean), then deliver
-one consolidated report at the end.
+If the workspace explicitly uses CCA's hardened knowledge bundle, its common conventions may include:
 
-## Rules
+- durable evidence under `raw/`;
+- maintained synthesis under `wiki/`;
+- `wiki/index.md` as navigation;
+- `log.md` as a maintenance chronicle;
+- frontmatter/lifecycle/provenance metadata.
 
-- Provenance is mandatory: every claim added to a page links its source.
-- Never delete or rewrite an existing claim merely because a new source
-  disagrees — preserve, date, and contextualize.
-- Keep pages under ~200 lines; split rather than bloat.
-- The index and log updates are part of ingest, not optional follow-ups.
+Follow those conventions when present. Do not describe them as universal LLM Wiki requirements.
+
+## Batch ingestion
+
+When processing multiple sources:
+
+- integrate sources one at a time so provenance and contradiction effects remain attributable;
+- avoid combining unrelated sources into a single synthetic "source" record;
+- update shared synthesis incrementally;
+- deliver one consolidated final report unless the workspace requires per-source review gates.
+
+## Production rules
+
+- Never rewrite durable evidence as though it were synthesis.
+- Never resolve a contradiction by silently deleting the older claim.
+- Never fabricate provenance, source locations, dates, or confidence.
+- Preserve the knowledge base's native schema unless an explicit migration/hardening change was requested.
+- Do not depend on templates or files outside this skill package.
+- Load only the pages required to integrate the source correctly.
