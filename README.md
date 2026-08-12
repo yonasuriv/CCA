@@ -1,152 +1,181 @@
 # CCA — Convergent Context Architecture
 
-> **CCA is an interoperability and agnostic evolution layer for filesystem-native agent context. \
-> It builds on ICM and LLM Wiki, follows ecosystem standards such as AGENTS.md and SKILL.md (and growing), \
-> and prefers convergence over introducing competing conventions.**
+> **CCA is an interoperability and evolution layer for filesystem-native agent context. It builds on ICM and LLM Wiki, adopts ecosystem conventions such as AGENTS.md and Agent Skills, and prefers convergence over introducing competing conventions.**
 
-CCA unifies two proven patterns for structuring agent context as plain files:
+CCA does not replace ICM or LLM Wiki. It provides shared semantics, portable operations, and compatibility rules so agents can work across staged ICM workspaces, persistent LLM Wiki-style knowledge bases, ordinary coding repositories, and hybrids without requiring a proprietary runtime.
 
-- **LLM Wiki** — Andrej Karpathy's pattern for a persistent, LLM-maintained knowledge base: immutable raw sources, a compounding markdown wiki, and a schema that disciplines the agent. (ingest → query → lint)
-- **ICM (Interpretable Context Methodology)** — folder structure as agent architecture: numbered stages, layered context loading, stage contracts, human review gates.
+## The core idea
 
-CCA does **not** replace either one. It defines the shared ground that lets an ICM workspace, an LLM Wiki, and a CCA workspace be read by the same agent, maintained by the same skills, and swapped for one another without breaking. ICM workspaces and LLM Wikis are already valid CCA workspaces; CCA is the upgraded, agent-agnostic form of both.
+```mermaid
+flowchart TB
+    CCA["CCA semantics"]
 
-> See [References](#references) at the bottom of this file for lineage and credits.
+    STANDARDS["Portable standards"]
+    METHODS["Workflow architecture"]
+    KNOWLEDGE["Persistent knowledge"]
 
-## Why CCA exists
+    AGENTS["AGENTS.md"]
+    SKILLS["Agent Skills / SKILL.md"]
+    ICM["ICM / Model Workspace Protocol"]
+    WIKI["LLM Wiki"]
 
-Both parent patterns are strong, and both have a gap:
+    RUNTIMES["Agent runtimes and adapters"]
 
-| | ICM | LLM Wiki |
-| --- | --- | --- |
-| **Great at** | Sequential pipelines with human review gates | Accumulating knowledge that compounds over time |
-| **Root file** | Hardcoded to `CLAUDE.md` (Claude-only assumption) | "e.g. CLAUDE.md or AGENTS.md" — left open |
-| **Knowledge** | Layer 3/4 split, no persistence model across runs | Raw → wiki synthesis, but no pipeline model |
-| **Form** | A protocol + reference workspaces | An intentionally abstract idea file |
-| **Agent support** | Tested on one model family | "Your agent will build out the specifics" |
-
-Meanwhile the ecosystem has been converging: `AGENTS.md` is now read by most coding agents, and `SKILL.md` is the emerging cross-vendor skill package format. \
-CCA's move is to **adopt those standards instead of adding new ones**, give ICM and LLM Wiki one shared vocabulary (layers, file roles, operations), and ship the skills that make any agent — Claude Code, Codex, Cursor, Gemini, open-weight harnesses — a disciplined operator of both.
-
-If ICM gave us the factory floor and LLM Wiki gave us the library, CCA is the building code that lets both coexist under one roof.
-
-## The model in 60 seconds
-
-A CCA workspace is a folder. Agents navigate **five layers** and stop when they
-have what they need:
-
-```txt
-Layer 0  AGENTS.md               "Where am I?"                catalog               ~800 tok
-Layer 1  CONTEXT.md / index.md   "Where do I go?"             catalog               ~300 tok
-Layer 2  Stage CONTEXT.md        "What do I do?"              contract              200–500 tok
-Layer 3  _config/ + raw/         "What rules and evidence?"   factory + source
-Layer 4  output/ + wiki/         "What am I working with?"    product + synthesis
+    CCA --> STANDARDS
+    CCA --> METHODS
+    CCA --> KNOWLEDGE
+    STANDARDS --> AGENTS
+    STANDARDS --> SKILLS
+    METHODS --> ICM
+    KNOWLEDGE --> WIKI
+    AGENTS --> RUNTIMES
+    SKILLS --> RUNTIMES
+    ICM --> RUNTIMES
+    WIKI --> RUNTIMES
 ```
 
-Every file in a workspace plays one of eight **roles**:
+CCA's rule is simple: **when an upstream convention already solves the problem, preserve it.** CCA may add optional hardening where upstreams intentionally leave implementation open, but it should not fork an upstream shape and still call it identical.
 
-| Role | What it is | Examples |
-| --- | --- | --- |
-| **catalog** | Points at everything, stores almost nothing | `AGENTS.md`, `CONTEXT.md`, `wiki/index.md` |
-| **contract** | Defines one unit of work: inputs, process, outputs | stage `CONTEXT.md` |
-| **factory** | Stable rules, configured once; internalize as constraints | `_config/voice.md`, `references/` |
-| **source** | Immutable raw evidence; cite it, never edit it | `raw/` |
-| **synthesis** | Derived knowledge the agent owns and maintains | `wiki/` |
-| **product** | Per-run artifacts; produced, reviewed, handed off | `output/` |
-| **chronicle** | Append-only history | `log.md` |
-| **dead** | Unreferenced and unowned — flagged by lint | — |
+## Compatibility, not replacement
 
-Agents perform six **operations**, each shipped as a skill:
+CCA distinguishes three states:
 
-| Operation | Skill | One line |
-| --- | --- | --- |
-| architect | `cca-architect` | Design a new workspace, or restructure an existing folder into one. |
-| scaffold | `cca-scaffold` | Add a CCA layer to an existing project without disturbing it. |
-| sync | `cca-sync` | Reconcile catalogs with what is actually on disk. |
-| ingest | `cca-ingest` | Integrate a new source into the wiki — update pages, index, log. |
-| query | `cca-query` | Answer from the wiki with citations; file valuable answers back. |
-| lint | `cca-lint` | Health-check structure and knowledge; report conformance level. |
+| State | Meaning |
+|---|---|
+| **Native-compatible** | CCA tooling can consume the upstream workspace without structural migration. |
+| **CCA-hardened** | Optional CCA routing, portability, provenance, or maintenance conventions were added. |
+| **CCA-conformant** | The workspace intentionally adopts the CCA specification. |
 
-That's the whole model. Everything else in this repo is specification, templates, and examples of these layers, roles, and operations.
+An ICM workspace or LLM Wiki does not become “CCA” merely because CCA can understand it.
 
-## Compatibility: the swap guarantee
+### ICM
 
-CCA is designed so the three systems interoperate:
+CCA preserves the ICM conventions it relies on: five-layer routing, native `CLAUDE.md` behavior, root/stage `CONTEXT.md`, exact `Inputs` / `Process` / `Outputs` stage contracts, selective section loading, one-way references, canonical sources, zero-padded hyphenated stage names such as `01-collect`, and human-editable `output/` handoffs.
 
-| From | To CCA | To the other |
-| --- | --- | --- |
-| **LLM Wiki** | Already conformant. The schema section moves into (or is referenced by) the root `AGENTS.md` catalog. | An ICM pipeline drops in as stages that read from `wiki/` and write to `output/`. |
-| **ICM workspace** | Already conformant. Rename or alias `CLAUDE.md` → thin adapter pointing at `AGENTS.md`. Stage contracts are already CCA contracts. | An LLM Wiki drops in as a knowledge-bundle form: `raw/`, `wiki/`, `index.md`, `log.md` are standard CCA roles. |
-| **CCA workspace** | — | Degrades gracefully: ICM tooling reads the `CLAUDE.md` adapter + `CONTEXT.md` contracts; Wiki tooling reads `raw/`, `wiki/`, `index.md`, `log.md`. Nothing is CCA-only. |
+Portable `AGENTS.md` guidance may be added where useful, but CCA must not break the native ICM entry path to do so.
 
-The full mapping, authority order for root files (`AGENTS.md` canonical; `CLAUDE.md`, `IDENTITY.md` legacy aliases), and conformance levels are in [`spec/compatibility.md`](spec/compatibility.md).
+### LLM Wiki
 
-**Conformance at a glance:**
+CCA preserves LLM Wiki as an intentionally flexible idea pattern: durable source material plus maintained LLM-owned synthesis that compounds across sessions. CCA can recommend an opinionated implementation, but it does not treat its own directory taxonomy, YAML frontmatter, log syntax, or page types as universal LLM Wiki requirements.
 
-- **CCA-0 Detectable** — a folder with a root instruction file and plain-text artifacts. Every existing ICM workspace and LLM Wiki already qualifies.
-- **CCA-1 Conformant** — canonical catalogs, files classifiable into the eight roles, contracts for pipelines, index + log for wikis, thin adapters.
-- **CCA-2 Verified** — passes the **walk test**: an agent with no memory can orient, act, and report status from the files alone; lint is clean.
+## Start here
 
-## Quickstart
+```mermaid
+flowchart LR
+    A["Existing ICM workspace"] --> G["Keep native structure"]
+    B["Existing LLM Wiki"] --> G
+    C["Existing coding repo"] --> S["Add minimal routing in place"]
+    D["New workflow / knowledge space"] --> R["Design smallest useful form"]
 
-### FAQ
-1. **I have an ICM workspace.** You are done — it is CCA-0 already. To upgrade: add an `AGENTS.md` root catalog (template in `skills/cca-architect/assets/templates/AGENTS.md`) and reduce `CLAUDE.md` to a two-line adapter. See [`docs/migration.md`](docs/migration.md).
-2. **I have an LLM Wiki.** Same story: add the root catalog, keep `raw/`, `wiki/`, `index.md`, `log.md` exactly as they are. Your schema conventions become part of the catalog or `_config/`.
-3. **I am starting fresh.** Point your agent at this repo and ask it to `cca-architect` a workspace for your workflow — or copy `examples/topic-research/` and reshape it.
-4. **I want the skills.** Each skill under `skills/` is a standard `SKILL.md` package. Copy any of them into your agent's skills directory (e.g. `~/.claude/skills/`, `.agents/skills/`, or your tool's equivalent). They are agent-agnostic by design; nothing in them assumes a specific vendor.
+    G --> V["Validate native compatibility"]
+    S --> V
+    R --> V
+    V --> H["Optionally add CCA hardening"]
+```
+
+Read [`docs/getting-started.md`](docs/getting-started.md) for the practical path from each starting point. Common questions — Obsidian, VS Code, coding projects, MCP, databases, nested `AGENTS.md`, multi-agent work, and what CCA is not — are in [`docs/faq.md`](docs/faq.md).
+
+## Agent routing
+
+For an ICM-compatible pipeline, routing remains layered and selective:
+
+```mermaid
+flowchart LR
+    U["User intent"] --> A["Portable/root instructions"]
+    A --> C["Root CONTEXT.md"]
+    C --> S["Stage CONTEXT.md"]
+    S --> R["Selected references"]
+    S --> W["Working artifacts"]
+    R --> O["Stage output"]
+    W --> O
+    O --> H["Human edit/review"]
+    H --> N["Next stage"]
+```
+
+A knowledge workspace may use a different router/index/schema. CCA does not force every workspace into pipeline layers.
+
+## Portable operations
+
+The repository ships six Agent Skills packages:
+
+| Skill | Purpose |
+|---|---|
+| [`cca-architect`](skills/cca-architect/) | Design or restructure a workspace while preserving native compatibility. |
+| [`cca-scaffold`](skills/cca-scaffold/) | Add the smallest useful routing/context layer without restructuring existing content. |
+| [`cca-sync`](skills/cca-sync/) | Reconcile routing/navigation with disk while preserving scope and native semantics. |
+| [`cca-ingest`](skills/cca-ingest/) | Integrate new evidence into maintained knowledge using the workspace's own schema. |
+| [`cca-query`](skills/cca-query/) | Query maintained synthesis and verify against source evidence as needed. |
+| [`cca-lint`](skills/cca-lint/) | Validate the correct profile and separate compatibility failures from optional hardening. |
+
+Each skill is designed to remain useful when copied independently: core execution must not require a sibling skill or repository-global file.
 
 ## Repository layout
 
-```txt
-cca/
-├── AGENTS.md                  Root catalog for this repo (CCA dogfooding itself)
-├── README.md                  You are here
-├── LICENSE                    MIT
+The repository itself is intentionally small and mirrors the separation used by ICM: canonical specification, explanatory documentation, portable skills, templates, and worked workspaces.
+
+```text
+CCA/
+├── AGENTS.md
+├── CLAUDE.md
+├── README.md
+├── CONTRIBUTING.md
 ├── spec/
-│   ├── SPEC.md                The canonical specification (normative)
-│   ├── compatibility.md       ICM ↔ LLM Wiki ↔ CCA mapping, swap guarantees
-│   └── adapters.md            Per-tool adapter conventions (CLAUDE.md, .cursorrules, …)
+│   ├── SPEC.md
+│   ├── compatibility.md
+│   └── adapters.md
 ├── docs/
-│   ├── principles.md          The design principles behind CCA
-│   └── migration.md           Migrating from ICM, from an LLM Wiki, from CLAUDE.md-only repos
+│   ├── getting-started.md
+│   ├── faq.md
+│   ├── migration.md
+│   ├── principles.md
+│   └── standards.md
 ├── skills/
-│   ├── cca-architect/         Build or restructure workspaces (+ references, templates)
-│   ├── cca-scaffold/          Add CCA structure to an existing project
-│   ├── cca-sync/              Keep catalogs accurate with disk
-│   ├── cca-ingest/            Integrate new sources into a wiki
-│   ├── cca-query/             Answer from a wiki, file answers back
-│   └── cca-lint/              Structural + knowledge health checks, conformance report
-└── examples/
-    └── topic-research/        Worked example: a wiki feeding a two-stage pipeline
+│   ├── cca-architect/
+│   ├── cca-scaffold/
+│   ├── cca-sync/
+│   ├── cca-ingest/
+│   ├── cca-query/
+│   └── cca-lint/
+├── examples/
+│   └── topic-research/
+└── scripts/
+    └── validate_repo.py
 ```
 
 ## Design principles
 
-CCA inherits its principles; it does not invent them. The short list (full treatment in [`docs/principles.md`](docs/principles.md)):
+1. **Convergence over invention.** Adopt standards and upstream shapes rather than minting competing ones.
+2. **Plain files as the durable interface.** Humans and agents can inspect and edit the same state.
+3. **Route the right context.** Selective context beats indiscriminate loading.
+4. **One fact, one canonical home.** Link instead of duplicating authoritative rules.
+5. **One stage, one job.** Preserve explicit contracts and one-way dependencies for pipelines.
+6. **Every output is an edit surface.** File handoffs keep human review visible and durable.
+7. **Persistent synthesis over stateless retrieval.** When knowledge should compound, maintain it instead of rebuilding it per query.
+8. **Optional infrastructure stays optional.** Databases, vector stores, MCP, and orchestration may extend CCA but are not required to understand the workspace.
 
-1. **One stage, one job.** Decompose by what each unit hides from the rest.
-2. **Plain text as the interface.** Any tool that reads text can participate; any human with an editor holds the control surface.
-3. **Layered context loading.** Route the right context, not bigger prompts. Prevention, not compression.
-4. **Every output is an edit surface.** Human review happens on files, between stages — not in chat history.
-5. **Configure the factory, not the product.** Set up once; produce repeatedly.
-6. **Persistent synthesis over stateless retrieval.** Knowledge compiles once and is kept current, not re-derived per query.
-7. **Convergence over convention.** Adopt ecosystem standards; never mint a competing filename where one exists.
+See [`docs/principles.md`](docs/principles.md) for the extended rationale.
+
+## What CCA is not
+
+CCA is not an agent runtime, orchestration framework, message bus, vector database, replacement for MCP, replacement for ICM, or replacement for LLM Wiki.
+
+Real-time multi-agent collaboration, where agents need to communicate dynamically in tight loops, requires message-passing/orchestration infrastructure. CCA can provide durable shared context beneath such systems.
+
+## Staying compatible as upstreams evolve
+
+[`docs/standards.md`](docs/standards.md) is the tracked upstream compatibility surface. When an upstream changes, CCA should verify the primary source and update the spec, affected skills/templates, examples, migration guidance, and compatibility matrix together rather than freezing a stale fork.
 
 ## References
 
-CCA stands on public work by others:
-
-- **[ICM / Model Workspace Protocol](https://github.com/RinDig/Interpretable-Context-Methodology)** — Jake Van Clief & David McDermott,
-  _[Interpretable Context Methodology: Folder Structure as Agent Architecture](https://arxiv.org/pdf/2603.16021)_
-- **[LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)** — Andrej Karpathy's idea pattern file for LLM-maintained persistent knowledge bases.
-- **Ecosystem standards** — [AGENTS.md](https://agents.md) and the Agent Skills [SKILL.md](https://agentskills.io) format.
-
-ICM and LLM Wiki remain independent projects. CCA tracks them; when they evolve, CCA evolves toward them — convergence, not competition.
+- **[ICM / Model Workspace Protocol](https://github.com/RinDig/Interpretable-Context-Methodology)** — Jake Van Clief & David McDermott, [Interpretable Context Methodology: Folder Structure as Agent Architecture](https://arxiv.org/pdf/2603.16021)
+- **[LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)** — Andrej Karpathy's idea pattern for LLM-maintained persistent knowledge bases
+- **[AGENTS.md](https://agents.md)** — portable agent instructions
+- **[Agent Skills](https://agentskills.io)** — portable `SKILL.md` packages
 
 ## Contributing
 
-See [CONTRIBUTING](CONTRIBUTING.md).
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). Compatibility changes should cite the relevant primary upstream and update the full affected surface in one change.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [`LICENSE`](LICENSE).
