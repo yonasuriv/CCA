@@ -4,7 +4,7 @@
 
 ## [2026-08-05] init | Workspace created
 
-- Form: maintained knowledge + two-stage ICM-compatible pipeline.
+- Form: maintained knowledge + two-stage ICM-derived pipeline.
 - Scaffolding: portable guidance, routing, synthetic sources, maintained wiki, stages, and stable conventions.
 
 ## [2026-08-05] ingest | Regional carriers expand electric flight trials
