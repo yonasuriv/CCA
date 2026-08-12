@@ -1,9 +1,29 @@
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files
+
 cff-version: 1.2.0
 message: "If you use CCA, please cite it using the metadata below."
 title: "CCA: Convergent Context Architecture"
 authors:
-  - name: "yona"
+  - family-names: "Di Rico"
+    given-name: "Jonathan"
 repository-code: "https://github.com/yonasuriv/CCA"
 url: "https://github.com/yonasuriv/CCA"
 license: MIT
 type: software
+references:
+  - type: generic
+    title: "LLM Wiki"
+    authors:
+      - family-names: "Karpathy"
+        given-names: "Andrew"
+    year: 2026
+    url: "https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f"
+- type: article
+    title: "Interpretable Context Methodology: Folder Structure as Agent Architecture"
+    authors:
+      - family-names: "Van Clief"
+        given-names: "Jake"
+      - family-names: "McDermott"
+        given-names: "David"
+    year: 2026
+    url: "https://arxiv.org/abs/2603.16021"
