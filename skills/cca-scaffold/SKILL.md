@@ -1,6 +1,6 @@
 ---
 name: cca-scaffold
-description: Add the smallest useful CCA-compatible routing layer to an existing repository without restructuring application or knowledge content. Use when the user wants to make a project easier for agents to navigate, add portable AGENTS.md guidance, add lightweight task routing, or introduce optional ICM-style stages or maintained knowledge while preserving the project's existing structure and native instruction files.
+description: Add the smallest useful CCA-compatible routing layer to an existing repository without restructuring application or knowledge content. Use when the user wants to make a project easier for agents to navigate, add portable AGENTS.md guidance, add lightweight task routing, or introduce optional ICM-derived stages or maintained knowledge while preserving the project's existing structure and native instruction files.
 compatibility: Filesystem read/write access. No sibling skill or vendor-specific runtime required.
 ---
 
@@ -38,7 +38,11 @@ Use when the repository layout already works.
 
 Use only when the project actually needs a new capability.
 
-**Pipeline:** add ICM-compatible stages using lowercase hyphenated names such as `stages/01-collect/`. Every stage gets a small `CONTEXT.md` with the exact `Inputs` / `Process` / `Outputs` shape and its own `output/` handoff folder.
+**Pipeline:** add ICM-derived stages using lowercase hyphenated names such as `stages/01-collect/`. Every stage gets a small `CONTEXT.md` with the exact ICM `Inputs` / `Process` / `Outputs` shape and its own `output/` handoff folder.
+
+Adding ICM-derived stage contracts to an ordinary repository does **not** by itself make that repository a native ICM workspace. Only claim **ICM native compatibility** after the full applicable ICM profile passes: five-layer routing, native `CLAUDE.md`, root routing, setup/status behavior, questionnaire rules, naming, handoffs, one-way references, selective loading, CONTEXT purity, quality guardrails, and all other applicable current ICM conventions and workspace-builder validation checks.
+
+If the user explicitly requests a complete native ICM workspace, either implement the full current ICM profile in place or use a dedicated architecture workflow if available. Do not label a partial scaffold as fully ICM-compatible.
 
 **Maintained knowledge:** discover whether the project already has a knowledge schema. If not, create the smallest knowledge structure the user needs. A CCA-hardened `raw/`, `wiki/`, `wiki/index.md`, `log.md` layout is an option, not a universal LLM Wiki requirement.
 
@@ -59,6 +63,7 @@ Before writing:
 - Do not assume a universal precedence between `AGENTS.md` and harness-specific instruction files.
 - Do not require another CCA skill to finish this skill's core operation.
 - Do not claim CCA conformance unless the workspace intentionally adopted the relevant CCA profile and was validated against it.
+- Do not claim native ICM compatibility for a repository that merely borrows ICM stage-contract patterns.
 
 ## Verification
 
@@ -68,5 +73,6 @@ After scaffolding, simulate a fresh agent:
 2. Can it route one representative task without broad filesystem exploration?
 3. If a pipeline was added, can it execute one stage from the contract alone?
 4. If maintained knowledge was added, can it find the implementation's own navigation/schema instructions?
+5. If native ICM compatibility is claimed, did the complete applicable ICM acceptance surface pass rather than only the stage-contract subset?
 
 Report native compatibility separately from optional CCA hardening opportunities.
