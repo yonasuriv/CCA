@@ -11,7 +11,7 @@ CCA unifies two proven patterns for structuring agent context as plain files:
 
 CCA does **not** replace either one. It defines the shared ground that lets an ICM workspace, an LLM Wiki, and a CCA workspace be read by the same agent, maintained by the same skills, and swapped for one another without breaking. ICM workspaces and LLM Wikis are already valid CCA workspaces; CCA is the upgraded, agent-agnostic form of both.
 
-> See [Lineage and Credits](#lineage-and-credits) at the bottom of this file.
+> See [References](#references) at the bottom of this file for lineage and credits.
 
 ## Why CCA exists
 
@@ -89,10 +89,11 @@ The full mapping, authority order for root files (`AGENTS.md` canonical; `CLAUDE
 
 ## Quickstart
 
-**I have an ICM workspace.** You are done — it is CCA-0 already. To upgrade: add an `AGENTS.md` root catalog (template in `skills/cca-architect/assets/templates/AGENTS.md`) and reduce `CLAUDE.md` to a two-line adapter. See [`docs/migration.md`](docs/migration.md).
-**I have an LLM Wiki.** Same story: add the root catalog, keep `raw/`, `wiki/`, `index.md`, `log.md` exactly as they are. Your schema conventions become part of the catalog or `_config/`.
-**I am starting fresh.** Point your agent at this repo and ask it to `cca-architect` a workspace for your workflow — or copy `examples/topic-research/` and reshape it.
-**I want the skills.** Each skill under `skills/` is a standard `SKILL.md` package. Copy any of them into your agent's skills directory (e.g. `~/.claude/skills/`, `.agents/skills/`, or your tool's equivalent). They are agent-agnostic by design; nothing in them assumes a specific vendor.
+### FAQ
+1. **I have an ICM workspace.** You are done — it is CCA-0 already. To upgrade: add an `AGENTS.md` root catalog (template in `skills/cca-architect/assets/templates/AGENTS.md`) and reduce `CLAUDE.md` to a two-line adapter. See [`docs/migration.md`](docs/migration.md).
+2. **I have an LLM Wiki.** Same story: add the root catalog, keep `raw/`, `wiki/`, `index.md`, `log.md` exactly as they are. Your schema conventions become part of the catalog or `_config/`.
+3. **I am starting fresh.** Point your agent at this repo and ask it to `cca-architect` a workspace for your workflow — or copy `examples/topic-research/` and reshape it.
+4. **I want the skills.** Each skill under `skills/` is a standard `SKILL.md` package. Copy any of them into your agent's skills directory (e.g. `~/.claude/skills/`, `.agents/skills/`, or your tool's equivalent). They are agent-agnostic by design; nothing in them assumes a specific vendor.
 
 ## Repository layout
 
@@ -121,8 +122,7 @@ cca/
 
 ## Design principles
 
-CCA inherits its principles; it does not invent them. The short list (full
-treatment in [`docs/principles.md`](docs/principles.md)):
+CCA inherits its principles; it does not invent them. The short list (full treatment in [`docs/principles.md`](docs/principles.md)):
 
 1. **One stage, one job.** Decompose by what each unit hides from the rest.
 2. **Plain text as the interface.** Any tool that reads text can participate; any human with an editor holds the control surface.
@@ -145,11 +145,7 @@ ICM and LLM Wiki remain independent projects. CCA tracks them; when they evolve,
 
 ## Contributing
 
-If you would like to contribute by submitting a PR, ensure the following check passes:
-
-- [ ] If used, would it break ICM principles?
-- [ ] If used, would it break LLM Wiki principles?
-- [ ] If it's a new convention, is it a GenAI/LLM standard?
+See [CONTRIBUTING](CONTRIBUTING.md).
 
 ## License
 
