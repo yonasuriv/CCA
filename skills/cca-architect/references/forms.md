@@ -4,13 +4,18 @@ Forms are design heuristics, not compatibility requirements. Choose the smallest
 
 ## 1. Pipeline
 
-Use for sequential work with explicit handoffs and review gates. When ICM compatibility is claimed, preserve ICM naming and contracts.
+Use for sequential work with explicit handoffs and review gates.
+
+First choose whether the user needs a **full native ICM workspace** or only **ICM-derived stage contracts** inside another project.
+
+### ICM-derived pipeline
+
+A minimal derived pipeline may look like:
 
 ```text
 workspace/
 ├── AGENTS.md                 # optional portable guidance
-├── CLAUDE.md                 # native ICM Layer 0 when applicable
-├── CONTEXT.md
+├── CONTEXT.md                # task router when useful
 ├── stages/
 │   ├── 01-research/
 │   │   ├── CONTEXT.md
@@ -27,9 +32,17 @@ workspace/
 └── [stable shared references/configuration]
 ```
 
-Use when the same multi-step workflow runs repeatedly and stage boundaries make review or context isolation clearer.
+This may borrow ICM naming, contracts, selective routing, one-way dependencies, and output handoffs, but it is **not** a native ICM workspace merely because this tree exists.
 
-Failure modes: multi-job stages, missing/oversized contracts, downstream-to-upstream back-references, and quality rules copied from old outputs instead of canonical references.
+### Full native ICM pipeline
+
+When native ICM compatibility is requested, implement the complete applicable current ICM profile: native `CLAUDE.md`, five-layer routing, root and stage contracts, `setup`/`status` behavior, flat all-at-once questionnaire, naming and placeholder rules, tool prerequisites where needed, applicable checkpoints/audits/spec/value/shared-constant patterns, quality guardrails, and workspace-builder-equivalent validation.
+
+Do not reduce that profile to the minimal tree above.
+
+Use pipelines when the same multi-step workflow runs repeatedly and stage boundaries make review or context isolation clearer.
+
+Failure modes: multi-job stages, missing/oversized contracts, downstream-to-upstream back-references, quality rules copied from old outputs instead of canonical references, and partial ICM-derived structures mislabeled as native ICM.
 
 ## 2. Umbrella
 
@@ -101,7 +114,7 @@ Markdown links and lightweight metadata can express relationships without requir
 
 ## Composition
 
-Forms may compose when the work naturally crosses boundaries. A common example is a maintained knowledge base feeding an ICM-compatible pipeline.
+Forms may compose when the work naturally crosses boundaries. A common example is a maintained knowledge base feeding an ICM-derived pipeline inside a broader CCA workspace. A full native ICM profile is also possible, but must satisfy its complete upstream acceptance surface.
 
 ```mermaid
 flowchart LR
