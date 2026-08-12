@@ -2,7 +2,7 @@
 
 **Version 0.1.0** — Status: Draft, tracking ICM, LLM Wiki, AGENTS.md, and Agent Skills upstream.
 
-Normative. Skills and examples in this repository must conform to this document.
+Normative. Skills and examples in this repository must conform to this document. Method composition is additionally governed by [`method-composition.md`](method-composition.md).
 
 The key words **must**, **should**, and **may** are to be interpreted as in RFC 2119.
 
@@ -17,7 +17,9 @@ CCA builds on:
 - **AGENTS.md** for portable agent guidance.
 - **Agent Skills (`SKILL.md`)** for portable, progressively disclosed capabilities.
 
-CCA does not replace those upstreams. Where an upstream already defines a useful shape, CCA should preserve it rather than minting a competing convention.
+CCA can also compose with human knowledge-work methodologies such as PARA, Zettelkasten, and Building a Second Brain without promoting them to structural compatibility profiles.
+
+CCA does not replace those upstreams or methods. Where an upstream already defines a useful shape, CCA should preserve it rather than minting a competing convention.
 
 ## 2. Core principle
 
@@ -29,7 +31,7 @@ CCA may add optional semantics where upstreams leave implementation open, but it
 2. make a CCA-specific choice appear mandatory for ICM or LLM Wiki compatibility;
 3. require a proprietary runtime to understand the workspace;
 4. duplicate canonical rules across adapters or catalogs;
-5. force a pipeline, wiki, database, or agent framework where the work does not need one.
+5. force a pipeline, wiki, database, agent framework, or organizational taxonomy where the work does not need one.
 
 ## 3. Compatibility states
 
@@ -43,6 +45,8 @@ Compatibility is an acceptance guarantee, not a claim that every upstream worksp
 
 CCA also distinguishes a **native upstream profile** from **derived use of upstream patterns**. Borrowing an upstream construct does not by itself justify claiming full compatibility with that upstream.
 
+PARA, Zettelkasten, BASB/CODE, and similar human methods are **method overlays**, not additional compatibility states.
+
 ## 4. Workspace model
 
 A workspace is a folder containing durable files that an agent and human can inspect and edit. Markdown is preferred for prose; JSON/YAML may be used for structured data.
@@ -55,7 +59,20 @@ A workspace may be:
 - an LLM Wiki-style knowledge base;
 - an ordinary coding repository with portable agent guidance;
 - a hybrid of those forms;
+- a second brain or PKM system using method overlays such as PARA or Zettelkasten;
 - another filesystem-native form whose boundaries improve routing and maintenance.
+
+### 4.1 Boundary composition
+
+CCA composes heterogeneous methods and profiles by preserving boundaries rather than forcing one universal tree.
+
+- An outer organizational method may determine where a nested workspace lives.
+- A nested native ICM root remains governed by the complete applicable ICM profile.
+- A nested LLM Wiki remains governed by its own schema and maintenance instructions.
+- Human-authored knowledge such as Zettelkasten notes must not be assumed agent-writable without local authority.
+- Ordinary filesystem semantics should be inferred when safe rather than serialized into a giant CCA manifest that merely restates paths.
+
+See [`method-composition.md`](method-composition.md).
 
 ## 5. Layered context routing
 
@@ -71,7 +88,7 @@ For pipeline-oriented work, CCA adopts ICM's five-layer architecture when the IC
 
 Agents read down the layers and stop when they have enough context for the current task.
 
-CCA may use analogous routing for non-pipeline forms, but it must not force LLM Wiki or ordinary repositories into ICM layers merely for cosmetic consistency.
+CCA may use analogous routing for non-pipeline forms, but it must not force LLM Wiki, PARA, Zettelkasten, BASB, or ordinary repositories into ICM layers merely for cosmetic consistency.
 
 ## 6. Portable root guidance
 
@@ -254,10 +271,14 @@ Requirements:
 - description states what the skill does and when it should trigger;
 - `SKILL.md` remains compact enough for activation-time loading;
 - detailed material lives in skill-local `references/`, `assets/`, or `scripts/` and is loaded only when required;
-- paths referenced by a skill are relative to that skill root;
-- core execution must not depend on a sibling skill or a repository-global file that will disappear when the skill is copied elsewhere.
+- implementation files referenced by path remain inside that skill package;
+- sibling filesystem paths and repository-global implementation paths are not part of a skill's execution contract.
 
-A skill may recommend another skill for an optional follow-up, but absence of that sibling cannot make the active skill unusable.
+CCA's first-party skills are distributed as a **suite of focused capabilities**. Package portability means a skill does not depend on where sibling packages happen to be installed; it does not require each capability to be a useful unrelated standalone product.
+
+A skill may coordinate with another installed CCA capability by semantic skill name, for example `Use cca-lint to validate the selected profile`. This is semantic delegation, not a filesystem dependency.
+
+`cca-architect` is the primary coordinator for compound workspace-design requests and may lazy-load detailed method/form references before delegating focused operations. It is not a mandatory gateway for direct requests that already match another focused skill.
 
 ## 12. Operations
 
@@ -265,7 +286,7 @@ CCA currently defines six portable operations:
 
 | Operation | Purpose |
 |---|---|
-| `architect` | design a new filesystem-native workspace or restructure an existing one with an explicit migration gate |
+| `architect` | design a new filesystem-native workspace or restructure an existing one with an explicit migration gate; coordinate compound method/profile composition |
 | `scaffold` | add the smallest useful routing/context layer without restructuring existing content |
 | `sync` | reconcile routing/catalog files with disk without inventing content |
 | `ingest` | integrate new evidence into maintained synthesis |
@@ -274,7 +295,7 @@ CCA currently defines six portable operations:
 
 ## 13. Profile-aware linting
 
-Linting must distinguish upstream validity from optional CCA hardening.
+Linting must distinguish upstream validity from optional CCA hardening and method overlays.
 
 At minimum, `cca-lint` supports:
 
@@ -282,6 +303,8 @@ At minimum, `cca-lint` supports:
 - **ICM-derived patterns** — validate borrowed ICM constructs without falsely promoting the host repository to native ICM compatibility.
 - **LLM Wiki native compatibility** — validate the core maintained-wiki behavior without imposing one CCA filesystem schema.
 - **CCA conformance** — validate whichever additional CCA conventions the workspace explicitly adopted.
+
+PARA, Zettelkasten, BASB/CODE, and similar overlays must not be invented as native lint profiles. Locally declared preservation constraints may be checked as workspace rules.
 
 A missing CCA optional convention may be reported as a hardening opportunity, but not as an upstream compatibility failure.
 
@@ -291,7 +314,7 @@ For intentionally structured CCA workspaces, the CCA portability walk test is:
 
 > A fresh agent with no prior chat memory can orient, perform a representative operation, and report status using the workspace files alone.
 
-- **Orient**: identify what the workspace is and where relevant context lives.
+- **Orient**: identify what the workspace is, which profile/method boundary is active, and where relevant context lives.
 - **Act**: perform one representative operation using only routed files and available tools.
 - **Report**: state what changed, what was produced, what remains, and what is missing or ambiguous.
 
@@ -320,6 +343,7 @@ CCA is not:
 - a replacement for MCP;
 - a vector database or retrieval engine;
 - a workflow scheduler;
+- a replacement for PARA, Zettelkasten, BASB, ICM, LLM Wiki, AGENTS.md, or Agent Skills;
 - a requirement to use Markdown for every artifact;
 - a claim that all filesystem layouts should look identical.
 
@@ -328,5 +352,7 @@ Real-time multi-agent collaboration, where agents need to communicate dynamicall
 ## 17. Upstream evolution
 
 CCA tracks its upstreams. When ICM, LLM Wiki, AGENTS.md, Agent Skills, or a directly relevant adjacent standard changes, CCA should verify the primary source and adapt toward it.
+
+Method-overlay guidance should likewise be updated when the methods it describes materially change, without silently promoting them to structural compatibility profiles.
 
 See `docs/standards.md` for the tracked compatibility surface and update procedure.
