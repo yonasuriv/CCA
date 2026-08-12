@@ -6,11 +6,13 @@ Normative companion to `SPEC.md`. This document defines compatibility boundaries
 
 CCA distinguishes three states:
 
-- **Native-compatible** — CCA can consume the workspace without structural migration.
+- **Native-compatible** — CCA can consume the workspace without structural migration and, when CCA generates or materially rewrites that native profile, the applicable upstream acceptance surface passes.
 - **CCA-hardened** — optional CCA routing, portability, provenance, or maintenance conventions were added.
 - **CCA-conformant** — the workspace intentionally adopts the CCA specification.
 
 An ICM workspace or LLM Wiki does not become "CCA" merely because CCA can understand it. Compatibility is an acceptance guarantee, not retroactive ownership of upstream semantics.
+
+CCA also distinguishes a **native upstream profile** from **derived use of upstream patterns**. Borrowing part of a convention does not justify claiming full compatibility with that upstream.
 
 ## 2. Concept mapping
 
@@ -29,20 +31,47 @@ The overlap is semantic, not an excuse to force identical directory trees.
 
 ## 3. ICM compatibility profile
 
-CCA claims ICM compatibility only when it preserves the current ICM conventions it uses:
+### Native ICM
 
-1. Five-layer routing architecture.
-2. `CLAUDE.md` as ICM's native Layer 0 entry point.
-3. Root and stage `CONTEXT.md` routing.
-4. Stage contracts with the canonical sections `Inputs`, `Process`, `Outputs`.
-5. ICM's canonical Inputs table shape: `Source | File/Location | Section/Scope | Why`.
-6. Zero-padded, lowercase, hyphenated stage folders such as `01-collect`.
-7. One-way cross-references.
-8. Selective section routing.
-9. One fact, one canonical home.
-10. Human-editable handoffs through each stage's `output/` folder.
+CCA claims **native ICM compatibility** only when the workspace satisfies the complete applicable current ICM profile. CCA treats upstream `_core/CONVENTIONS.md` as the canonical semantic authority and the workspace-builder validation stage as the practical acceptance checklist for generated ICM workspaces.
 
-CCA extensions must be ignorable by an ICM-only consumer.
+Native ICM validation includes, where applicable:
+
+1. five-layer routing and native Layer 0 `CLAUDE.md`;
+2. root and per-stage `CONTEXT.md` routing;
+3. exact `Inputs` / `Process` / `Outputs` stage contracts and canonical Inputs columns;
+4. current ICM naming conventions, including zero-padded lowercase-hyphenated stages;
+5. per-stage `output/` handoffs and an unbroken handoff chain;
+6. cross-reference integrity and an acyclic one-way dependency graph;
+7. selective section routing and one canonical home per substantive rule;
+8. `CONTEXT.md` purity;
+9. current `setup` and `status` trigger behavior;
+10. a flat, all-at-once, system-level questionnaire with complete placeholder coverage where setup placeholders are used;
+11. valid conditional placeholder syntax where used;
+12. tool prerequisite/setup/verification guidance where required;
+13. bundled-skill behavior where the optional ICM pattern is used;
+14. spec stages that define WHAT/WHEN rather than implementation HOW where applicable;
+15. checkpoints for applicable creative stages;
+16. audits for applicable creative/build stages;
+17. value validation for applicable content-producing stages;
+18. docs-over-outputs discipline;
+19. shared constants in applicable code-producing workspaces;
+20. current ICM quality guardrails, including routing/reference size and formatting/readability rules;
+21. workspace-builder-equivalent end-to-end validation before a generated workspace is described as ready.
+
+CCA extensions must be ignorable by an ICM-only consumer. If current upstream ICM changes this acceptance surface, CCA must converge toward the current upstream rather than treat this list as frozen authority.
+
+### ICM-derived patterns
+
+A non-ICM workspace may intentionally borrow ICM constructs such as:
+
+- numbered stage folders;
+- stage `CONTEXT.md` contracts;
+- selective Inputs routing;
+- one-way dependencies;
+- per-stage output handoffs.
+
+That is **ICM-derived**, not native ICM compatibility, unless the rest of the applicable ICM profile also passes.
 
 ### Portable `AGENTS.md` with ICM
 
@@ -54,6 +83,8 @@ Where both exist:
 - Use tool-supported include/import behavior where available.
 - Otherwise keep the secondary file as a minimal pointer that does not fork rules.
 - Never claim CCA can override a harness's own instruction-discovery precedence.
+
+Where native ICM specifies a concrete trigger output or representation, CCA preferences such as Mermaid do not replace that upstream-required form.
 
 ## 4. LLM Wiki compatibility profile
 
@@ -103,7 +134,7 @@ Cross-skill suggestions are allowed, but they must be optional: if the sibling s
 
 ### ICM → CCA tooling
 
-CCA tooling must be able to inspect and operate on a native ICM workspace without first renaming stages, rewriting contracts, or replacing `CLAUDE.md`.
+CCA tooling must be able to inspect and operate on a native ICM workspace without first renaming stages, rewriting contracts, replacing `CLAUDE.md`, or forcing CCA-only metadata.
 
 Optional hardening may add portable `AGENTS.md` guidance or knowledge capabilities, but the ICM workflow remains valid.
 
@@ -115,13 +146,27 @@ Optional hardening may add portable routing, provenance metadata, indexes, or li
 
 ### CCA → ICM consumer
 
-The pipeline subset of a CCA-conformant workspace must preserve ICM stage naming, contracts, routing semantics, one-way references, and handoffs so an ICM consumer can ignore CCA-only additions.
+If a CCA-conformant workspace claims a **native ICM profile**, that profile must preserve the full applicable current ICM acceptance surface so an ICM consumer can operate it without depending on CCA-only semantics.
+
+If a CCA workspace only borrows ICM stage-contract patterns, it must describe that part as **ICM-derived** rather than promise native ICM interchangeability.
 
 ### CCA → LLM Wiki practice
 
 A CCA knowledge bundle must preserve the LLM Wiki core idea: persistent, agent-maintained synthesis over durable source material. CCA-specific metadata and maintenance structure must remain implementation choices, not reinterpretations of the upstream pattern.
 
-## 8. Upstream drift
+## 8. Validation precedence
+
+Validation order is:
+
+1. detect the actual native/upstream profile;
+2. validate that profile against its current upstream rules;
+3. validate any intentionally adopted CCA conformance;
+4. run the CCA fresh-agent walk test as a supplemental portability check;
+5. report optional hardening separately.
+
+CCA must not use a successful walk test to waive a failed upstream acceptance check.
+
+## 9. Upstream drift
 
 CCA does not freeze upstream behavior. When ICM, LLM Wiki, AGENTS.md, or Agent Skills evolves, verify the primary source and update CCA toward it unless doing so would contradict CCA's core principle of filesystem-native, portable, inspectable context.
 
