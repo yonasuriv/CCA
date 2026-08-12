@@ -1,4 +1,4 @@
-# CCA — Convergent Context Architecture
+# Convergent Context Architecture
 
 > **CCA is an agent-agnostic interoperability layer for filesystem-native AI context. It makes ICM workspaces, LLM Wikis, AGENTS.md, Agent Skills, and existing projects easier to use together without forcing them into a new competing convention.**
 
@@ -61,7 +61,7 @@ flowchart TB
 
 If an upstream changes, CCA should change toward it rather than freezing a near-compatible fork.
 
-## What CCA is — and is not
+## What CCA is, and what is not
 
 CCA **is**:
 
@@ -152,7 +152,7 @@ If CCA documentation and current upstream ICM ever disagree, upstream ICM wins a
 
 CCA preserves LLM Wiki as an intentionally flexible idea pattern: durable source material plus maintained LLM-owned synthesis that compounds across sessions.
 
-CCA may recommend stronger organization when useful — for example an index, provenance metadata, lifecycle fields, contradiction tracking, or a `raw/` + `wiki/` split — but these are **CCA hardening choices**, not universal requirements of LLM Wiki.
+CCA may recommend stronger organization when useful, for example: an index, provenance metadata, lifecycle fields, contradiction tracking, or a `raw/` + `wiki/` split, but these are **CCA hardening choices**, not universal requirements of LLM Wiki.
 
 A pre-existing LLM Wiki should be understood through its own schema and maintenance instructions before CCA adds anything.
 
@@ -255,9 +255,9 @@ CCA is a strong fit when the work benefits from:
 
 CCA deliberately does not solve every systems problem.
 
-**Real-time multi-agent collaboration** — agents communicating dynamically in tight loops — needs message-passing/orchestration infrastructure.
+**Real-time multi-agent collaboration**: agents communicating dynamically in tight loops, needs message-passing/orchestration infrastructure.
 
-**High-concurrency shared services** need queueing, isolation, locking/transactions, deployment, and other runtime concerns.
+**High-concurrency shared services**: need queueing, isolation, locking/transactions, deployment, and other runtime concerns.
 
 **Complex automated branching or scheduling** may need a workflow engine. CCA can still store the durable context and contracts that such a runtime consumes.
 
@@ -373,10 +373,11 @@ The full FAQ is in [`docs/faq.md`](docs/faq.md), including:
 
 ## References
 
-- **[ICM / Model Workspace Protocol](https://github.com/RinDig/Interpretable-Context-Methodology)** — Jake Van Clief & David McDermott, [Interpretable Context Methodology: Folder Structure as Agent Architecture](https://arxiv.org/pdf/2603.16021)
-- **[LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)** — Andrej Karpathy's idea pattern for LLM-maintained persistent knowledge bases
-- **[AGENTS.md](https://agents.md)** — portable agent instructions
-- **[Agent Skills](https://agentskills.io)** — portable `SKILL.md` packages
+- **[ICM / Model Workspace Protocol](https://github.com/RinDig/Interpretable-Context-Methodology)**: Jake Van Clief & David McDermott \
+    [Interpretable Context Methodology: Folder Structure as Agent Architecture Paper](https://arxiv.org/pdf/2603.16021)
+- **[LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)**: Andrej Karpathy's idea pattern for LLM-maintained persistent knowledge bases
+- **[AGENTS.md](https://agents.md)**: portable agent instructions
+- **[Agent Skills](https://agentskills.io)**: portable `SKILL.md` packages
 
 ## Contributing
 
