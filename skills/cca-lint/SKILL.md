@@ -13,11 +13,12 @@ Validate the workspace it actually is. Do not fail upstream projects for omittin
 Determine one or more applicable profiles from the workspace files and instructions:
 
 - **ICM native compatibility**
+- **ICM-derived patterns only**
 - **LLM Wiki native compatibility**
 - **CCA conformance**
 - **ordinary project with portable agent guidance**
 
-If detection is ambiguous, report the ambiguity. Do not silently choose the strictest profile.
+If detection is ambiguous, report the ambiguity. Do not silently choose the strictest profile. A project that only borrows ICM stage contracts is not automatically a native ICM workspace.
 
 ## 2. Universal structural checks
 
@@ -32,20 +33,38 @@ These checks apply where relevant regardless of profile:
 
 ## 3. ICM native compatibility checks
 
-When the workspace claims or exhibits ICM/MWP structure, verify the upstream invariants:
+For a workspace that claims native ICM/MWP compatibility, validate the **complete applicable current upstream profile**, not only stage-folder syntax. Treat current upstream ICM `_core/CONVENTIONS.md` as canonical and its workspace-builder validation stage as the practical acceptance checklist for generated workspaces.
 
-1. Five-layer routing semantics are preserved.
-2. Native Layer 0 `CLAUDE.md` behavior is not broken.
-3. Root and stage `CONTEXT.md` files route context rather than duplicate reference content.
-4. Stage folders use zero-padded lowercase hyphenated names such as `01-collect`.
-5. Every stage contract contains `Inputs`, `Process`, and `Outputs`.
-6. The Inputs table uses the canonical columns `Source | File/Location | Section/Scope | Why`.
-7. Inputs use selective section routing where only part of a reference is needed.
-8. Cross-stage/reference dependencies are one-way.
-9. Each stage writes to its own `output/` handoff surface.
-10. Canonical-source discipline is preserved.
+At minimum verify:
 
-CCA-only wiki metadata is irrelevant to this profile unless the workspace also adopted it.
+1. **Five layers.** Native Layer 0 `CLAUDE.md`, root `CONTEXT.md`, stage `CONTEXT.md`, selectively loaded reference material, and working artifacts preserve ICM semantics.
+2. **Root routing.** One root `CONTEXT.md` routes task types to the appropriate stages rather than storing reference content.
+3. **Stage contracts.** Every stage has `Inputs`, `Process`, and `Outputs`; the Inputs table uses exactly `Source | File/Location | Section/Scope | Why`.
+4. **CONTEXT purity.** `CONTEXT.md` files contain routing/process/checkpoint/audit/output contract material, not extended reference content.
+5. **Naming.** Files/folders follow current ICM naming rules; stages use zero-padded `01-name` prefixes; output artifacts follow the workspace convention; no spaces; intentionally empty persistent folders contain `.gitkeep`.
+6. **Handoff chain.** Each stage writes to its own `output/`; Stage N+1 references Stage N's actual output location; the chain is unbroken.
+7. **Reference integrity.** Every path named by an Inputs table exists.
+8. **One-way graph.** Cross-stage/reference dependencies are acyclic and do not point backward in a way that creates circular dependencies.
+9. **Selective routing.** Inputs identify exact sections where only part of a reference is needed; use `Full file` only when justified.
+10. **Canonical sources.** Substantive rules have one authoritative home; downstream routers point rather than duplicate.
+11. **Setup trigger.** `setup` starts the one-time onboarding flow defined by the workspace and resolves configured placeholders.
+12. **Status trigger.** `status` reports pipeline completion according to the current ICM convention. Do not substitute a different presentation format when native ICM specifies one.
+13. **Questionnaire.** Onboarding is flat, all-at-once, system-level, derives instead of re-asking inferable fields, supplies sensible defaults/examples, and is not repeated after setup.
+14. **Placeholder coverage.** Every placeholder has a corresponding setup answer/question, every questionnaire field maps somewhere useful, no unresolved/orphaned placeholders remain, and conditional placeholder blocks are structurally valid when used.
+15. **Tool prerequisites.** Required system tools have setup/verification guidance in the correct reference scope; optional tools remain conditional.
+16. **Bundled skills.** If present, skill references and discovery/bundling behavior do not break current ICM expectations; CCA portability checks may be reported separately.
+17. **Specs as contracts.** Specification stages define WHAT/WHEN and leave implementation HOW to the build stage where applicable.
+18. **Checkpoints.** Creative stages include at least one valid checkpoint; checkpoint step references resolve.
+19. **Audits.** Creative/build stages include specific pass/fail audit checks after process execution and before writing output where applicable.
+20. **Value validation.** Content-producing stages define and lock relevant value criteria where the current ICM pattern applies.
+21. **Docs over outputs.** Reference docs remain authoritative for quality/build rules; old outputs are not treated as pattern libraries.
+22. **Shared constants.** Code-producing workspaces centralize configurable shared values when applicable.
+23. **Quality guardrails.** Enforce current ICM size/readability/formatting guardrails, including CONTEXT/reference size limits and ICM-specific text style rules.
+24. **End-to-end validation.** A generated workspace should pass the equivalent of the current workspace-builder validation stage and complete at least one representative run before being called ready when that claim is being made.
+
+If only ICM-derived stage patterns are present, report whether those borrowed patterns are internally valid, but mark **ICM native compatibility: N/A** unless the full profile is actually claimed and present.
+
+CCA-only wiki metadata is irrelevant to the native ICM profile unless the workspace separately adopted it.
 
 ## 4. LLM Wiki native compatibility checks
 
@@ -112,6 +131,7 @@ When remediation is authorized, automatically repair only changes whose intent i
 
 Profiles detected:
 - ICM native compatibility: PASS | FAIL | N/A
+- ICM-derived patterns: PASS | FAIL | N/A
 - LLM Wiki native compatibility: PASS | FAIL | N/A
 - CCA conformance: PASS | PARTIAL | N/A
 
@@ -133,4 +153,4 @@ Profiles detected:
 
 ## Production rule
 
-A clean lint report means the workspace satisfies the profile it claims. It does not mean CCA has imposed every optional convention it knows about.
+A clean lint report means the workspace satisfies the profile it claims. The CCA walk test supplements profile-specific validation; it does not replace ICM acceptance or another upstream's stricter rules.
