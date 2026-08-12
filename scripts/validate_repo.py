@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """CCA repository regression validator.
 
-Checks mechanical invariants that protect ICM compatibility, Agent Skills
-portability, documentation integrity, and the worked example. Uses only the
-Python standard library so contributors and CI can run it without setup.
+Checks mechanical invariants that protect selected ICM-derived patterns,
+Agent Skills portability, documentation integrity, and the worked example.
+This is a repository regression gate, not a certification of the complete
+native ICM acceptance surface. Uses only the Python standard library so
+contributors and CI can run it without setup.
 """
 
 from __future__ import annotations
@@ -94,7 +96,8 @@ def validate_skills() -> None:
                 error(f"broken skill-local reference: {skill_dir.name}: {target}")
 
 
-def validate_icm_example() -> None:
+def validate_icm_derived_example() -> None:
+    """Validate only the ICM-derived patterns the hybrid example adopts."""
     stages = EXAMPLE / "stages"
     if not stages.is_dir():
         error("worked example is missing stages/")
@@ -103,7 +106,7 @@ def validate_icm_example() -> None:
     stage_dirs = sorted(path for path in stages.iterdir() if path.is_dir())
     for stage in stage_dirs:
         if not re.fullmatch(r"\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*", stage.name):
-            error(f"non-ICM stage directory name: {stage.relative_to(ROOT)}")
+            error(f"non-ICM-derived stage directory name: {stage.relative_to(ROOT)}")
 
         contract = stage / "CONTEXT.md"
         text = read(contract)
@@ -113,9 +116,9 @@ def validate_icm_example() -> None:
 
         canonical_header = "| Source | File/Location | Section/Scope | Why |"
         if canonical_header not in text:
-            error(f"ICM Inputs table drift: {contract.relative_to(ROOT)}")
+            error(f"ICM-derived Inputs table drift: {contract.relative_to(ROOT)}")
         if "| Role |" in text or "| Section/Scope | Role | Why |" in text:
-            error(f"CCA-only Role column added to ICM contract: {contract.relative_to(ROOT)}")
+            error(f"CCA-only Role column added to ICM-derived contract: {contract.relative_to(ROOT)}")
         if not (stage / "output").is_dir():
             error(f"stage missing output/ handoff: {stage.relative_to(ROOT)}")
 
@@ -166,7 +169,7 @@ def validate_required_docs() -> None:
 def main() -> int:
     validate_required_docs()
     validate_skills()
-    validate_icm_example()
+    validate_icm_derived_example()
     validate_markdown_links()
 
     if ERRORS:
@@ -175,7 +178,7 @@ def main() -> int:
             print(f"- {item}", file=sys.stderr)
         return 1
 
-    print("CCA validation passed.")
+    print("CCA repository validation passed (mechanical regression checks only).")
     return 0
 
 
