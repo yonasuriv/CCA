@@ -1,89 +1,74 @@
-# Migration guide
+# Compatibility and hardening guide
 
-How to bring an existing project into CCA. Every path ends at CCA-1
-(conformant); run the walk test from `spec/SPEC.md` to claim CCA-2.
+Native compatibility does not require migration. Use this guide only when adding CCA portability or maintenance conventions improves the workspace.
 
-The fastest route for all of these: point your agent at this repo and ask it
-to use `cca-scaffold` (add structure in place) or `cca-architect` (full
-restructure). What follows is the manual equivalent.
+## Existing ICM workspace
 
-## Path A — From an ICM workspace
+Keep native ICM structure unchanged: `CLAUDE.md`, root/stage `CONTEXT.md`, `stages/01-name/`, references, and `output/` handoffs remain valid.
 
-You need: an ICM workspace with `CLAUDE.md`, `CONTEXT.md`, `stages/`,
-`_config/`.
+Optional hardening:
 
-1. **Add the canonical root.** Create `AGENTS.md` from
-   `skills/cca-architect/assets/templates/AGENTS.md`. Fill in the directory
-   map and routing rules for your workspace.
-2. **Demote `CLAUDE.md` to an adapter** (see `spec/adapters.md`):
-   ```markdown
-   # CLAUDE.md
-   This workspace follows the Convergent Context Architecture.
-   Read `AGENTS.md` — it is the authoritative root catalog.
-   ```
-   Move any content that only existed in `CLAUDE.md` into `AGENTS.md` first.
-3. **Done.** Your `CONTEXT.md` routing, stage contracts, `_config/`, and
-   `output/` handoffs are already conformant — that format *is* CCA's.
-4. Optional: add knowledge capability later by creating `raw/`, `wiki/`,
-   `wiki/index.md`, `log.md` and routing ingest/query/lint (see Path B, in
-   reverse).
+1. Add portable `AGENTS.md` guidance for agents that support it.
+2. Keep native `CLAUDE.md` behavior intact. Where guidance is shared, use a minimal pointer/include instead of duplicated rules.
+3. Add maintained knowledge only if the workflow needs synthesis that persists across runs.
+4. Validate ICM native compatibility before checking optional CCA conventions.
 
-Nothing is renamed, deleted, or reformatted. ICM tooling keeps working.
+Do not rename stages, change the canonical Inputs table, or rewrite stage contracts merely to make them look more CCA-specific.
 
-## Path B — From an LLM Wiki
+## Existing LLM Wiki
 
-You need: `raw/`, `wiki/`, `index.md`, `log.md`, and a schema file
-(`CLAUDE.md`, `AGENTS.md`, or similar).
+Keep the implementation's own schema, directories, navigation, and maintenance procedures.
 
-1. **Add (or upgrade) the root catalog.** If you already have `AGENTS.md`
-   as your schema, add a directory map and routing rules if missing. If your
-   schema lives in `CLAUDE.md` or `schema.md`, move its conventions into
-   `AGENTS.md` (or `_config/`) and leave a thin adapter behind.
-2. **Keep everything else exactly as-is.** `raw/` is the source role,
-   `wiki/` is synthesis, `index.md` is a catalog, `log.md` is the chronicle.
-   You were already speaking CCA.
-3. **Check the wiki hygiene rules:** frontmatter on pages, provenance links
-   to sources, log entries with a consistent `## [DATE] op | subject`
-   prefix. `cca-lint` will report gaps.
-4. Optional: add a pipeline later — `stages/01_.../` folders whose contracts
-   read from `wiki/` and write to `output/` (see `examples/topic-research/`).
+Optional hardening may add:
 
-## Path C — From a CLAUDE.md-only repo (no structure yet)
+- portable `AGENTS.md` routing;
+- stronger provenance or lifecycle metadata;
+- an explicit index/history mechanism when the existing wiki would benefit from one;
+- an ICM-compatible pipeline that consumes maintained knowledge.
 
-You need: a project with a single instruction file and folders that grew
-organically.
+CCA's preferred `raw/`, `wiki/`, `wiki/index.md`, `log.md`, frontmatter, and page taxonomies are implementation options, not universal LLM Wiki requirements.
 
-1. Run `cca-scaffold` in quick mode, or manually:
-   - Write `AGENTS.md`: what this project is, the directory map, routing
-     rules ("for X, look in Y"), authority order.
-   - Write `CONTEXT.md`: given common tasks, which folder or procedure
-     handles each.
-   - Create `_config/` for stable conventions (style, glossary, decisions).
-2. Leave all existing folders untouched. Quick mode adds a routing layer; it
-   does not restructure.
-3. If the project has a repeated multi-step workflow, promote it to full
-   mode: numbered stage folders with contracts. If it has accumulating
-   knowledge, add the wiki triad (`raw/`, `wiki/`, `index.md` + `log.md`).
+## Existing coding repository
 
-## Path D — From an unstructured folder ("organize this mess")
+Start with the smallest useful change:
 
-Use `cca-architect` in restructure mode. It will:
+1. Add or improve root `AGENTS.md` if portable agent guidance is useful.
+2. Preserve nested `AGENTS.md` scope in monorepos/subprojects.
+3. Add `CONTEXT.md` only when explicit intent-to-context routing materially reduces exploration.
+4. Do not move source code, tests, configuration, or docs into CCA-specific folders by default.
+5. Add stages only for genuine sequential workflows; add maintained knowledge only when it should compound across sessions.
 
-1. Audit the folder and classify every file by role (catalog / contract /
-   factory / source / synthesis / product / chronicle / dead).
-2. Propose a migration map — where each file should live — for your approval
-   *before* moving anything.
-3. Migrate, generate the missing catalogs and contracts, then run the walk
-   test to validate.
+## Existing harness-specific instruction file
 
-Never let the agent skip step 2. The map is the review gate.
+Do not blindly replace `CLAUDE.md`, `GEMINI.md`, or another native instruction file.
 
-## After any migration
+1. Determine how the target harness discovers and scopes instructions.
+2. Identify unique substantive guidance in each file.
+3. Choose one canonical body of shared rules where possible.
+4. Use the harness's native include/import mechanism if available; otherwise use the smallest safe pointer.
+5. Re-test the native harness after the change.
 
-- [ ] `AGENTS.md` exists, is a catalog (points, doesn't store), ≤ ~800 tokens
-- [ ] Root authority order respected; adapters are thin pointers
-- [ ] Every file classifiable into one of the eight roles
-- [ ] Pipelines: every stage has a contract with an Inputs table
-- [ ] Wikis: `index.md` current, `log.md` append-only and parseable
-- [ ] `cca-lint` passes with no structural errors
-- [ ] Walk test: a fresh agent orients, acts, and reports from files alone
+CCA cannot override a harness's own precedence rules.
+
+## Unstructured folder
+
+Use `cca-architect` in restructure mode:
+
+1. audit the current structure and native conventions;
+2. classify function without forcing relocations;
+3. propose a migration map including compatibility impact;
+4. obtain explicit approval before moves, merges, renames, or deletions;
+5. apply only the approved map;
+6. validate the original native profile first, then any intentional CCA conformance.
+
+## After hardening
+
+Check the profile you actually claim:
+
+- **ICM:** native Layer 0 remains usable; stages are `01-name`; contracts retain `Inputs` / `Process` / `Outputs` and canonical Inputs columns; references remain one-way and selectively loaded.
+- **LLM Wiki:** maintained synthesis still follows the implementation's own schema; CCA-specific metadata has not been mislabeled as upstream-required.
+- **AGENTS.md:** nested scope remains intact; portable guidance does not contradict native harness instructions.
+- **Agent Skills:** each skill can execute independently using skill-local relative resources.
+- **CCA:** optional conventions are validated only where intentionally adopted.
+
+Finally run a fresh-agent walk test: orient, perform one representative operation, and report state using durable files alone.
