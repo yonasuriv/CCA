@@ -1,6 +1,4 @@
-# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files
-
-cff-version: 1.2.0
+cff-version: 1.2.0 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files
 message: "If you use CCA, please cite it using the metadata below."
 title: "CCA: Convergent Context Architecture"
 authors:
