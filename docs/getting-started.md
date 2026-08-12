@@ -2,6 +2,8 @@
 
 CCA is a filesystem-native interoperability layer for agent context. You do not install a runtime to use it. Start from the workspace you already have, then add only the structure that improves routing or portability.
 
+CCA's first-party Agent Skills are intended as a **suite of focused capabilities**. `cca-architect` handles compound workspace-design questions; direct lint, ingest, query, sync, or scaffold requests can route straight to their focused skill.
+
 ## Choose your starting point
 
 ```mermaid
@@ -9,17 +11,19 @@ flowchart TD
     A["What do you already have?"]
     A -->|"ICM workspace"| B["Keep the ICM structure unchanged"]
     A -->|"LLM Wiki"| C["Keep the wiki implementation unchanged"]
+    A -->|"PARA / Zettelkasten / BASB / second brain"| P["Preserve the method and identify nested boundaries"]
     A -->|"Coding project / existing repo"| D["Add portable routing in place"]
     A -->|"New workflow or knowledge space"| E["Design the smallest suitable workspace"]
 
     B --> F["Validate full native ICM profile"]
     C --> G["Validate native wiki behavior"]
+    P --> I["Use cca-architect for composition changes"]
     D --> H["Use cca-scaffold"]
-    E --> I["Use cca-architect"]
+    E --> I
 
     F --> J["Optionally add CCA hardening"]
     G --> J
-    H --> K["Validate the profile actually adopted"]
+    H --> K["Use cca-lint for adopted profiles"]
     I --> K
     K --> J
 ```
@@ -62,7 +66,44 @@ CCA can recognize common concepts such as durable evidence, maintained synthesis
 
 Add CCA hardening only when useful: portable `AGENTS.md` routing, stronger provenance conventions, lifecycle metadata, or a pipeline that consumes the wiki.
 
-## 3. Existing coding project
+## 3. Existing PARA, Zettelkasten, BASB, or second brain
+
+Keep it. These are **method overlays**, not structures CCA needs to replace.
+
+- **PARA** can remain the outer organization for Projects, Areas, Resources, and Archives.
+- **Zettelkasten** notes can remain linked idea-level knowledge; do not assume agents may rewrite them.
+- **BASB/CODE** can remain the human lifecycle across Capture, Organize, Distill, and Express.
+- **LLM Wiki** can coexist as maintained agent synthesis where that is useful.
+- **ICM** can exist as a nested workflow boundary for repeatable staged work.
+
+A typical hybrid may look like:
+
+```text
+workspace/
+├── AGENTS.md
+├── Projects/
+│   ├── software-project/
+│   │   ├── AGENTS.md
+│   │   ├── src/
+│   │   └── tests/
+│   └── client-work/
+│       └── assessment/
+│           ├── CLAUDE.md
+│           ├── CONTEXT.md
+│           └── stages/
+├── Areas/
+├── Resources/
+│   └── knowledge/
+│       ├── zettelkasten/
+│       └── llm-wiki/
+└── Archives/
+```
+
+The key rule is **nest boundaries; do not merge schemas merely because they coexist**. If `assessment/` is a native ICM root, validate and operate that directory as ICM even though PARA determines where it lives.
+
+Use `cca-architect` when you want to design/restructure this composition. Read [`method-composition.md`](method-composition.md) for the full model.
+
+## 4. Existing coding project
 
 Use `cca-scaffold` in quick mode. It should add context routing without reorganizing application code.
 
@@ -83,7 +124,7 @@ Nested `AGENTS.md` files may be used for subprojects or packages. Follow the AGE
 
 If you add numbered ICM-style stages to a coding repository but do not implement the full ICM profile, describe them as **ICM-derived stage contracts** rather than calling the whole repository native ICM-compatible.
 
-## 4. New workspace
+## 5. New workspace
 
 Use `cca-architect` and start from the work, not from a preferred folder tree.
 
@@ -92,8 +133,33 @@ Choose the smallest form that fits:
 - **Full native ICM pipeline** for a repeatable sequential workflow when you want complete ICM compatibility, including its onboarding and validation model.
 - **ICM-derived pipeline** when explicit stages/handoffs help but the host project does not need the complete ICM workspace profile.
 - **Knowledge bundle** for persistent synthesis that compounds across sessions.
-- **Hybrid** when a pipeline consumes or updates maintained knowledge.
+- **Method-organized PKM/second brain** when PARA, Zettelkasten, BASB, or another human method already expresses the work well.
+- **Hybrid** when a pipeline consumes or updates maintained knowledge or when several valid boundaries coexist.
 - **Ordinary project routing** when the existing repository structure already expresses the work well.
+
+## Skill routing
+
+CCA uses Agent Skills progressive disclosure rather than one monolithic skill.
+
+```mermaid
+flowchart TD
+    U["User request"]
+    U -->|"Design / combine methods / restructure"| A["cca-architect"]
+    U -->|"Add routing/context"| S["cca-scaffold"]
+    U -->|"Repair stale navigation"| Y["cca-sync"]
+    U -->|"Integrate evidence"| I["cca-ingest"]
+    U -->|"Query knowledge"| Q["cca-query"]
+    U -->|"Validate"| L["cca-lint"]
+
+    A --> M["Lazy-load forms/method references"]
+    A -. "semantic delegation" .-> S
+    A -. "semantic delegation" .-> Y
+    A -. "semantic delegation" .-> I
+    A -. "semantic delegation" .-> Q
+    A -. "semantic delegation" .-> L
+```
+
+Cross-skill coordination is by semantic skill name, never by reaching into sibling skill directories. Package portability means implementation references stay inside each skill package; the six CCA capabilities are intended to be distributed as a suite.
 
 ## How CCA routes context
 
@@ -109,7 +175,7 @@ flowchart LR
     P -->|"Knowledge workspace"| I["Native wiki router / index"]
     I --> W["Relevant synthesis"]
     W --> E["Evidence when verification is needed"]
-    P -->|"Ordinary project"| R["Existing project structure + scoped instructions"]
+    P -->|"Ordinary / method-organized project"| R["Existing structure + scoped instructions"]
     N --> K["Matching SKILL.md when an operation is needed"]
     K --> Q["Skill-local resources loaded as needed"]
 ```
@@ -123,6 +189,8 @@ Run `cca-lint` with the correct profile:
 - **LLM Wiki native compatibility**: verify the core maintained-wiki behavior without imposing one concrete implementation.
 - **CCA conformance**: verify the additional CCA conventions the workspace intentionally adopted.
 
+PARA, Zettelkasten, and BASB are reported as method overlays/preservation constraints when relevant, not invented native profiles.
+
 Then perform the CCA walk test: a fresh agent should be able to orient, perform a representative operation, and report state using the files alone. The walk test supplements upstream validation; it does not replace it.
 
 ## Where CCA fits well
@@ -135,6 +203,7 @@ CCA is useful when you want one or more of these properties:
 - portable instructions and skills without forcing a single agent vendor;
 - repeatable staged workflows with durable handoffs;
 - persistent maintained knowledge that compounds over time;
+- existing PKM/second-brain methods connected to agent workflows without being replaced;
 - an existing coding or knowledge repository made easier for agents to navigate without restructuring it.
 
 CCA is less useful when the problem is primarily real-time message passing, high-concurrency orchestration, queueing, scheduling, or a service/database problem. Those can sit above or beside CCA, but CCA does not try to replace them.
@@ -144,6 +213,8 @@ CCA is less useful when the problem is primarily real-time message passing, high
 - [`../README.md`](../README.md) — project overview, mental model, and compatibility model.
 - [`../spec/SPEC.md`](../spec/SPEC.md) — normative CCA specification.
 - [`../spec/compatibility.md`](../spec/compatibility.md) — compatibility boundaries.
+- [`../spec/method-composition.md`](../spec/method-composition.md) — normative method-overlay and skill-suite rules.
+- [`method-composition.md`](method-composition.md) — explanatory composition model and examples.
 - [`migration.md`](migration.md) — optional hardening/migration paths.
 - [`faq.md`](faq.md) — common usage questions.
 - [`standards.md`](standards.md) — upstream conventions CCA tracks.

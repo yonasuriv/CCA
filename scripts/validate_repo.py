@@ -2,7 +2,7 @@
 """CCA repository regression validator.
 
 Checks mechanical invariants that protect selected ICM-derived patterns,
-Agent Skills portability, documentation integrity, and the worked example.
+Agent Skills package locality, documentation integrity, and the worked example.
 This is a repository regression gate, not a certification of the complete
 native ICM acceptance surface. Uses only the Python standard library so
 contributors and CI can run it without setup.
@@ -95,6 +95,11 @@ def validate_skills() -> None:
             if not target_path.exists():
                 error(f"broken skill-local reference: {skill_dir.name}: {target}")
 
+        # Semantic delegation may name another installed skill, but a package
+        # must never reach into a sibling skill directory by filesystem path.
+        if re.search(r"(?:\.\./)+cca-[a-z0-9-]+/", text):
+            error(f"skill uses sibling filesystem dependency: {skill_dir.name}")
+
 
 def validate_icm_derived_example() -> None:
     """Validate only the ICM-derived patterns the hybrid example adopts."""
@@ -157,9 +162,11 @@ def validate_required_docs() -> None:
         ROOT / "CONTRIBUTING.md",
         ROOT / "docs" / "getting-started.md",
         ROOT / "docs" / "faq.md",
+        ROOT / "docs" / "method-composition.md",
         ROOT / "docs" / "standards.md",
         ROOT / "spec" / "SPEC.md",
         ROOT / "spec" / "compatibility.md",
+        ROOT / "spec" / "method-composition.md",
     ]
     for path in required:
         if not path.is_file():

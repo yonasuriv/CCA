@@ -1,6 +1,6 @@
 # Workspace forms
 
-Forms are design heuristics, not compatibility requirements. Choose the smallest shape that improves routing or maintenance. Preserve an existing ICM or LLM Wiki implementation before applying a CCA-preferred form.
+Forms are design heuristics, not compatibility requirements. Choose the smallest shape that improves routing or maintenance. Preserve an existing ICM or LLM Wiki implementation before applying a CCA-preferred form. When PARA, Zettelkasten, BASB/CODE, or other human methods are involved, read [methods.md](methods.md) and preserve them as method overlays rather than forcing them into one CCA tree.
 
 ## 1. Pipeline
 
@@ -40,6 +40,8 @@ When native ICM compatibility is requested, implement the complete applicable cu
 
 Do not reduce that profile to the minimal tree above.
 
+A native ICM pipeline may be nested inside an outer PARA/client/project hierarchy. The outer organization can determine where the ICM root lives but must not rewrite the native ICM internals merely for uniformity.
+
 Use pipelines when the same multi-step workflow runs repeatedly and stage boundaries make review or context isolation clearer.
 
 Failure modes: multi-job stages, missing/oversized contracts, downstream-to-upstream back-references, quality rules copied from old outputs instead of canonical references, and partial ICM-derived structures mislabeled as native ICM.
@@ -59,6 +61,8 @@ org/
 ```
 
 Members may consume shared canonical references. Avoid coupling members to one another's internal working outputs.
+
+An umbrella can also be method-organized, for example with PARA at the outer level. Treat member workspaces as nested boundaries rather than flattening them into the umbrella schema.
 
 ## 3. Record library
 
@@ -94,6 +98,8 @@ brain/
 
 Additional entity/concept/source/synthesis directories and metadata are optional implementation choices.
 
+A knowledge bundle may coexist beside Zettelkasten notes or inside a PARA Resources tree. Do not silently reinterpret human-authored notes as agent-maintained synthesis; determine authority from the workspace instructions.
+
 Failure modes: isolated summaries instead of integrated synthesis, invented provenance, silent contradiction overwrite, and indexes that drift from the knowledge they route to.
 
 ## 5. Context map
@@ -112,9 +118,11 @@ map/
 
 Markdown links and lightweight metadata can express relationships without requiring a graph database. Add stronger graph infrastructure only when scale or query needs justify it.
 
+Do not create a context map merely to duplicate an already-obvious PARA tree, repository layout, ICM router, or wiki index. Structure should earn its maintenance cost.
+
 ## Composition
 
-Forms may compose when the work naturally crosses boundaries. A common example is a maintained knowledge base feeding an ICM-derived pipeline inside a broader CCA workspace. A full native ICM profile is also possible, but must satisfy its complete upstream acceptance surface.
+Forms and method overlays may compose when the work naturally crosses boundaries. A common example is a maintained knowledge base feeding an ICM-derived pipeline inside a broader CCA workspace. A full native ICM profile is also possible, but must satisfy its complete upstream acceptance surface.
 
 ```mermaid
 flowchart LR
@@ -125,4 +133,6 @@ flowchart LR
     O -. "optional knowledge update" .-> W
 ```
 
-Do not create the reverse dependency merely for symmetry: pipeline stages may consume canonical knowledge, but shared knowledge should not depend on a downstream stage's internals unless the workspace explicitly defines that maintenance operation.
+Another common composition is an outer PARA hierarchy containing coding projects, native ICM roots, Zettelkasten notes, and LLM Wiki synthesis. In that case, **nest boundaries; do not merge schemas merely because they coexist**.
+
+Do not create reverse dependencies merely for symmetry: pipeline stages may consume canonical knowledge, but shared knowledge should not depend on a downstream stage's internals unless the workspace explicitly defines that maintenance operation.

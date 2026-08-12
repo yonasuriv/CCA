@@ -10,6 +10,7 @@ Identify which surface the change affects:
 - LLM Wiki
 - AGENTS.md
 - Agent Skills / `SKILL.md`
+- method-overlay composition such as PARA, Zettelkasten, or BASB/CODE
 - CCA-only semantics
 
 If an upstream is affected, verify its current primary source before editing. Do not rely on CCA's existing wording as evidence that upstream still behaves the same way.
@@ -27,20 +28,23 @@ A contribution should answer all applicable questions:
 - [ ] Where applicable, are native ICM `setup`/`status`, questionnaire, placeholder, prerequisite, checkpoint, audit, spec/value, shared-constant, and quality-guardrail rules preserved?
 - [ ] Does native LLM Wiki remain implementation-flexible rather than being forced into CCA's preferred taxonomy/metadata?
 - [ ] Are CCA-specific hardening choices clearly labeled as CCA choices?
+- [ ] Are PARA, Zettelkasten, BASB/CODE, and similar methods treated as overlays rather than invented native compatibility profiles?
+- [ ] Do nested native/method boundaries remain intact when an outer organization changes?
 - [ ] Does nested `AGENTS.md` scope remain intact?
-- [ ] Does each skill remain independently portable, with skill-local relative resources and no required sibling/repository-global dependency?
+- [ ] Do skill implementation references remain package-local, with no sibling/repository-global filesystem dependency?
+- [ ] If skills coordinate, is that coordination expressed semantically by skill name rather than by sibling path?
 - [ ] Is a new convention actually necessary, or does an upstream/ecosystem convention already solve it?
 
 For ICM, treat the current upstream `_core/CONVENTIONS.md` as canonical semantics and the workspace-builder's final validation stage as the practical acceptance checklist for generated workspaces. CCA's walk test is supplemental, not a waiver for upstream failures.
 
 ## Documentation structure
 
-- `spec/` is normative CCA behavior.
-- `docs/` explains usage, migration/hardening, principles, FAQ, and tracked upstream standards.
-- `skills/` must implement the spec without depending on repository-global files for core execution.
+- `spec/` is normative CCA behavior, including method-composition rules.
+- `docs/` explains usage, migration/hardening, principles, FAQ, method composition, and tracked upstream standards.
+- `skills/` implements the CCA capability suite through focused Agent Skill packages.
 - `examples/` must be executable evidence of the profile they actually claim, not illustrative pseudo-state or overclaimed compatibility.
 
-When a compatibility rule changes, update the full affected surface in one PR: spec, skills/templates, examples, migration/getting-started/FAQ, and `docs/standards.md` where relevant.
+When a compatibility or composition rule changes, update the full affected surface in one PR: spec, skills/templates, examples, migration/getting-started/FAQ, and `docs/standards.md` where relevant.
 
 ## Visuals
 
@@ -48,13 +52,18 @@ Prefer Mermaid for CCA-owned architecture, routing, lifecycle, and dependency di
 
 ## Skills
 
-Follow the current Agent Skills specification. In particular:
+Follow the current Agent Skills specification. CCA's six first-party skills are intended to be distributed as a focused suite; the package split exists for precise triggering and progressive disclosure.
+
+In particular:
 
 - `name` must match the skill directory and satisfy current naming limits;
 - `description` must explain both purpose and trigger conditions and remain within the current limit;
 - keep `SKILL.md` compact and progressively disclose detailed material through skill-local resources;
-- use relative references from the skill root;
-- core execution must work if the skill is copied by itself.
+- implementation file references must stay inside the skill package;
+- never reach into a sibling skill directory or repository-global implementation file by relative path;
+- cross-skill coordination may use semantic skill names such as `Use cca-lint`;
+- do not collapse focused operations into one monolithic skill merely to centralize routing;
+- `cca-architect` may coordinate compound architecture flows but is not a mandatory gateway for direct lint/ingest/query/sync/scaffold requests.
 
 ## Validation
 

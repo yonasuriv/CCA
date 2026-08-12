@@ -2,21 +2,70 @@
 
 ## What is CCA?
 
-CCA is an interoperability layer for filesystem-native agent context. It defines shared semantics and maintenance practices that let agents work across ICM staged workspaces, LLM Wiki-style persistent knowledge bases, ordinary coding repositories, and hybrids without requiring a proprietary runtime.
+CCA is an interoperability layer for filesystem-native agent context. It defines shared semantics and maintenance practices that let agents work across ICM staged workspaces, LLM Wiki-style persistent knowledge bases, ordinary coding repositories, PKM/second-brain systems, and hybrids without requiring a proprietary runtime.
 
-It prefers existing standards and upstream conventions over inventing new ones.
+It prefers existing standards, upstream conventions, and useful human methodologies over inventing competing ones.
 
 ## What is CCA not?
 
-CCA is not an agent runtime, orchestration framework, vector database, model protocol, replacement for MCP, replacement for ICM, or replacement for LLM Wiki.
+CCA is not an agent runtime, orchestration framework, vector database, model protocol, replacement for MCP, replacement for ICM, replacement for LLM Wiki, replacement for PARA, replacement for Zettelkasten, or replacement for Building a Second Brain.
 
 It does not provide real-time multi-agent message passing. Tight-loop coordination still belongs in runtimes/frameworks built for it.
+
+## How do BASB, PARA, Zettelkasten, LLM Wiki, and ICM fit together?
+
+They solve different layers of the problem:
+
+- **BASB/CODE** describes a human knowledge-work lifecycle: Capture, Organize, Distill, Express.
+- **PARA** organizes material by actionability: Projects, Areas, Resources, Archives.
+- **Zettelkasten** develops knowledge through small addressable linked ideas.
+- **LLM Wiki** maintains persistent agent-generated synthesis over durable sources.
+- **ICM/MWP** structures sequential agent work through stages, routing, contracts, and handoffs.
+- **CCA** defines how those boundaries can coexist without one silently redefining another.
+
+See [`method-composition.md`](method-composition.md).
+
+## Are PARA, Zettelkasten, and BASB CCA compatibility profiles?
+
+No. CCA treats them as **method overlays**.
+
+They can influence organization, knowledge development, and human workflow, but CCA does not invent a universal native conformance test for them. A workspace may be described as PARA-organized, Zettelkasten-style, or BASB-guided while its nested ICM/LLM Wiki/coding boundaries retain their own semantics.
+
+## Can I use PARA with CCA?
+
+Yes. PARA can organize the outer workspace while nested projects preserve their own structure.
+
+For example, a native ICM workspace can live under `Projects/client-acme/assessment/`, an ordinary coding repo can live under another Project, and an LLM Wiki can live under `Resources/knowledge/`. CCA should not rewrite those nested boundaries merely to make the PARA tree more uniform.
+
+## Can I use Zettelkasten with CCA?
+
+Yes. CCA can treat Zettelkasten notes as linked knowledge/reference material without forcing them into an LLM Wiki schema.
+
+Do not assume agents may rewrite every zettel. The local workspace decides whether notes are human-authored source/reference material, jointly maintained synthesis, working notes, or something else.
+
+A common hybrid keeps Zettelkasten for idea-level thinking and LLM Wiki for maintained higher-level synthesis.
+
+## Can I use Building a Second Brain with CCA?
+
+Yes. BASB/CODE can remain the human lifecycle across the workspace. CCA does not claim to implement BASB; it can route the files, knowledge, and workflows that participate in Capture, Organize, Distill, and Express.
+
+PARA often fits the Organize step; Zettelkasten or LLM Wiki may support Distill; coding projects, documentation, client deliverables, or ICM workflows may support Express.
+
+## Can all of them coexist in one workspace?
+
+Yes. The key rule is **nest boundaries; do not merge schemas merely because they coexist**.
+
+An outer PARA structure may contain coding projects, client work, an LLM Wiki, Zettelkasten notes, and a native ICM root. Each nested native boundary remains valid for the consumer that owns it, while a CCA-aware agent can understand how the pieces relate.
+
+## Does a second brain need ICM?
+
+No. Use ICM only where a repeatable sequential workflow benefits from explicit stages, selective routing, and handoffs. A second brain can be purely knowledge-oriented, or it can contain one or more ICM/ICM-derived workflows for production tasks.
 
 ## Is CCA just ICM with AGENTS.md?
 
 No. ICM is the primary upstream for CCA's staged workflow architecture: layered routing, stage contracts, selective loading, one-way references, canonical sources, human-editable handoffs, onboarding, and quality gates.
 
-CCA adds an interoperability layer around those ideas, including agent-agnostic root guidance, portable skills, LLM Wiki compatibility, and cross-form maintenance. Where CCA claims native ICM compatibility, it preserves the complete applicable current ICM profile rather than only copying its stage-folder syntax.
+CCA adds an interoperability layer around those ideas, including agent-agnostic root guidance, portable skills, LLM Wiki compatibility, method-overlay composition, and cross-form maintenance. Where CCA claims native ICM compatibility, it preserves the complete applicable current ICM profile rather than only copying its stage-folder syntax.
 
 ## Does CCA conflict with ICM's workspace-builder?
 
@@ -76,7 +125,7 @@ An existing LLM Wiki can remain native-compatible without being forced into an I
 
 ## Does every CCA workspace need a wiki?
 
-No. Pipelines, coding repositories, record libraries, and other filesystem-native workspaces can use CCA semantics without persistent wiki synthesis.
+No. Pipelines, coding repositories, record libraries, PARA-organized environments, and other filesystem-native workspaces can use CCA semantics without persistent wiki synthesis.
 
 ## Does every CCA workspace need stages?
 
@@ -116,6 +165,30 @@ Only for the specific CCA hardened knowledge-bundle profile that chooses those c
 
 No for LLM Wiki native compatibility. CCA may recommend frontmatter for lifecycle, provenance, and machine-readable maintenance, but that is an optional hardening convention unless a particular workspace adopts it.
 
+CCA also does not require a giant workspace manifest merely to map obvious paths such as Projects, Areas, Resources, Archives, stages, or wiki folders. Infer ordinary filesystem semantics when safe; declare only facts that genuinely need explicit metadata.
+
+## Are the six CCA skills supposed to be installed separately?
+
+They are **focused Agent Skill packages intended to be distributed as the CCA skill suite**. The package split exists for precise triggering and progressive disclosure, not because each capability is meant to be an unrelated standalone product.
+
+Package portability means implementation file references remain inside the skill package and installation paths do not become architecture. A skill may coordinate another installed CCA capability by semantic name, for example `Use cca-lint`, without reaching into the sibling skill's directory.
+
+## Is `cca-architect` the router for every CCA operation?
+
+No. It is the primary entry point for compound architecture/design requests: choosing forms, combining methods, deciding boundaries, or planning restructuring.
+
+A request that is already clearly an ingest, lint, query, sync, or scaffold operation should route directly to the focused skill. `cca-architect` may semantically delegate those capabilities when they are part of a larger architecture workflow.
+
+## Why not one giant `cca` or `cca-architect` skill?
+
+Because Agent Skills progressive disclosure works better when focused capabilities have precise trigger descriptions and lazily loaded resources. A monolithic skill would load unrelated procedures and make routing less precise.
+
+CCA unifies the **methodology and capability model**, not every operation into one `SKILL.md`.
+
+## Why not create `cca-para`, `cca-zettelkasten`, or `cca-second-brain` skills?
+
+Because those names describe methodologies/forms, not distinct executable operations. Their composition knowledge belongs as a lazy-loaded architecture reference behind `cca-architect` unless a future operation becomes distinct enough to justify its own skill.
+
 ## Does CCA require Git?
 
 No. Git is strongly compatible with CCA because plain files make history, review, diffing, and rollback cheap, but the workspace model does not require a specific VCS.
@@ -136,12 +209,12 @@ For asynchronous or loose coordination, agents can hand off through durable file
 
 Run `cca-lint` using the correct profile.
 
-For native ICM, that means the complete applicable current ICM profile and workspace-builder-equivalent acceptance surface. For ICM-derived patterns, validate only what was actually adopted. For LLM Wiki, validate the implementation's maintained-knowledge behavior without forcing CCA's optional schema.
+For native ICM, that means the complete applicable current ICM profile and workspace-builder-equivalent acceptance surface. For ICM-derived patterns, validate only what was actually adopted. For LLM Wiki, validate the implementation's maintained-knowledge behavior without forcing CCA's optional schema. Method overlays may produce preservation findings but are not invented native profiles.
 
-Then perform the CCA walk test: a fresh agent should be able to orient, act, and report state from the files alone. The lint result must distinguish upstream compatibility findings from optional CCA hardening findings.
+Then perform the CCA walk test: a fresh agent should be able to orient, act, and report state from the files alone. The lint result must distinguish upstream compatibility findings from optional CCA hardening and method-preservation findings.
 
 ## Can CCA evolve without breaking old workspaces?
 
-That is a core design constraint. CCA should track upstream ICM, LLM Wiki, AGENTS.md, Agent Skills, and relevant adjacent standards. Changes should prefer additive aliases, optional hardening, and migration guidance over breaking reinterpretations of upstream conventions.
+That is a core design constraint. CCA should track upstream ICM, LLM Wiki, AGENTS.md, Agent Skills, and relevant adjacent standards. Changes should prefer additive aliases, optional hardening, boundary preservation, and migration guidance over breaking reinterpretations of upstream conventions or user methodologies.
 
-See [`standards.md`](standards.md) for the upstream-change rule.
+See [`standards.md`](standards.md) for the upstream-change rule and [`method-composition.md`](method-composition.md) for the method-overlay model.

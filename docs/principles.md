@@ -1,8 +1,8 @@
 # Design principles behind CCA
 
-Explanatory, not normative. CCA inherits ideas from ICM, the LLM Wiki pattern, and broader context-engineering practice. This document explains the reasoning behind CCA without turning optional implementation choices into upstream requirements.
+Explanatory, not normative. CCA inherits ideas from ICM, the LLM Wiki pattern, Agent Skills, and broader context-engineering practice. This document explains the reasoning behind CCA without turning optional implementation choices into upstream requirements.
 
-When this document conflicts with `spec/SPEC.md` or a current upstream primary source, the spec/upstream wins.
+When this document conflicts with `spec/SPEC.md`, `spec/method-composition.md`, or a current upstream primary source, the normative spec/upstream wins.
 
 ## Context principles
 
@@ -86,18 +86,53 @@ Automation removes repetitive work; augmentation increases what a person can und
 
 *Encoded as:* human-editable files, visible handoffs, profile-specific checkpoints where applicable, and filesystem observability.
 
+## Architecture principles
+
+### 13. Stable context plane, replaceable execution plane
+
+Durable instructions, knowledge, workflows, constraints, and capabilities should survive changes in model vendor, agent harness, orchestration framework, or deployment environment.
+
+*Encoded as:* filesystem-native context packages, thin adapters, portable Agent Skills, and a refusal to make runtime-specific infrastructure the canonical home of durable semantics.
+
+### 14. One runtime, many context-defined specializations
+
+A general agent runtime should become specialized by loading the relevant skill and context rather than requiring a permanent named agent for every task. Focused capabilities are cheaper to route and easier to replace than a proliferation of static agent identities.
+
+*Encoded as:* the CCA skill suite, precise skill descriptions, compact `SKILL.md` files, lazy-loaded references, and semantic delegation between focused capabilities when compound work requires it.
+
+This does **not** mean one monolithic skill. `cca-architect` coordinates compound architecture requests, while direct lint/ingest/query/sync/scaffold requests can activate the focused skill immediately.
+
+### 15. Collaboration and deployment are separate layers
+
+Durable workspace context, real-time collaboration infrastructure, and execution runtime are different concerns. Files can support asynchronous handoffs and shared history, but they are not a substitute for message buses, authorization systems, transactions, scheduling, or high-concurrency services.
+
+*Encoded as:* CCA keeps collaboration/runtime infrastructure optional and out of the core filesystem contract while remaining usable beneath those layers.
+
+### 16. Compose boundaries; do not flatten methods
+
+PARA, Zettelkasten, BASB/CODE, LLM Wiki, ICM, coding repositories, and other valid structures may coexist because they solve different concerns. Interoperability is strongest when each nested boundary remains understandable to the convention that owns it.
+
+*Encoded as:* method overlays, nested native boundaries, no fake PARA/Zettelkasten/BASB lint profiles, and the rule that an outer organizational method may place a nested workspace without rewriting its native internals.
+
+### 17. Infer structure before declaring metadata
+
+Filesystem-native context loses much of its value if every obvious path must be mirrored in a central manifest. Explicit metadata should represent facts that cannot safely be inferred, not restate the directory tree.
+
+*Encoded as:* optional metadata, native/profile discovery first, and rejection of giant manifests that duplicate Projects/Areas/Resources/Archives, stages, wiki folders, skill collections, or other obvious filesystem roles.
+
 ## Convergence rule
 
-CCA's own preferred forms are never allowed to erase upstream distinctions:
+CCA's own preferred forms are never allowed to erase upstream distinctions or human methodology boundaries:
 
 - Native ICM remains governed by current ICM conventions and acceptance.
 - LLM Wiki remains implementation-flexible unless a specific implementation chooses stronger structure.
 - `AGENTS.md` follows its own standard and nested-scope behavior.
-- Agent Skills remain portable packages governed by the current Agent Skills specification.
+- Agent Skills remain focused packages governed by the current Agent Skills specification; CCA suite coordination uses semantic capability names rather than sibling filesystem paths.
+- PARA, Zettelkasten, and BASB/CODE remain method overlays unless a future concrete contract is deliberately adopted.
 - CCA-specific hardening must be labeled as CCA-specific hardening.
 
 Prefer Mermaid for CCA's own explanatory architecture/routing diagrams, but preserve an upstream-required representation when compatibility depends on it.
 
 ---
 
-Primary influences: the ICM repository and paper, Karpathy's LLM Wiki idea file, AGENTS.md, Agent Skills, and the context-engineering design notes that informed CCA. Normative claims belong in the specification or in the upstream standard itself, not in this explanatory document.
+Primary influences: the ICM repository and paper, Karpathy's LLM Wiki idea file, AGENTS.md, Agent Skills, the method-composition sources documented in `docs/method-composition.md`, and the context-engineering design notes that informed CCA. Normative claims belong in the specification or in the upstream standard itself, not in this explanatory document.
