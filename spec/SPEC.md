@@ -82,16 +82,18 @@ For pipeline-oriented work, CCA adopts ICM's five-layer architecture when the IC
 |---|---|---|
 | 0 | `AGENTS.md` (authoritative Layer-0 catalog), created by directive when needed: `CLAUDE.md` = single-line `@ AGENTS.md` | Where am I? |
 | 1 | root `CONTEXT.md` (recommended default) | Where do I go? |
-| 2 | stage `CONTEXT.md` (recommended default) | What do I do? |
+| 2 | stage `CONTEXT.md` (contract per stage) | What do I do? |
 | 3 | references, configuration, skills | What rules apply? |
 | 4 | working artifacts, previous outputs, user-provided inputs | What am I working with? |
 
 Agents read down the layers and stop when they have enough context for the current task.
 
-`CONTEXT.md` is a recommended default, not an enforced requirement. A CCA-created or CCA-hardened workspace may use a different name for its context/router file when the project's naming makes sense that way. When it does:
+The root `CONTEXT.md` is a recommended default for the workspace's context/router file, not an enforced requirement. A CCA-created or CCA-hardened workspace may use a different name for its context/router file when the project's naming makes sense that way. When it does:
 
 - the alternative name must be declared in the Layer-0 catalog (`AGENTS.md`) with a single pointer line so agents and humans can resolve it without guessing;
-- the file must keep the same mechanics as `CONTEXT.md` (the same preferred token and line allowances and routing behavior ICM assigns to the layer), treated as recommendations, not requirements.
+- the file must keep the same mechanics as root `CONTEXT.md` (the same preferred token and line allowances and routing behavior ICM assigns to that layer), treated as recommendations, not requirements.
+
+Stage `CONTEXT.md` is a per-stage contract that describes that stage's Inputs/Process/Outputs; it is not a routing default and is not interchangeable under this rule.
 
 A workspace may use analogous routing for non-pipeline forms, but it must not force LLM Wiki, PARA, Zettelkasten, BASB, or ordinary repositories into ICM layers merely for cosmetic consistency.
 

@@ -62,12 +62,12 @@ A native ICM root may be nested inside a broader CCA/PARA/client workspace. The 
 
 ## Context router file
 
-`CONTEXT.md` is a recommended default for the context/router file, not an enforced requirement. A CCA-created or CCA-hardened workspace may use another name when the project's naming calls for it. When it does:
+The root `CONTEXT.md` is a recommended default for the workspace's context/router file, not an enforced requirement. A CCA-created or CCA-hardened workspace may use another name when the project's naming calls for it. When it does:
 
 - declare the alternative name in `AGENTS.md` with a single pointer line so agents and humans can resolve it;
 - keep the same mechanics ICM assigns to that layer (token/line allowances, routing behavior) as recommendations, not requirements.
 
-Native ICM workspaces keep `CONTEXT.md` because the upstream profile requires that exact name.
+A stage `CONTEXT.md` is a per-stage contract, not a routing default, and is not interchangeable under this rule. Native ICM workspaces keep the exact names because the upstream profile requires them.
 
 ## Knowledge invariants
 
