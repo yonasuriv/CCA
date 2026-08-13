@@ -1,4 +1,4 @@
-# Setup questionnaire — [WORKSPACE NAME]
+# Setup questionnaire -- [WORKSPACE NAME]
 
 > One-time onboarding. Configure the factory, not the product. Ask everything
 > at once, in one pass. Use sensible defaults/examples, derive fields that can

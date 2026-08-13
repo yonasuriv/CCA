@@ -1,4 +1,4 @@
-# CONTEXT.md — Stage [NN]: [NAME]
+# CONTEXT.md -- Stage [NN]: [NAME]
 
 > Layer 2 contract. Keep this file small. It scopes exactly what the agent loads, does, and writes.
 

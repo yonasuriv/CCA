@@ -1,6 +1,6 @@
 # Regional carriers expand electric flight trials
 
-*Sample source for the CCA example workspace — synthetic content.*
+*Sample source for the CCA example workspace -- synthetic content.*
 
 Regional carrier Skyline Regional announced on 2026-08-03 that it will add
 two more electric aircraft routes to its trial program, bringing the total

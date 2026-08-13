@@ -153,6 +153,8 @@ Every native ICM stage `CONTEXT.md` uses the canonical sections:
 
 CCA must not add required columns to the ICM Inputs table while claiming the shape is exact. Additional semantics such as CCA file roles may be documented elsewhere or treated as optional metadata.
 
+Layer-3 folder names (for example `_config/`, `references/`, `shared/`, `brand-vault/`, or `design-system/`) are workspace-native; upstream ICM does not mandate one name. CCA examples and templates typically use `_config/` as a default, but an existing workspace's own Layer-3 homes are authoritative and must be preserved. CCA must not require renaming them to `_config/` for compatibility.
+
 ### 7.3 Core pipeline invariants
 
 - One stage, one job.

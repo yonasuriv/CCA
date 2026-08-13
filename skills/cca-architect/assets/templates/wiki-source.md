@@ -20,11 +20,11 @@ source; entity/concept pages synthesize across sources. Do not mix the two.]
 
 ## Key claims
 
-1. [Claim] — [page/section of the raw source]
+1. [Claim] -- [page/section of the raw source]
 2. [Claim]
 
 ## What this source changed in the wiki
 
-- Updated: [entity-a](../entities/entity-a.md) — [how]
+- Updated: [entity-a](../entities/entity-a.md) -- [how]
 - Created: [concept-b](../concepts/concept-b.md)
-- Challenged: [synthesis-c](../syntheses/current-thesis.md) — [what it contradicts]
+- Challenged: [synthesis-c](../syntheses/current-thesis.md) -- [what it contradicts]

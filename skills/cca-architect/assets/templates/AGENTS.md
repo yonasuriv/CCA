@@ -1,4 +1,4 @@
-# AGENTS.md — [WORKSPACE NAME]
+# AGENTS.md -- [WORKSPACE NAME]
 
 > Portable agent guidance. Keep this file compact and scoped to this directory tree. Nested `AGENTS.md` files may add more specific instructions for subtrees.
 

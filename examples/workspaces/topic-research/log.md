@@ -1,4 +1,4 @@
-# Log — topic-research
+# Log -- topic-research
 
 > This example intentionally adopts a CCA maintenance chronicle. New entries are appended at the bottom.
 

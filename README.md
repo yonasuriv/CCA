@@ -137,7 +137,7 @@ When the ICM profile is active, CCA preserves the upstream contract shape instea
 | Source         | File/Location               | Section/Scope | Why             |
 | -------------- | --------------------------- | ------------- | --------------- |
 | Previous stage | `../01-research/output/`    | Full file     | Source material |
-| Style guide    | `../../references/voice.md` | "Voice Rules" | Tone guidance   |
+| Style guide    | `../../_config/voice.md`    | "Voice Rules" | Tone guidance   |
 
 ## Process
 

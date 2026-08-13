@@ -9,13 +9,13 @@ tags: [regulation]
 
 # Certification timelines
 
-Analysts expect certification — not airframe availability — to pace broader
+Analysts expect certification -- not airframe availability -- to pace broader
 electric aviation adoption through the decade
 ([source](../sources/2026-08-04-regional-electric-flight-trials.md)).
 
 ## How it connects
 
-- [Skyline Regional](../entities/skyline-regional.md) — trial operator whose
+- [Skyline Regional](../entities/skyline-regional.md) -- trial operator whose
   expansion depends on certification progress.
 
 ## Contradictions / open questions

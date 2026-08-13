@@ -1,4 +1,4 @@
-# Voice — weekly brief
+# Voice -- weekly brief
 
 Role: factory. Configured once during setup; every brief follows it.
 

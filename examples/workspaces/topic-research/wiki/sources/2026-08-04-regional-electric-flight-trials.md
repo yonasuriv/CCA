@@ -23,9 +23,9 @@ certification, not airframes, to pace adoption.
 
 ## Key claims
 
-1. Five trial routes; ~40% energy cost reduction on two oldest — paragraph 1–2
-2. Charging time caps utilization at ~4 rotations/day — paragraph 3
-3. Certification is the pacing item for adoption — final paragraph
+1. Five trial routes; ~40% energy cost reduction on two oldest -- paragraph 1–2
+2. Charging time caps utilization at ~4 rotations/day -- paragraph 3
+3. Certification is the pacing item for adoption -- final paragraph
 
 ## What this source changed in the wiki
 

@@ -133,6 +133,38 @@ def validate_icm_derived_example() -> None:
         error("Worked example current-state handoff is missing")
 
 
+def validate_architect_templates() -> None:
+    """Catch regressions in the shipped templates that would violate CCA SPEC §7.1.
+
+    The spec forbids underscore stage variants ('01_collect') and commits to
+    upstream ICM guardrails (no em dashes). Templates are instantiated into
+    workspaces, so they must not teach the forbidden forms.
+    """
+    template_dir = SKILLS / "cca-architect" / "assets" / "templates"
+    if not template_dir.is_dir():
+        error("cca-architect templates directory is missing")
+        return
+
+    underscore_stage = re.compile(r"0\d_|01_|0\[N\+?1\]_|0\[N\]_|\d{2}_[a-z]")
+    for path in sorted(template_dir.glob("*.md")):
+        text = read(path)
+        for line_no, line in enumerate(text.splitlines(), start=1):
+            if underscore_stage.search(line):
+                error(f"underscore stage variant in template {path.name}:{line_no}")
+            if "\u2014" in line:
+                error(f"em dash in template {path.name}:{line_no} (ICM guardrail)")
+
+
+def validate_example_style() -> None:
+    """The shipped example instantiates CCA templates into a workspace-like tree,
+    so it must also respect the no-em-dash guardrail CCA commits to enforce."""
+    for path in sorted(EXAMPLE.rglob("*.md")):
+        text = read(path)
+        for line_no, line in enumerate(text.splitlines(), start=1):
+            if "\u2014" in line:
+                error(f"em dash in example {path.relative_to(ROOT)}:{line_no}")
+
+
 def validate_markdown_links() -> None:
     for path in sorted(ROOT.rglob("*.md")):
         if ".git" in path.parts:
@@ -181,6 +213,8 @@ def main() -> int:
     validate_required_docs()
     validate_skills()
     validate_icm_derived_example()
+    validate_architect_templates()
+    validate_example_style()
     validate_markdown_links()
 
     if ERRORS:

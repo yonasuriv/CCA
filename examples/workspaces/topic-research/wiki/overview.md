@@ -7,7 +7,7 @@ sources: 2
 tags: [electric-aviation]
 ---
 
-# Overview — electric aviation (sample domain)
+# Overview -- electric aviation (sample domain)
 
 Current synthesis across all ingested sources.
 

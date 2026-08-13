@@ -1,4 +1,4 @@
-# Setup questionnaire — topic-research (completed example)
+# Setup questionnaire -- topic-research (completed example)
 
 > One-time onboarding, answered in a single pass. These answers populated
 > `_config/`, the catalogs, and the stage contracts. Never re-asked per run.
@@ -33,9 +33,9 @@
    send. Reviews happen at both gates; selection of findings (stage 02
    checkpoint) is the moment that matters most.
 9. **Mechanical work:** none yet. If clipping volume grows, a script will
-   fetch and rename sources into `raw/` — the agent should not do that.
+   fetch and rename sources into `raw/` -- the agent should not do that.
 
 ## Tooling
 
-10. **Agents used:** Claude Code primarily, occasionally others — so
+10. **Agents used:** Claude Code primarily, occasionally others -- so
     `CLAUDE.md` ships as a thin adapter and `AGENTS.md` stays canonical.

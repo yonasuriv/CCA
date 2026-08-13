@@ -7,7 +7,7 @@ sources: 1
 tags: [batteries, survey]
 ---
 
-# Source: Survey — battery energy density progress
+# Source: Survey -- battery energy density progress
 
 - **Raw file:** [raw/2026-08-09-battery-density-survey.md](../../raw/2026-08-09-battery-density-survey.md)
 - **Ingested:** 2026-08-09
@@ -22,9 +22,9 @@ sample-change grounds.
 
 ## Key claims
 
-1. Median 285 Wh/kg among flight-testing programs — paragraph 1
-2. Prior-year median 260 Wh/kg — paragraph 1
-3. Trend "not a clean measurement" due to sample changes — final paragraph
+1. Median 285 Wh/kg among flight-testing programs -- paragraph 1
+2. Prior-year median 260 Wh/kg -- paragraph 1
+3. Trend "not a clean measurement" due to sample changes -- final paragraph
 
 ## What this source changed in the wiki
 

@@ -16,14 +16,14 @@ headline trend is methodologically disputed.
 ## Positions
 
 - **Survey median 285 Wh/kg** (up from 260 Wh/kg prior year) across twelve
-  programs in flight testing — [source](../sources/2026-08-09-battery-density-survey.md)
-- **Trend disputed** — a quoted researcher argues sample changes make the
-  year-over-year comparison "not a clean measurement" —
+  programs in flight testing -- [source](../sources/2026-08-09-battery-density-survey.md)
+- **Trend disputed** -- a quoted researcher argues sample changes make the
+  year-over-year comparison "not a clean measurement" --
   [same source](../sources/2026-08-09-battery-density-survey.md)
 
 ## How it connects
 
-- [Certification timelines](certification-timelines.md) — both gate adoption;
+- [Certification timelines](certification-timelines.md) -- both gate adoption;
   density sets route economics, certification sets timing.
 
 ## Contradictions / open questions

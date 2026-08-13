@@ -1,4 +1,4 @@
-# CONTEXT.md — Stage 02: brief
+# CONTEXT.md -- Stage 02: brief
 
 > Layer 2 contract. Compile the human-reviewed collection notes into the weekly brief.
 

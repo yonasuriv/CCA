@@ -39,6 +39,24 @@ A project that uses `stages/01-name/` and ICM-style stage contracts but omits th
 
 Where upstream ICM prescribes a specific trigger or representation, CCA preferences such as Mermaid diagrams do not override it.
 
+### Current upstream mechanics snapshot
+
+The following concrete mechanics are normative *in the current upstream* and are authoritative when CCA performs native ICM validation. They are recorded here as the tracked snapshot so CCA can act without re-fetching manuals; if upstream changes any value, CCA must converge toward the new upstream per the upstream-change rule below, never treat this table as a frozen fork.
+
+| Upstream mechanic | Current upstream value | CCA behavior |
+|---|---|---|
+| Five-layer token budgets | Layer 0 `CLAUDE.md` ~800 tokens; Layer 1 root `CONTEXT.md` ~300 tokens; Layer 2 stage `CONTEXT.md` ~200-500 tokens; Layer 3/4 selective | Enforce selective loading; do not restate new budgets in stage contracts |
+| `setup` trigger | Reads `setup/questionnaire.md`, asks questions conversationally, replaces placeholders workspace-wide, scans for remaining `{{` patterns, completes only when zero remain | Validate the onboarding flow resolves placeholders with zero remaining |
+| `status` trigger | Scans all `stages/*/output/` folders; renders an ASCII pipeline diagram with COMPLETE/PENDING per stage (files other than `.gitkeep` = COMPLETE) | Validate status renders per current ICM convention (CCA Mermaid does not substitute where upstream specifies ASCII) |
+| Placeholder syntax | `{{SCREAMING_SNAKE_CASE}}`; may appear in any markdown file except `CLAUDE.md`, top-level `CONTEXT.md`, and `questionnaire.md` itself | Lint placeholder coverage; flag placeholders in the negative list as invalid |
+| Conditional placeholders | `{{?SECTION}}...{{/SECTION}}` blocks may only wrap whole sections (a heading and its content), never inline content | Validate conditional blocks wrap complete sections only |
+| Guardrail line limits | `CONTEXT.md` under 80 lines; reference files under 200 lines | Enforce in native ICM lint |
+| Guardrail formatting | Plain English; **no em dashes** in the repository (replace with `--`) | Enforce in native ICM lint and in CCA-generated workspace artifacts |
+| Persistent empty folders | Contain `.gitkeep` | Validate presence |
+| Naming | `lowercase-with-hyphens`; zero-padded stage prefixes `01-`, `02-`; output artifacts `[topic-slug]-[artifact-type].md` | Match CCA SPEC §7.1 |
+| Questionnaire design | Flat, all-at-once, system-level, derive-don't-ask, sensible defaults/examples, ask-once | Validate flow matches; encourage examples over adjective-only descriptions |
+| Layered loading target | Streaming (not monolithic): full stage context ~2,000-8,000 tokens | Keep routing small; route before loading |
+
 ## Upstream-change rule
 
 When an upstream convention changes:

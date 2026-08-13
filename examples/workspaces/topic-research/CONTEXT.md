@@ -1,4 +1,4 @@
-# CONTEXT.md — topic-research routing
+# CONTEXT.md -- topic-research routing
 
 > Root task router for the worked hybrid example. The two pipeline stages intentionally use ICM-derived contracts; this repository example does not claim the complete native ICM profile.
 

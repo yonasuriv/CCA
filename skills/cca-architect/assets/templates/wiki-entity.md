@@ -9,16 +9,16 @@ tags: []
 
 # [Entity name]
 
-[One-paragraph current understanding. This is synthesis — it evolves as
+[One-paragraph current understanding. This is synthesis -- it evolves as
 sources arrive. Keep it current, not historical.]
 
 ## Key facts
 
-- [Fact] — [source](../../sources/SOURCE-SLUG.md) (YYYY-MM-DD)
+- [Fact] -- [source](../sources/SOURCE-SLUG.md) (YYYY-MM-DD)
 
 ## Relationships
 
-- [Related entity/concept](../concepts/CONCEPT-SLUG.md) — [how they relate]
+- [Related entity/concept](../concepts/CONCEPT-SLUG.md) -- [how they relate]
 
 ## Contradictions / open questions
 
@@ -27,4 +27,4 @@ sources arrive. Keep it current, not historical.]
 
 ## Sources
 
-- [Source title](../../sources/SOURCE-SLUG.md) — [what this source contributed]
+- [Source title](../sources/SOURCE-SLUG.md) -- [what this source contributed]

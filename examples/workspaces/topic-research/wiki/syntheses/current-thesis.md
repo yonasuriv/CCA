@@ -15,10 +15,10 @@ by airframe supply or energy costs.**
 Supporting evidence:
 
 - Energy economics already favor electric on trial routes (~40% cost
-  reduction at [Skyline Regional](../entities/skyline-regional.md)) —
+  reduction at [Skyline Regional](../entities/skyline-regional.md)) --
   [source](../sources/2026-08-04-regional-electric-flight-trials.md)
-- Utilization is capped by 45–60 min turnaround charging — same source
-- Analysts name certification the pacing item — same source
+- Utilization is capped by 45–60 min turnaround charging -- same source
+- Analysts name certification the pacing item -- same source
 
 Watch items that would challenge this thesis:
 

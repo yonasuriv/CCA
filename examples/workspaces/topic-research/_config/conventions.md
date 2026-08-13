@@ -1,4 +1,4 @@
-# Conventions — topic-research
+# Conventions -- topic-research
 
 Role: factory. Workspace-wide rules; stage contracts may tighten them for
 their stage but never loosen them.

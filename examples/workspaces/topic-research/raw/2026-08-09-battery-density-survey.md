@@ -1,6 +1,6 @@
 # Survey: battery energy density progress across aviation programs
 
-*Sample source for the CCA example workspace — synthetic content.*
+*Sample source for the CCA example workspace -- synthetic content.*
 
 A survey of twelve electric aviation battery programs published this week
 reports a median pack-level energy density of 285 Wh/kg among programs

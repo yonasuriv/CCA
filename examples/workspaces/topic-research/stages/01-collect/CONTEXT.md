@@ -1,4 +1,4 @@
-# CONTEXT.md — Stage 01: collect
+# CONTEXT.md -- Stage 01: collect
 
 > Layer 2 contract. Collect what changed during the current reporting window from maintained knowledge.
 

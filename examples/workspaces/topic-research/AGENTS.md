@@ -1,8 +1,8 @@
-# AGENTS.md — topic-research example
+# AGENTS.md -- topic-research example
 
 > Portable root guidance for a synthetic worked example: maintained research knowledge feeding a two-stage ICM-derived weekly-brief pipeline.
 
-This example deliberately demonstrates **composition**, not a complete native ICM workspace. Its stages preserve selected ICM patterns — numbered stage folders, exact `Inputs` / `Process` / `Outputs` contract shape, selective routing, one-way dependencies, and human-editable output handoffs — while the surrounding hybrid adopts CCA-specific maintained-knowledge conventions.
+This example deliberately demonstrates **composition**, not a complete native ICM workspace. Its stages preserve selected ICM patterns -- numbered stage folders, exact `Inputs` / `Process` / `Outputs` contract shape, selective routing, one-way dependencies, and human-editable output handoffs -- while the surrounding hybrid adopts CCA-specific maintained-knowledge conventions.
 
 ## Directory map
 
