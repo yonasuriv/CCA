@@ -32,3 +32,9 @@ List only directories/files that actually exist or are being created now. Do not
 ## Instruction interoperability
 
 `AGENTS.md` is the authoritative Layer-0 catalog in this workspace. It does not override a harness's native discovery rules. If a harness needs its own entry file (`CLAUDE.md`, `GEMINI.md`, ...), that file is created by directive as a single-line `@ AGENTS.md` include, never a second hand-maintained copy of this routing.
+
+## Context router
+
+This workspace's context/router file is `CONTEXT.md` by default. If this workspace renames it, the name is declared here as a single line, and the declared file keeps the same mechanics (preferred tokens/lines and routing behavior) ICM assigns to that layer, as recommendations:
+
+- Context router: `CONTEXT.md`

@@ -25,7 +25,7 @@ Do not use “ICM-compatible” as shorthand for “contains ICM-like stage fold
 
 For a **full ICM profile**, preserve and validate all applicable current upstream rules, including:
 
-1. the five-layer routing architecture, with `AGENTS.md` as the authoritative Layer-0 catalog and harness entry files (`CLAUDE.md`) created by directive as single-line `@ AGENTS.md` includes where a harness path is needed;
+1. the five-layer routing architecture, with `AGENTS.md` as the authoritative Layer-0 catalog and harness entry files (`CLAUDE.md`) created by directive as single-line `@AGENTS.md` includes where a harness path is needed;
 2. one root `CONTEXT.md` and one stage `CONTEXT.md` per stage;
 3. exact stage contract sections `Inputs`, `Process`, `Outputs` and canonical Inputs columns `Source | File/Location | Section/Scope | Why`;
 4. lowercase-with-hyphens naming, zero-padded stage prefixes, output-artifact naming, and `.gitkeep` for intentionally empty persistent folders;
@@ -57,8 +57,17 @@ A native ICM root may be nested inside a broader CCA/PARA/client workspace. The 
 - Preserve nested `AGENTS.md` scopes; the closest applicable file governs its subtree under the AGENTS.md convention.
 - `AGENTS.md` has no mandatory CCA heading schema.
 - Do not assume it overrides a harness-specific instruction file; native harness discovery remains authoritative.
-- Keep one substantive source of truth. When a harness needs its own entry path (`CLAUDE.md`, `GEMINI.md`, ...), create it by directive as a single-line `@ AGENTS.md` include, never a second copy of the routing.
+- Keep one substantive source of truth. When a harness needs its own entry path (`CLAUDE.md`, `GEMINI.md`, ...), create it by directive as a single-line `@AGENTS.md` include, never a second copy of the routing.
 - When operating on an existing native ICM workspace, preserve its native `CLAUDE.md` entry path; do not replace or break it merely to make `AGENTS.md` look canonical. If portability is wanted, derive the `AGENTS.md` counterpart from the native entry so the two interoperate under the open AGENTS.md convention.
+
+## Context router file
+
+`CONTEXT.md` is a recommended default for the context/router file, not an enforced requirement. A CCA-created or CCA-hardened workspace may use another name when the project's naming calls for it. When it does:
+
+- declare the alternative name in `AGENTS.md` with a single pointer line so agents and humans can resolve it;
+- keep the same mechanics ICM assigns to that layer (token/line allowances, routing behavior) as recommendations, not requirements.
+
+Native ICM workspaces keep `CONTEXT.md` because the upstream profile requires that exact name.
 
 ## Knowledge invariants
 
