@@ -52,7 +52,26 @@ Prefer Mermaid for CCA-owned architecture, routing, lifecycle, and dependency di
 
 ## Skills
 
-Follow the current Agent Skills specification. CCA's six first-party skills are intended to be distributed as a focused suite; the package split exists for precise triggering and progressive disclosure.
+Follow the current Agent Skills open standard specification and key design principles:
+
+1. **Accepted Format**
+   A single markdown file containing YAML frontmatter for metadata (name, description) and a markdown body for instructions.
+2. **Context Efficiency**
+   Skills body should all be under 5,000 tokens (ideally under 500 lines) and push detailed references, scripts, or assets into separate files as lazy-load references to avoid context pollution.
+3. **Constraints**
+   The name field must be lowercase with hyphens (max 64 characters), and description is limited to 1,024 characters.
+4. **Precise Description**
+   The description field is the primary trigger mechanism; it must be specific, include trigger keywords, and clearly define the skill's scope and boundaries to ensure accurate activation.
+5. **Process Over Prose**
+   Skills should define step-by-step workflows with exit criteria rather than serving as reference documentation; they must guide the agent on what to do, not just what to know.
+6. **Constitutional Rules**
+   Instructions should act as strict contracts with explicit guardrails, preventing the agent from guessing or overriding deterministic steps.
+7. **Test-Driven Creation**
+   Validate skills by testing against realistic prompts to ensure trigger accuracy and output quality, often using a RED-GAP-GREEN-REFACTOR cycle to bridge performance gaps.
+8. **Progressive Disclosure**
+   Agents load only the metadata initially, loading the full instructions only when the skill is triggered, keeping context costs low.
+
+CCA's six first-party skills are intended to be distributed as a focused suite; the package split exists for precise triggering and progressive disclosure.
 
 In particular:
 
@@ -67,10 +86,10 @@ In particular:
 
 ## Validation
 
-Run:
+Before submitting changes, run the repository validator script _(automated github workflow)_:
 
 ```bash
-python scripts/validate_repo.py
+python .github/scripts/validate_repo.py
 ```
 
 The validator is a repository regression gate, not a substitute for upstream acceptance review. A passing check means the repository still satisfies the mechanical invariants it knows how to test; it does **not** certify an arbitrary workspace as fully native ICM-compatible.

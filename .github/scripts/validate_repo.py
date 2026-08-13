@@ -14,9 +14,10 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = Path(__file__).resolve().parent
+ROOT = SCRIPT.parents[1]
 SKILLS = ROOT / "skills"
-EXAMPLE = ROOT / "examples" / "topic-research"
+EXAMPLE = ROOT / "examples" / "workspaces" / "topic-research"
 
 ERRORS: list[str] = []
 
@@ -29,20 +30,20 @@ def read(path: Path) -> str:
     try:
         return path.read_text(encoding="utf-8")
     except FileNotFoundError:
-        error(f"missing required file: {path.relative_to(ROOT)}")
+        error(f"Missing required file: {path.relative_to(ROOT)}")
         return ""
 
 
 def parse_frontmatter(path: Path) -> dict[str, str]:
     text = read(path)
     if not text.startswith("---\n"):
-        error(f"missing YAML frontmatter: {path.relative_to(ROOT)}")
+        error(f"Missing YAML frontmatter: {path.relative_to(ROOT)}")
         return {}
 
     try:
         block = text.split("---\n", 2)[1]
     except IndexError:
-        error(f"unterminated YAML frontmatter: {path.relative_to(ROOT)}")
+        error(f"Unterminated YAML frontmatter: {path.relative_to(ROOT)}")
         return {}
 
     values: dict[str, str] = {}
@@ -60,13 +61,13 @@ def parse_frontmatter(path: Path) -> dict[str, str]:
 
 def validate_skills() -> None:
     if not SKILLS.is_dir():
-        error("skills/ directory is missing")
+        error("Skills/ directory is missing")
         return
 
     for skill_dir in sorted(path for path in SKILLS.iterdir() if path.is_dir()):
         skill_file = skill_dir / "SKILL.md"
         if not skill_file.is_file():
-            error(f"skill missing SKILL.md: {skill_dir.relative_to(ROOT)}")
+            error(f"Skill missing SKILL.md: {skill_dir.relative_to(ROOT)}")
             continue
 
         meta = parse_frontmatter(skill_file)
@@ -74,13 +75,13 @@ def validate_skills() -> None:
         description = meta.get("description", "")
 
         if name != skill_dir.name:
-            error(f"skill name mismatch: {skill_dir.name!r} != {name!r}")
+            error(f"Skill name mismatch: {skill_dir.name!r} != {name!r}")
         if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", name):
-            error(f"invalid Agent Skills name: {name!r}")
+            error(f"Invalid Agent Skills name: {name!r}")
         if not 1 <= len(name) <= 64:
-            error(f"skill name length out of range: {name!r}")
+            error(f"Skill name length out of range: {name!r}")
         if not 1 <= len(description) <= 1024:
-            error(f"skill description length out of range: {skill_dir.name} ({len(description)})")
+            error(f"Skill description length out of range: {skill_dir.name} ({len(description)})")
 
         text = read(skill_file)
         for target in re.findall(r"\[[^\]]+\]\(([^)]+)\)", text):
@@ -98,20 +99,20 @@ def validate_skills() -> None:
         # Semantic delegation may name another installed skill, but a package
         # must never reach into a sibling skill directory by filesystem path.
         if re.search(r"(?:\.\./)+cca-[a-z0-9-]+/", text):
-            error(f"skill uses sibling filesystem dependency: {skill_dir.name}")
+            error(f"Skill uses sibling filesystem dependency: {skill_dir.name}")
 
 
 def validate_icm_derived_example() -> None:
     """Validate only the ICM-derived patterns the hybrid example adopts."""
     stages = EXAMPLE / "stages"
     if not stages.is_dir():
-        error("worked example is missing stages/")
+        error("Worked example is missing stages/")
         return
 
     stage_dirs = sorted(path for path in stages.iterdir() if path.is_dir())
     for stage in stage_dirs:
         if not re.fullmatch(r"\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*", stage.name):
-            error(f"non-ICM-derived stage directory name: {stage.relative_to(ROOT)}")
+            error(f"Non-ICM-derived stage directory name: {stage.relative_to(ROOT)}")
 
         contract = stage / "CONTEXT.md"
         text = read(contract)
@@ -125,11 +126,11 @@ def validate_icm_derived_example() -> None:
         if "| Role |" in text or "| Section/Scope | Role | Why |" in text:
             error(f"CCA-only Role column added to ICM-derived contract: {contract.relative_to(ROOT)}")
         if not (stage / "output").is_dir():
-            error(f"stage missing output/ handoff: {stage.relative_to(ROOT)}")
+            error(f"Stage missing output/ handoff: {stage.relative_to(ROOT)}")
 
     expected_handoff = EXAMPLE / "stages" / "01-collect" / "output" / "2026-08-11-collect-notes.md"
     if not expected_handoff.is_file():
-        error("worked example current-state handoff is missing")
+        error("Worked example current-state handoff is missing")
 
 
 def validate_markdown_links() -> None:
@@ -139,6 +140,9 @@ def validate_markdown_links() -> None:
         # Template links intentionally contain placeholders for files that will
         # exist only after the template is instantiated in a target workspace.
         if "assets" in path.parts and "templates" in path.parts:
+            continue
+        # Whitepaper drafts intentionally use repo-root-absolute links.
+        if path.name in {"paper.md", "paper-brief.md"}:
             continue
 
         text = read(path)
@@ -151,7 +155,7 @@ def validate_markdown_links() -> None:
                 continue
             candidate = (path.parent / clean).resolve()
             if not candidate.exists():
-                error(f"broken Markdown link: {path.relative_to(ROOT)} -> {target}")
+                error(f"Broken Markdown link: {path.relative_to(ROOT)} -> {target}")
 
 
 def validate_required_docs() -> None:
@@ -170,7 +174,7 @@ def validate_required_docs() -> None:
     ]
     for path in required:
         if not path.is_file():
-            error(f"missing required repository surface: {path.relative_to(ROOT)}")
+            error(f"Missing required repository surface: {path.relative_to(ROOT)}")
 
 
 def main() -> int:
@@ -180,12 +184,12 @@ def main() -> int:
     validate_markdown_links()
 
     if ERRORS:
-        print(f"CCA validation failed with {len(ERRORS)} issue(s):", file=sys.stderr)
+        print(f"\nCCA validation failed with {len(ERRORS)} issue(s):", file=sys.stderr)
         for item in ERRORS:
             print(f"- {item}", file=sys.stderr)
         return 1
 
-    print("CCA repository validation passed (mechanical regression checks only).")
+    print("\nCCA repository validation passed (mechanical regression checks only).")
     return 0
 
 

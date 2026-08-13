@@ -13,8 +13,8 @@ CCA is an interoperability and evolution layer for filesystem-native agent conte
 | `spec/` | Normative CCA specification and compatibility boundaries |
 | `docs/` | Getting started, FAQ, principles, method composition, hardening/migration, tracked upstream standards |
 | `skills/` | CCA Agent Skills suite implementing focused operations |
-| `examples/topic-research/` | Worked hybrid: maintained knowledge feeding an ICM-derived pipeline example |
-| `scripts/` | Repository validation/regression tooling |
+| `examples/` | Worked examples: hybrid workspace under `workspaces/`, publication drafts under `articles/`, worked conversations under `conversations/` |
+| `.github/scripts/` | Repository validation/regression tooling |
 | `README.md` | Human-facing overview |
 | `CITATION.cff` | Citation metadata |
 
@@ -27,7 +27,7 @@ CCA is an interoperability and evolution layer for filesystem-native agent conte
 - Answer common integration questions → `docs/faq.md`.
 - Change a skill → read that skill's `SKILL.md` and only its referenced local resources.
 - Change repository behavior → update the normative spec first, then every affected skill/template/example/doc surface.
-- Validate changes → `python scripts/validate_repo.py`.
+- Validate changes → `python .github/scripts/validate_repo.py`.
 
 ## Repository invariants
 
