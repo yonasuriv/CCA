@@ -36,7 +36,7 @@ This may borrow ICM naming, contracts, selective routing, one-way dependencies, 
 
 ### Full native ICM pipeline
 
-When native ICM compatibility is requested, implement the complete applicable current ICM profile: native `CLAUDE.md`, five-layer routing, root and stage contracts, `setup`/`status` behavior, flat all-at-once questionnaire, naming and placeholder rules, tool prerequisites where needed, applicable checkpoints/audits/spec/value/shared-constant patterns, quality guardrails, and workspace-builder-equivalent validation.
+When native ICM compatibility is requested, implement the complete applicable current ICM profile: `AGENTS.md` as the authoritative Layer-0 catalog (single-line `@ AGENTS.md` `CLAUDE.md` include where a harness path is needed), five-layer routing, root and stage contracts, `setup`/`status` behavior, flat all-at-once questionnaire, naming and placeholder rules, tool prerequisites where needed, applicable checkpoints/audits/spec/value/shared-constant patterns, quality guardrails, and workspace-builder-equivalent validation. When operating on an existing upstream workspace, preserve its native `CLAUDE.md` entry path.
 
 Do not reduce that profile to the minimal tree above.
 
@@ -117,6 +117,8 @@ map/
 ```
 
 Markdown links and lightweight metadata can express relationships without requiring a graph database. Add stronger graph infrastructure only when scale or query needs justify it.
+
+For the context-map operating model, copy the node and schema starters: `node.md` defines one entity/process card (frontmatter labels, Purpose/Inputs/Process/Outputs, human checks, links), and `schema.md` declares the closed set of node types, labels, and naming rules so the map stays queryable.
 
 Do not create a context map merely to duplicate an already-obvious PARA tree, repository layout, ICM router, or wiki index. Structure should earn its maintenance cost.
 

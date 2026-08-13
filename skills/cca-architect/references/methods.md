@@ -26,7 +26,8 @@ workspace/
 ├── Projects/                         # PARA organization
 │   └── client-acme/
 │       ├── assessment/              # native ICM boundary
-│       │   ├── CLAUDE.md
+│       │   ├── CLAUDE.md            # single-line @ AGENTS.md include (or native entry preserved)
+│       │   ├── AGENTS.md            # authoritative Layer-0 catalog
 │       │   ├── CONTEXT.md
 │       │   └── stages/
 │       └── code/                    # ordinary coding repository

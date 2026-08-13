@@ -43,6 +43,8 @@ Where upstream ICM prescribes a specific trigger or representation, CCA preferen
 
 The following concrete mechanics are normative *in the current upstream* and are authoritative when CCA performs native ICM validation. They are recorded here as the tracked snapshot so CCA can act without re-fetching manuals; if upstream changes any value, CCA must converge toward the new upstream per the upstream-change rule below, never treat this table as a frozen fork.
 
+CCA's own Layer-0 convention is a superset: in CCA-created and CCA-hardened workspaces, `AGENTS.md` is the authoritative Layer-0 catalog and `CLAUDE.md` is a single-line `@ AGENTS.md` include. When a workspace claims upstream native ICM compatibility, the upstream conventions in this table still govern its `CLAUDE.md` entry path; CCA does not rewrite an existing native entry merely for uniformity.
+
 | Upstream mechanic | Current upstream value | CCA behavior |
 |---|---|---|
 | Five-layer token budgets | Layer 0 `CLAUDE.md` ~800 tokens; Layer 1 root `CONTEXT.md` ~300 tokens; Layer 2 stage `CONTEXT.md` ~200-500 tokens; Layer 3/4 selective | Enforce selective loading; do not restate new budgets in stage contracts |
