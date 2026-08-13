@@ -80,7 +80,7 @@ For pipeline-oriented work, CCA adopts ICM's five-layer architecture when the IC
 
 | Layer | Typical file(s) | Question |
 |---|---|---|
-| 0 | `AGENTS.md` (authoritative Layer-0 catalog); `CLAUDE.md` is a single-line `@ AGENTS.md` include | Where am I? |
+| 0 | `AGENTS.md` (authoritative Layer-0 catalog), created by directive when needed: `CLAUDE.md` = single-line `@ AGENTS.md` | Where am I? |
 | 1 | root `CONTEXT.md` | Where do I go? |
 | 2 | stage `CONTEXT.md` | What do I do? |
 | 3 | references, configuration, skills | What rules apply? |
@@ -102,9 +102,9 @@ Rules:
 4. Tool-specific instruction files may coexist when required by a harness.
 5. CCA must not claim it can override a harness's native instruction precedence.
 6. Contradictory copies of the same rule across root/adapter files are forbidden by the one-fact-one-home principle.
-7. `AGENTS.md` is the authoritative Layer-0 catalog in CCA-created and CCA-hardened workspaces. Where a harness needs its own entry path (`CLAUDE.md`, `GEMINI.md`, ...), that file is a single-line `@ AGENTS.md` include, never a second copy of the routing.
+7. `AGENTS.md` is the authoritative Layer-0 catalog in CCA-created and CCA-hardened workspaces. Where a harness needs its own entry path (`CLAUDE.md`, `GEMINI.md`, ...), that file is created by directive as a single-line `@ AGENTS.md` include, never a second copy of the routing, and never shipped as a template asset.
 
-When CCA operates on an existing **native ICM** workspace, it must not replace or break the native ICM `CLAUDE.md` entry path merely to make `AGENTS.md` look canonical; preserve the workspace's own native entry and add `AGENTS.md` only as supplemental portability.
+When CCA operates on an existing **native ICM** workspace that already has a `CLAUDE.md`, it must not replace or break the native entry merely to make `AGENTS.md` look canonical; preserve it and, when portability is wanted, derive the `AGENTS.md` counterpart so both files interoperate under the open AGENTS.md convention.
 
 ## 7. ICM pipeline profile
 
@@ -176,7 +176,7 @@ When CCA creates, modifies, or validates a workspace that **claims native ICM co
 
 At minimum, native ICM validation must cover the applicable current upstream requirements for:
 
-1. five-layer routing, with `AGENTS.md` as the authoritative Layer-0 catalog in CCA-created workspaces and a single-line `@ AGENTS.md` `CLAUDE.md` include when a harness path is needed; an existing upstream workspace keeps its native `CLAUDE.md` entry path;
+1. five-layer routing, with `AGENTS.md` as the authoritative Layer-0 catalog; harness entry files such as `CLAUDE.md` are created by directive as single-line `@ AGENTS.md` includes when needed, and an existing upstream workspace keeps its native `CLAUDE.md` entry path;
 2. one root `CONTEXT.md` and one stage `CONTEXT.md` per stage;
 3. exact stage contract shape and canonical Inputs columns;
 4. lowercase-with-hyphens naming, zero-padded stages, output naming, and `.gitkeep` for intentionally empty persistent folders;

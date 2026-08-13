@@ -25,7 +25,7 @@ Do not use “ICM-compatible” as shorthand for “contains ICM-like stage fold
 
 For a **full ICM profile**, preserve and validate all applicable current upstream rules, including:
 
-1. the five-layer routing architecture, with `AGENTS.md` as the authoritative Layer-0 catalog and a single-line `@ AGENTS.md` `CLAUDE.md` include where a harness path is needed;
+1. the five-layer routing architecture, with `AGENTS.md` as the authoritative Layer-0 catalog and harness entry files (`CLAUDE.md`) created by directive as single-line `@ AGENTS.md` includes where a harness path is needed;
 2. one root `CONTEXT.md` and one stage `CONTEXT.md` per stage;
 3. exact stage contract sections `Inputs`, `Process`, `Outputs` and canonical Inputs columns `Source | File/Location | Section/Scope | Why`;
 4. lowercase-with-hyphens naming, zero-padded stage prefixes, output-artifact naming, and `.gitkeep` for intentionally empty persistent folders;
@@ -57,8 +57,8 @@ A native ICM root may be nested inside a broader CCA/PARA/client workspace. The 
 - Preserve nested `AGENTS.md` scopes; the closest applicable file governs its subtree under the AGENTS.md convention.
 - `AGENTS.md` has no mandatory CCA heading schema.
 - Do not assume it overrides a harness-specific instruction file; native harness discovery remains authoritative.
-- Keep one substantive source of truth. When a harness needs its own entry path (`CLAUDE.md`, `GEMINI.md`, ...), that file is a single-line `@ AGENTS.md` include, never a second copy of the routing.
-- When operating on an existing native ICM workspace, preserve its native `CLAUDE.md` entry path; do not replace or break it merely to make `AGENTS.md` look canonical.
+- Keep one substantive source of truth. When a harness needs its own entry path (`CLAUDE.md`, `GEMINI.md`, ...), create it by directive as a single-line `@ AGENTS.md` include, never a second copy of the routing.
+- When operating on an existing native ICM workspace, preserve its native `CLAUDE.md` entry path; do not replace or break it merely to make `AGENTS.md` look canonical. If portability is wanted, derive the `AGENTS.md` counterpart from the native entry so the two interoperate under the open AGENTS.md convention.
 
 ## Knowledge invariants
 

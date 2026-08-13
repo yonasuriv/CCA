@@ -31,4 +31,4 @@ List only directories/files that actually exist or are being created now. Do not
 
 ## Instruction interoperability
 
-`AGENTS.md` is portable guidance for agents that support the convention and is the authoritative Layer-0 catalog in this workspace. It does not override a harness's native discovery rules. If this workspace also uses `CLAUDE.md`, `GEMINI.md`, or another tool-specific instruction file, that file must be a single-line `@ AGENTS.md` include, never a second hand-maintained copy of this routing.
+`AGENTS.md` is the authoritative Layer-0 catalog in this workspace. It does not override a harness's native discovery rules. If a harness needs its own entry file (`CLAUDE.md`, `GEMINI.md`, ...), that file is created by directive as a single-line `@ AGENTS.md` include, never a second hand-maintained copy of this routing.

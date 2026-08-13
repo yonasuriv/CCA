@@ -143,11 +143,11 @@ Because it is an existing cross-agent convention rather than a CCA-specific file
 
 ## Why keep `CLAUDE.md` at all?
 
-For compatibility with tools and ICM workspaces that already use it. In a CCA-created or CCA-hardened workspace, `AGENTS.md` is the authoritative Layer-0 catalog and `CLAUDE.md` is a single-line `@ AGENTS.md` include so a harness that looks for `CLAUDE.md` still finds its way to the same guidance. One substantive source of truth; one-line pointer, not a second copy. When CCA operates on an existing *native ICM* workspace, it must not break that workspace's native `CLAUDE.md` entry path merely to make `AGENTS.md` look canonical.
+For compatibility with tools and ICM workspaces that use it. In a CCA-created or CCA-hardened workspace, `AGENTS.md` is the authoritative Layer-0 catalog, and when a harness needs `CLAUDE.md` the skill creates it as a single-line `@ AGENTS.md` include (no template asset is shipped). One substantive source of truth; one-line pointer, not a second copy. When CCA operates on an existing *native ICM* workspace, it must not break the workspace's native `CLAUDE.md`; if portability is wanted it derives the `AGENTS.md` counterpart from that entry instead.
 
 ## Is `AGENTS.md` always authoritative over `CLAUDE.md`?
 
-Within a CCA-created or CCA-hardened workspace, yes: `AGENTS.md` is the authoritative Layer-0 catalog and `CLAUDE.md` is a single-line `@ AGENTS.md` include. Harness-native instruction precedence is still determined by the harness; CCA may define its internal authority policy for a workspace but cannot override how an external tool discovers instructions. For portability, avoid contradictory rules across root files: one canonical body of guidance, with one-line includes where the tool supports them.
+Within a CCA-created or CCA-hardened workspace, yes: `AGENTS.md` is the authoritative Layer-0 catalog and `CLAUDE.md` is created by directive as a single-line `@ AGENTS.md` include. Harness-native instruction precedence is still determined by the harness; CCA may define its internal authority policy for a workspace but cannot override how an external tool discovers instructions. For portability, avoid contradictory rules across root files: one canonical body of guidance, with one-line includes where the tool supports them.
 
 ## Can I use nested `AGENTS.md` files?
 

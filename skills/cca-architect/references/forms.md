@@ -36,7 +36,7 @@ This may borrow ICM naming, contracts, selective routing, one-way dependencies, 
 
 ### Full native ICM pipeline
 
-When native ICM compatibility is requested, implement the complete applicable current ICM profile: `AGENTS.md` as the authoritative Layer-0 catalog (single-line `@ AGENTS.md` `CLAUDE.md` include where a harness path is needed), five-layer routing, root and stage contracts, `setup`/`status` behavior, flat all-at-once questionnaire, naming and placeholder rules, tool prerequisites where needed, applicable checkpoints/audits/spec/value/shared-constant patterns, quality guardrails, and workspace-builder-equivalent validation. When operating on an existing upstream workspace, preserve its native `CLAUDE.md` entry path.
+When native ICM compatibility is requested, implement the complete applicable current ICM profile: `AGENTS.md` as the authoritative Layer-0 catalog, five-layer routing, root and stage contracts, `setup`/`status` behavior, flat all-at-once questionnaire, naming and placeholder rules, tool prerequisites where needed, applicable checkpoints/audits/spec/value/shared-constant patterns, quality guardrails, and workspace-builder-equivalent validation. Create a harness entry (`CLAUDE.md`) as a single-line `@ AGENTS.md` include only when a harness needs it. When operating on an existing upstream workspace, preserve its native `CLAUDE.md` entry path.
 
 Do not reduce that profile to the minimal tree above.
 
