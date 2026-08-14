@@ -61,6 +61,7 @@ flowchart TB
         FAF["Method engineering\nSEMAT"]
     end
 ```
+
 ```mermaid
 flowchart TB
     CCA["CCA\nComposition + interoperability semantics"]
@@ -259,10 +260,11 @@ The walk test asks whether a fresh agent with no chat memory can **orient, act, 
 
 ## CCA skill suite
 
-CCA ships six focused Agent Skills as one capability suite, following software engineering fundamentals and the key design principles of Agent Skills open standard:
+CCA ships seven focused Agent Skills as one capability suite, following software engineering fundamentals and the key design principles of Agent Skills open standard:
 
 | Skill | Purpose |
 | --- | --- |
+| [`cca-advisor`](skills/cca-advisor/) | Priors and judgment guidance for engineering work: artifact design, delivery process, adversarial security reasoning, agent and autonomous system design, learned-system practice, and escalation boundaries. |
 | [`cca-architect`](skills/cca-architect/) | Design/restructure compound workspaces, choose forms, preserve boundaries, and coordinate focused CCA operations. |
 | [`cca-scaffold`](skills/cca-scaffold/) | Add the smallest useful routing/context layer without restructuring existing content. |
 | [`cca-sync`](skills/cca-sync/) | Reconcile routing/navigation with disk while preserving scope and native semantics. |
@@ -280,10 +282,12 @@ Cross-skill coordination uses semantic capability names such as `Use cca-lint to
 flowchart TB
     CCA["CCA semantics"]
 
+    CCA --> J["Judgment"]
     CCA --> A["Architecture"]
     CCA --> M["Maintenance"]
     CCA --> V["Validation"]
 
+    J --> ADV["cca-advisor"]
     A --> ARCH["cca-architect"]
     A --> SC["cca-scaffold"]
 
