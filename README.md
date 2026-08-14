@@ -1,6 +1,16 @@
 # Convergent Context Architecture
 
-> **CCA is an evolving, agent-agnostic interoperability layer for filesystem-native AI context proposed to bridge the gap between human knowledge work, agentic work, and , by following open standards, ecosystem conventions and proving working methodologies and protocols to make any workspace, project, or body of human knowledge, easier to use without forcing it into a new competing convention with the goal to make automation easier in service of augmenting human capabilities while reducing operational infrastructure costs.**
+## What is CCA?
+
+> **CCA (Convergent Context Architecture)** is an evolving, agent-agnostic interoperability layer for filesystem-native AI context. It bridges human knowledge work and agentic work by building on open standards, ecosystem conventions, and proven methodologies, protocols and frameworks, to make any workspace, project, or body of human knowledge easier for both humans and AI agents to understand, navigate, and use, without forcing it into a new competing convention. It's goal is to make automation easier in service of augmenting human capabilities, while improving efficiency, reducing unnecessary complexity, and lowering compute, usage, and operational costs.
+
+**In plain English**
+
+CCA is a way to help people and AI work together more easily using the files, folders, tools, and methods they already have, and propose the best ones when they don't.
+
+Instead of creating another system that people need to adopt, CCA connects existing standards, frameworks, protocols, and proven ways of working so both humans and AI agents can better understand, navigate, and use the same projects and knowledge.
+
+The goal is to make automation easier where it helps people, while improving effectiveness, efficiency, and productivity and reducing unnecessary complexity, operational and usage costs
 
 ## Why CCA exists
 
@@ -42,9 +52,23 @@ flowchart TB
         SKILLSMD["SKILL.md\nFocused Capabilities"]
     end
 
+    subgraph FRAMEWORKS["Frameworks and Methodologies"]
+        FAA["Enterprise scaling\nSAFe · LeSS · DA"]
+        FAB["Team delivery methods\nScrum · Kanban · DSDM · FDD · ASD · XP"]
+        FAC["SE approaches\nTDD · MDE · RAD · IID · Lean SD · RUP / UP"]
+        FAD["Process discipline\nPSP · TSP"]
+        FAE["Delivery lifecycle\nDevOps"]
+        FAF["Method engineering\nSEMAT"]
+    end
+```
+```mermaid
+flowchart TB
     CCA["CCA\nComposition + interoperability semantics"]
 
+    FRAMEWORKS --> CCA
+    METHODOLOGIES --> CCA
     STANDARDS --> CCA
+    PRINCIPLES --> CCA
     AGENTS --> CCA
     HUMANS --> CCA
 
@@ -55,7 +79,11 @@ flowchart TB
     CCA --> HYBRID["Hybrid workspaces"]
 ```
 
-If an upstream changes, CCA should change toward it rather than freezing a near-compatible fork. Human methodologies remain method overlays unless CCA deliberately adopts a concrete machine-facing contract from them in a future revision.
+> While CCA’s foundational principles come from software engineering, **human principles should always take precedence**. \
+> Enforcing those principles is outside CCA’s scope and level of abstraction.
+> 
+> CCA is not a doctrine. Use judgment and adapt to context, while keeping one core principle in mind: \
+> -- **Automation is the means; augmenting human capabilities is the goal.**
 
 ## What CCA is, and what is not
 
@@ -79,6 +107,9 @@ CCA **IS NOT**:
 
 > [!IMPORTANT]
 > CCA core rule is: **when an upstream convention, open standard, or existing method already solves the problem, preserve it.**
+
+If an upstream changes, CCA should change toward it rather than freezing a near-compatible fork. \
+Human methodologies remain method overlays unless CCA deliberately adopts a concrete machine-facing contract from them in a future revision.
 
 ## Compatibility model
 
@@ -244,10 +275,6 @@ The split exists for precise triggering and progressive disclosure. `cca-archite
 Cross-skill coordination uses semantic capability names such as `Use cca-lint to validate the selected profile`. A skill must not reach into a sibling skill directory or repository-global implementation file by relative path.
 
 > These skills are not mandatory, neither they are a requirement, they were created only to make the process more efficient and simple.
-
-<div align="center">
-    <i>Simple mental model vizualisation</i>
-</div>
 
 ```mermaid
 flowchart TB
