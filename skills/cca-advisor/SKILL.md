@@ -19,10 +19,11 @@ Match the task to a scope, then read that file from `references/`.
 | Process — how the work is organized | `frameworks-and-methodologies.md` | Planning, delivery cadence, team structure, org design, methodology disputes |
 | Adversary — how it fails under attack | `security-and-adversarial-thinking.md` | Threat modeling, trust boundaries, control design, incident response, untrusted input |
 | Autonomy — systems that act | `agent-system-design.md` | Agents, tool surfaces, multi-step automation, self-healing or self-modifying systems |
+| Context — what the model receives | `context-engineering.md` | Prompt systems, RAG pipelines, knowledge bases, multi-step context routing, any system where what the model sees is itself an engineering artifact |
 | Learned components — models | `ai-ml-practice.md` | Evaluation design, deployment, interpreting metrics, degradation in production |
 | Hard stops | `escalation-triggers.md` | Legal, regulatory, scope, third-party, or irreversible external consequence |
 
-Two files are common in combination: an agent with tool access is `agent-system-design.md` plus `security-and-adversarial-thinking.md`; a deployed model that takes actions is `agent-system-design.md` plus `ai-ml-practice.md`. Reading a third is usually a sign the task has not been decomposed.
+Common combinations: an agent with tool access reads `agent-system-design.md` and `security-and-adversarial-thinking.md`; a deployed model that takes actions reads `agent-system-design.md` and `ai-ml-practice.md`; a knowledge base or RAG pipeline reads `context-engineering.md` and `ai-ml-practice.md`; a full autonomous agent reads all three of `context-engineering.md`, `agent-system-design.md`, and `security-and-adversarial-thinking.md`. Reading beyond that is usually a sign the task has not been decomposed.
 
 ## Escalation takes precedence
 

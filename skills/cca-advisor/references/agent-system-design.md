@@ -2,7 +2,7 @@
 scope: Autonomy — systems where a nondeterministic component selects and takes actions
 read_when: Designing agents, tool surfaces, multi-step automation, self-healing or self-improving systems, human-in-the-loop boundaries, or any pipeline where a model's output triggers an action rather than being read by a person
 skip_when: The model is producing output a human reads and acts on — that is a deterministic system with an unreliable input, covered by engineering-principles.md
-companion: engineering-principles.md for artifact properties; security-and-adversarial-thinking.md for tool surfaces under adversarial pressure; ai-ml-practice.md for evaluation and model behavior
+companion: context-engineering.md for what gets constructed before the agent runs; engineering-principles.md for artifact properties; security-and-adversarial-thinking.md for tool surfaces under adversarial pressure; ai-ml-practice.md for evaluation and model behavior
 last_reviewed: 2026-08
 ---
 
@@ -52,9 +52,7 @@ The working question for any entry is: **what does this component do when it is 
 
 ## Context and state
 
-**Context economy** — Context is a scarce, contended resource. Everything loaded competes with everything else for attention, and irrelevant content degrades performance rather than being harmlessly ignored. Load what the current step needs; prefer retrieval and lazy loading over resident context.
-
-**Progressive disclosure** — Structure knowledge so a router reads an index and pulls only the relevant payload. Costs indexing discipline and buys the ability to grow a knowledge base without degrading every task that does not need it.
+Context construction — what gets loaded, in what shape, at what stage — is covered in `context-engineering.md`. The entries below are the properties that become load-bearing specifically because an agent takes actions across multiple steps; they are downstream of context construction, not a substitute for it.
 
 **Explicit state over inferred state** — State the agent must track across steps belongs in a durable structure it reads and writes, not in the conversation history it is expected to remember. History is lossy, gets truncated, and cannot be inspected or corrected by anything else.
 
@@ -101,7 +99,6 @@ These properties apply to any system that changes its own behavior, configuratio
 | Tension | Failure when one side wins absolutely |
 |---|---|
 | Autonomy vs. oversight | Human approval on every step until nobody reads them, or unsupervised irreversible actions |
-| Context richness vs. context economy | Degraded attention from irrelevant loading, or missing the fact the task needed |
 | Structured output vs. flexibility | Brittle schemas that reject valid work, or free text that breaks downstream parsers |
 | Retry resilience vs. side-effect safety | Duplicated actions from retries, or transient failures that abort whole runs |
 | Agent capability vs. blast radius | Broad tool access it will eventually misuse, or an agent too constrained to finish the task |
