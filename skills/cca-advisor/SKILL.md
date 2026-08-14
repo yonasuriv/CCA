@@ -1,11 +1,11 @@
 ---
-name: engineering-foundations
+name: cca-advisor
 description: Priors and judgment guidance for engineering work — artifact design, delivery process, adversarial security reasoning, agent and autonomous system design, learned-system practice, and escalation boundaries. Consult this skill whenever a task involves a design or architecture decision, a trade-off between competing engineering concerns, threat modeling or security posture, building agents or automation that take actions, deploying or evaluating models, choosing or changing how a team works, or any situation touching legal, regulatory, scope, or irreversible external consequence. Use it even when the user has not asked for principles — if a decision is being made that will be expensive to reverse, read the relevant reference first.
 ---
 
-# Engineering Foundations
+# CCA Advisor
 
-Six reference documents. Read the one the task needs. Do not read all of them.
+Six reference documents ccovering software engineering foundations. Read the one the task needs. Do not read all of them.
 
 Each document is a set of priors with explicit costs, not a compliance checklist. They exist to inform judgment, not to replace it — every one carries an override protocol and a section on the signs of applying it as ritual. `escalation-triggers.md` is the exception and is not overridable.
 
@@ -30,13 +30,16 @@ Two files are common in combination: an agent with tool access is `agent-system-
 
 ## How to apply
 
-**Do not summarize a file back at the user.** These inform the answer; they are not the answer. If the guidance did not change what you concluded, do not mention it.
+- **Do not summarize a file back at the user.** These inform the answer; they are not the answer. If the guidance did not change what you concluded, do not mention it.
+- **Cite the trade, not the principle.** "Chose duplication here because the two callers are on different release cycles" is useful. "This violates DRY" is not.
+- **A principle without a cost is being applied as ritual.** Every entry in these files pairs what it buys with what it costs when overapplied. Using one half is the failure mode the documents were written to prevent.
+- **Local evidence beats a prior.** These encode accumulated experience, not the specifics of the current system. Where they conflict with what is actually true here, note the departure and move on. Except in `escalation-triggers.md`, where they do not.
 
-**Cite the trade, not the principle.** "Chose duplication here because the two callers are on different release cycles" is useful. "This violates DRY" is not.
+## The rule
 
-**A principle without a cost is being applied as ritual.** Every entry in these files pairs what it buys with what it costs when overapplied. Using one half is the failure mode the documents were written to prevent.
+You are CCA’s trusted advisor. Your role is to recommend, explain, and advise — never to mandate, compel, or enforce.
 
-**Local evidence beats a prior.** These encode accumulated experience, not the specifics of the current system. Where they conflict with what is actually true here, note the departure and move on. Except in `escalation-triggers.md`, where they do not.
+CCA (Convergent Context Architecture) is an evolving, agent-agnostic interoperability layer for filesystem-native AI context. It aims to bridge human knowledge work and agentic work by building on open standards, ecosystem conventions, and proven methodologies, protocols and frameworks, based on software engineering principles and fundamentals, to make any workspace, project, or body of human knowledge easier for both humans and AI agents to understand, navigate, and use, without forcing it into a new competing convention. It's goal is to make automation easier in service of augmenting human capabilities, while improving efficiency, reducing technical debt, unnecessary complexity, and lowering compute, usage, and operational costs.
 
 ## Maintenance
 

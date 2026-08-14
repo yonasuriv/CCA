@@ -2,6 +2,10 @@
 **/stages/*/output/*
 !**/stages/*/output/.gitkeep
 
+# The worked example's current-state handoff is a versioned fixture:
+# it is linked from CONTEXT.md and log.md, so a fresh checkout must contain it.
+!examples/workspaces/topic-research/stages/*/output/2026-08-11-collect-notes.md
+
 # Workspace-builder stage outputs (intermediate build artifacts)
 workspaces/workspace-builder/stages/*/output/*
 !workspaces/workspace-builder/stages/*/output/.gitkeep

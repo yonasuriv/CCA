@@ -2,7 +2,7 @@
 
 **Synopsis**
 
-> **CCA (Convergent Context Architecture)** is an evolving, agent-agnostic interoperability layer for filesystem-native AI context. It bridges human knowledge work and agentic work by building on open standards, ecosystem conventions, and proven methodologies, protocols and frameworks, to make any workspace, project, or body of human knowledge easier for both humans and AI agents to understand, navigate, and use, without forcing it into a new competing convention. It's goal is to make automation easier in service of augmenting human capabilities, while improving efficiency, reducing unnecessary complexity, and lowering compute, usage, and operational costs.
+> **CCA (Convergent Context Architecture)** is an evolving, agent-agnostic interoperability layer for filesystem-native AI context. It aims to bridge human knowledge work and agentic work by building on open standards, ecosystem conventions, and proven methodologies, protocols and frameworks, based on software engineering principles and fundamentals, to make any workspace, project, or body of human knowledge easier for both humans and AI agents to understand, navigate, and use, without forcing it into a new competing convention. It's goal is to make automation easier in service of augmenting human capabilities, while improving efficiency, reducing technical debt, unnecessary complexity, and lowering compute, usage, and operational costs.
 
 **In plain English**
 
@@ -388,7 +388,7 @@ See [FAQ](docs/faq.md) for a detailed list of common questions, doubts and conce
 14. **Automation is infrastructure; augmentation is the objective.** \
     The workspace should increase human leverage without making its state opaque.
 
-See [PRINCIPLES](docs/principles.md) for the extended rationale.
+See [PRINCIPLES](docs/design-principles.md) for the extended rationale.
 
 ### Staying compatible as upstreams evolve
 
