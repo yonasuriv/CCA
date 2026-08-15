@@ -1,0 +1,36 @@
+name: Finalize Session Semantics
+
+on:
+  push:
+    branches:
+      - refactor/unified-cca-skill
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Apply semantic completion
+        run: python .github/scripts/finalize_session_semantics.py
+      - name: Run evaluation harness tests
+        run: python -m unittest discover -s evals/tests -v
+      - name: Validate repository
+        run: python .github/scripts/validate_repo.py
+      - name: Remove one-shot finalizer
+        run: rm .github/scripts/finalize_session_semantics.py .github/workflows/finalize-session-semantics.yml
+      - name: Commit semantic completion
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "refactor: encode session compatibility semantics"
+          git push
