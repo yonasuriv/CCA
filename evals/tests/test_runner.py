@@ -34,7 +34,7 @@ class EvaluationRunnerTests(unittest.TestCase):
             self.assertTrue((case_dir / "assertions.json").is_file())
 
     def test_prepare_run_isolates_fixture_and_arm_material(self) -> None:
-        case_dir = EVALS / "cases" / "03-existing-code-repo"
+        case_dir = EVALS / "cases" / "01-native-icm"
         case = runner.load_case(case_dir)
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -48,8 +48,8 @@ class EvaluationRunnerTests(unittest.TestCase):
             arm_a = runner.prepare_run(case, "A", root / "runs", cca, baseline)
             arm_b = runner.prepare_run(case, "B", root / "runs", cca, baseline)
 
-            self.assertTrue((arm_a / "workspace" / "src" / "app.py").is_file())
-            self.assertTrue((arm_b / "workspace" / "src" / "app.py").is_file())
+            self.assertTrue((arm_a / "workspace" / "CLAUDE.md").is_file())
+            self.assertTrue((arm_b / "workspace" / "CLAUDE.md").is_file())
             self.assertTrue((arm_a / "baseline" / "BASELINE.md").is_file())
             self.assertFalse((arm_a / "cca").exists())
             self.assertTrue((arm_b / "cca" / "SKILL.md").is_file())
