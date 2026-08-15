@@ -36,6 +36,13 @@ replacements = {
     "`cca-ingest`": "`ingest` mode",
     "`cca-query`": "`query` mode",
     "`cca-lint`": "`lint` mode",
+    "cca-advisor": "advise mode",
+    "cca-architect": "architect mode",
+    "cca-scaffold": "scaffold mode",
+    "cca-sync": "sync mode",
+    "cca-ingest": "ingest mode",
+    "cca-query": "query mode",
+    "cca-lint": "lint mode",
 }
 for path in CCA.rglob("*.md"):
     data = path.read_text(encoding="utf-8")
