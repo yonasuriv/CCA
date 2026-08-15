@@ -32,6 +32,14 @@ def discover_cases(root: Path) -> list[Path]:
     )
 
 
+def suite_root(evals_root: Path, suite: str) -> Path:
+    mapping = {"core": "cases", "methodologies": "methodologies"}
+    try:
+        return evals_root / mapping[suite]
+    except KeyError as exc:
+        raise ValueError(f"unknown evaluation suite: {suite}") from exc
+
+
 def load_case(case_dir: Path) -> dict[str, Any]:
     for name in REQUIRED_CASE_FILES:
         path = case_dir / name
@@ -165,6 +173,7 @@ def write_result(result: dict[str, Any], path: Path) -> None:
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--suite", choices=("core", "methodologies"), default="core")
     parser.add_argument("--case", required=True, help="Case directory or two-digit case id")
     parser.add_argument("--arm", choices=("A", "B"), required=True)
     parser.add_argument("--runs", type=Path, default=Path("evals/runs"))
@@ -176,7 +185,8 @@ def _parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = _parse_args()
-    cases_root = Path(__file__).resolve().parent / "cases"
+    evals_root = Path(__file__).resolve().parent
+    cases_root = suite_root(evals_root, args.suite)
     case_dirs = discover_cases(cases_root)
     matches = [path for path in case_dirs if path.name == args.case or path.name.startswith(f"{args.case}-")]
     if len(matches) != 1:

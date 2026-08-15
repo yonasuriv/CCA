@@ -201,7 +201,7 @@ def validate_session_semantics() -> None:
 
     required_fragments = {
         CCA / "references/architect/system-map.md": ["live", "leftover", "ghost", "Hits", "Does not hit", "Cold-agent walk", "Re-verify"],
-        CCA / "references/architect/forms.md": ["Record Library defaults", "half-created", "frequency", "System Map"],
+        CCA / "references/architect/forms.md": ["Record Library defaults", "half-created", "frequency", "System Map", "full display name", "beta-corp"],
         CCA / "references/architect/native-icm-setup.md": ["Bidirectional coverage gate", "Question/answer → use", "Placeholder/field → source", "Conditional stage → condition"],
         CCA / "references/advisor/mode.md": ["These are seven references, not six."],
     }
@@ -212,13 +212,13 @@ def validate_session_semantics() -> None:
                 error(f"Missing session-required semantic in {path.relative_to(ROOT)}: {fragment!r}")
 
 
-def validate_evaluation_cases() -> None:
-    cases = ROOT / "evals/cases"
+def _validate_case_suite(directory: str, expected_count: int) -> None:
+    cases = ROOT / "evals" / directory
     dirs = sorted(path for path in cases.iterdir() if path.is_dir() and re.match(r"^\d{2}-", path.name)) if cases.is_dir() else []
-    expected = [f"{i:02d}" for i in range(1, 15)]
+    expected = [f"{i:02d}" for i in range(1, expected_count + 1)]
     found = [path.name[:2] for path in dirs]
     if found != expected:
-        error(f"Expected evaluation cases 01..14; found {found}")
+        error(f"Expected {directory} evaluation cases 01..{expected_count:02d}; found {found}")
         return
     for path in dirs:
         for required in ("case.json", "prompt.md", "assertions.json"):
@@ -227,6 +227,27 @@ def validate_evaluation_cases() -> None:
         fixture = path / "fixture"
         if not fixture.is_dir() or not any(p.is_file() for p in fixture.rglob("*")):
             error(f"Evaluation case missing non-empty fixture: {path.relative_to(ROOT)}")
+        assertions = path / "assertions.json"
+        if assertions.is_file() and '"assertions": []' in read(assertions).replace(" ", ""):
+            error(f"Evaluation case has empty assertions: {path.relative_to(ROOT)}")
+
+
+def validate_evaluation_cases() -> None:
+    _validate_case_suite("cases", 14)
+    _validate_case_suite("methodologies", 20)
+
+
+def validate_methodology_corpus() -> None:
+    path = CCA / "references/advisor/frameworks-and-methodologies.md"
+    text = read(path)
+    anchors = [
+        "Cynefin", "SAFe", "LeSS", "Disciplined Agile", "waterfall", "stage-gate", "V-model",
+        "Scrum", "Kanban", "DSDM", "FDD", "ASD", "XP", "RAD", "IID", "Lean",
+        "RUP / UP", "DevOps", "TDD", "MDE", "PSP", "TSP", "SEMAT", "Essence",
+    ]
+    for anchor in anchors:
+        if anchor not in text:
+            error(f"Methodology corpus lost coverage anchor: {anchor!r}")
 
 def validate_icm_derived_example() -> None:
     """Validate only the ICM-derived patterns the hybrid example adopts."""
@@ -363,6 +384,7 @@ def validate_required_docs() -> None:
         ROOT / "examples/publications/paper.md",
         ROOT / "evals/README.md",
         ROOT / "evals/cases/README.md",
+        ROOT / "evals/methodologies/README.md",
     ]
     for path in required:
         if not path.is_file():
@@ -385,6 +407,7 @@ def main() -> int:
     validate_skill_self_containment()
     validate_session_semantics()
     validate_evaluation_cases()
+    validate_methodology_corpus()
     validate_icm_derived_example()
     validate_architect_templates()
     validate_example_style()

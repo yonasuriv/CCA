@@ -1,0 +1,1 @@
+Fix the described implementation task using the smallest relevant intervention. Do not introduce methodology/process structure merely because CCA contains advisor material. Record any necessary explanation in result.md.

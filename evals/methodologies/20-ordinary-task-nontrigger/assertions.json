@@ -1,0 +1,29 @@
+{
+  "assertions": [
+    {
+      "type": "file_contains",
+      "path": "app.py",
+      "text": "return a + b"
+    },
+    {
+      "type": "path_absent",
+      "path": "decision.md"
+    },
+    {
+      "type": "path_absent",
+      "path": "scrum"
+    },
+    {
+      "type": "path_absent",
+      "path": "kanban"
+    },
+    {
+      "type": "path_absent",
+      "path": "safe"
+    },
+    {
+      "type": "path_absent",
+      "path": "stages"
+    }
+  ]
+}

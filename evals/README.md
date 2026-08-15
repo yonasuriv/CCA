@@ -4,7 +4,7 @@ This directory defines how to test CCA behavior against relevant upstream baseli
 
 ## Status
 
-The evaluation **protocol and case contract are defined**, but the 14 scenario fixtures have not yet all been implemented or executed. No repository claim of behavioral superiority over ICM should be inferred from this directory until real isolated runs and their results are committed.
+The evaluation protocol, 14-case core interoperability suite, and 20-case methodology/framework suite are implemented. Repository CI validates mechanics and deterministic contracts only; real isolated external-agent runs are still required for behavioral claims. The 2026-08-15 three-way report covers only the 14 frozen core cases and must not be generalized to the methodology suite until those cases are executed.
 
 ## Purpose
 
@@ -123,6 +123,13 @@ For mixed/existing-workspace cases, CCA can demonstrate capability beyond the IC
 
 Do not publish “CCA is better than ICM” as a universal result. Report scenario-level evidence and the upstream/model/runtime pins used to obtain it.
 
+## Evaluation suites
+
+- `cases/` — 14 core interoperability and workspace-behavior cases. Existing three-way results apply only to this suite.
+- `methodologies/` — 20 advisor/process cases covering sense-making, enterprise scaling, sequential constraints, team delivery, engineering practices/paradigms, lifecycle/operations, method engineering, composition/conflict, and an ordinary-task non-trigger.
+
+Use `--suite core` (default) or `--suite methodologies` when invoking the runner. Suite existence and CI success are not behavioral evidence.
+
 ## Runner usage
 
 The repository ships `evals/runner.py`; it prepares and grades runs but does not choose or impersonate an agent.
@@ -130,6 +137,7 @@ The repository ships `evals/runner.py`; it prepares and grades runs but does not
 ```bash
 # Arm B: CCA-only material. Everything after --command is the real agent command.
 python evals/runner.py \
+  --suite core \
   --case 03 \
   --arm B \
   --runs /tmp/cca-evals \

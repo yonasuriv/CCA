@@ -33,3 +33,5 @@ The scenario matrix and execution rules are defined in the parent [evaluation pr
 ## Implemented cases
 
 Directories `01-` through `14-` are executable fixture contracts, not recorded model outcomes. Each contains `case.json`, `prompt.md`, `fixture/`, and `assertions.json`. Assertions intentionally target semantic invariants and preservation boundaries rather than byte-for-byte reproduction of a pre-existing upstream golden workspace.
+
+This is the **core interoperability suite**. Broader process/methodology reasoning is tested separately under [`../methodologies/`](../methodologies/); do not infer that the 14 core cases cover the full advisor corpus.

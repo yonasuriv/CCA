@@ -1,0 +1,10 @@
+{
+  "id": "18",
+  "name": "SEMAT Essence method engineering",
+  "baseline": "none",
+  "profiles": [
+    "advisor",
+    "methodology"
+  ],
+  "expected_behavior": "Use the relevant method at its own scope, preserve independent authorities, and avoid unnecessary structural implementation of process guidance."
+}
