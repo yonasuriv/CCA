@@ -46,7 +46,7 @@ class ICMInheritanceContractTests(unittest.TestCase):
             "one-way",
             "selective section routing",
             "canonical sources",
-            "CONTEXT.md routing purity",
+            "routing purity",
             "tool prerequisites",
             "setup",
             "status",
