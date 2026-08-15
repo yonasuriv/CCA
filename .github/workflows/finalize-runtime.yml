@@ -1,0 +1,41 @@
+name: Finalize CCA Runtime
+
+on:
+  push:
+    branches:
+      - refactor/unified-cca-skill
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Align runtime semantics
+        run: python .github/scripts/finalize_runtime.py
+
+      - name: Validate repository
+        run: python .github/scripts/validate_repo.py
+
+      - name: Remove one-shot helper
+        run: |
+          rm .github/scripts/finalize_runtime.py
+          rm .github/workflows/finalize-runtime.yml
+
+      - name: Commit runtime alignment
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "refactor: enforce unified skill self-containment"
+          git push
