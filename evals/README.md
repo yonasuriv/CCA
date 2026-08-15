@@ -146,6 +146,7 @@ python evals/runner.py \
 
 # Arm A: upstream baseline material must be supplied for cases that require it.
 python evals/runner.py \
+  --suite core \
   --case 01 \
   --arm A \
   --runs /tmp/cca-evals \
@@ -157,4 +158,4 @@ The invoked command runs with its working directory set to the isolated `workspa
 
 Each prepared run writes `result.json` containing command/exit/duration metadata (when a command was actually run) and deterministic filesystem assertion results. `behavioral_run_executed: false` means the runner only prepared/graded a workspace; such output is **not** behavioral evidence.
 
-The 14 fixtures and harness are implemented. Real model A/B results are still unproven until actual external agent commands execute both arms under matched conditions and their artifacts are retained. Report results per scenario; never turn fixture existence or CI success into a universal “CCA is better than ICM” claim.
+The 14 core fixtures, 20 methodology/framework fixtures, and harness are implemented. Real model comparisons are still unproven for any suite until actual external agent commands execute the relevant arms under matched conditions and their artifacts are retained. Report results per scenario; never turn fixture existence or CI success into a universal “CCA is better than ICM” claim.

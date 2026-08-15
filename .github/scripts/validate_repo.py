@@ -228,7 +228,7 @@ def _validate_case_suite(directory: str, expected_count: int) -> None:
         if not fixture.is_dir() or not any(p.is_file() for p in fixture.rglob("*")):
             error(f"Evaluation case missing non-empty fixture: {path.relative_to(ROOT)}")
         assertions = path / "assertions.json"
-        if assertions.is_file() and '"assertions": []' in read(assertions).replace(" ", ""):
+        if assertions.is_file() and re.search(r'"assertions"\s*:\s*\[\s*\]', read(assertions)):
             error(f"Evaluation case has empty assertions: {path.relative_to(ROOT)}")
 
 
