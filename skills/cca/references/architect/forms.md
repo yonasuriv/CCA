@@ -36,7 +36,7 @@ This may borrow ICM naming, contracts, selective routing, one-way dependencies, 
 
 ### Full native ICM pipeline
 
-When native ICM compatibility is requested, implement the complete applicable current ICM profile: `AGENTS.md` as the authoritative Layer-0 catalog, five-layer routing, root and stage contracts, `setup`/`status` behavior, flat all-at-once questionnaire, naming and placeholder rules, tool prerequisites where needed, applicable checkpoints/audits/spec/value/shared-constant patterns, quality guardrails, and workspace-builder-equivalent validation. Create a harness entry (`CLAUDE.md`) as a single-line `@AGENTS.md` include only when a harness needs it. When operating on an existing upstream workspace, preserve its native `CLAUDE.md` entry path.
+When native ICM compatibility is requested, implement the complete applicable current ICM profile: preserve the current native Layer-0 entry semantics, five-layer routing, root and stage contracts, `setup`/`status` behavior, flat all-at-once questionnaire, naming and placeholder rules, tool prerequisites where needed, applicable checkpoints/audits/spec/value/shared-constant patterns, quality guardrails, and workspace-builder-equivalent validation. Portable `AGENTS.md` guidance may be added as an interoperable counterpart when useful, but it must not be described as universally overriding or replacing the native ICM `CLAUDE.md` entry. For new full-native generation, also read `native-icm-setup.md` and map onboarding answers to concrete files/placeholders/conditional stages before claiming setup completeness.
 
 Do not reduce that profile to the minimal tree above.
 
@@ -149,16 +149,8 @@ concrete mutable objects, processes, effects, and impact.
 
 ## Record Library defaults
 
-For a fresh Record Library, treat the record template as the schema: create new
-records by copying it rather than starting blank. Keep identifier/status
-authority in one declared catalog when the library uses those fields, define a
-small lifecycle only when needed, and detect half-created records or schema drift.
-Existing libraries keep their own schema and lifecycle.
+For a fresh Record Library, treat the record template as the schema and creation source: every new record starts by copying the template, then replacing declared fields; never create a blank record and reconstruct the shape from memory. If identifiers or lifecycle status exist, declare one catalog as their authority and make record-local copies derived/readable rather than competing authorities. Keep lifecycle deliberately small (for example `draft → active → archived`) unless the domain already defines one. A record is half-created when its catalog entry exists without the required template-derived body, or the body exists without the required catalog identity; lint/sync should report that state rather than silently guessing. Detect schema drift by comparing required template fields/sections against records, while preserving an existing library's own schema and lifecycle instead of imposing these defaults.
 
 ## Context Map operational fields
 
-When useful for the actual mapping question, nodes may include `frequency` in
-addition to ownership, value, pain, governance, inputs, outputs, and interfaces.
-Workshop observations are evidence, not automatically canonical truth. Promote a
-pattern only when the workspace's evidence rule is satisfied; three independent
-occurrences is a useful default, not a universal law.
+Context Map models organizational/process/information relationships, not source-code change impact. When useful for the actual mapping question, nodes may include `frequency` in addition to ownership, value, pain, governance, inputs, outputs, and interfaces. Keep evidence links/observation references close to claims that came from workshops or discovery. Workshop observations are evidence events, not automatically canonical truth. Promote a repeated pattern only when the workspace's evidence rule is satisfied; three independent occurrences is a useful default when no stronger local rule exists, never a universal law. If the question becomes 'what source file changes and what does that hit?', switch to System Map instead of stretching Context Map into a code graph.

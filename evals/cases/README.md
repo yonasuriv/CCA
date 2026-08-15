@@ -29,3 +29,7 @@ A runner may add machine-readable assertion files later, but the Markdown contra
 6. A no-change result must be gradeable as success where intervention is unnecessary.
 
 The scenario matrix and execution rules are defined in the parent [evaluation protocol](../README.md).
+
+## Implemented cases
+
+Directories `01-` through `14-` are executable fixture contracts, not recorded model outcomes. Each contains `case.json`, `prompt.md`, `fixture/`, and `assertions.json`. Assertions intentionally target semantic invariants and preservation boundaries rather than byte-for-byte reproduction of a pre-existing upstream golden workspace.

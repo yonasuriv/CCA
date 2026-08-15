@@ -51,39 +51,31 @@ Explicit metadata is appropriate when:
 
 PARA directories, Zettelkasten folders, ICM stages, wiki folders, projects, areas, resources, archives, and skill collections do not require CCA metadata solely to announce their path names.
 
-## 5. CCA skill suite
+## 5. CCA skill package and modes
 
-CCA's first-party Agent Skills are a **suite of focused capabilities**, not unrelated standalone products.
+CCA is **one installable Agent Skill** named `cca`. It exposes seven lazy modes: six workspace operations (`architect`, `scaffold`, `sync`, `ingest`, `query`, `lint`) plus the separate `advise` judgment capability.
 
 Package portability means:
 
-1. each skill's implementation resources referenced by file path are contained within that skill package;
-2. no skill reaches into a sibling skill directory or repository-global implementation file by relative path;
-3. installation location must not become part of CCA semantics;
-4. a skill may coordinate with another installed CCA capability by semantic skill name, for example `Use lint mode to validate the selected profile`;
-5. semantic delegation must not be rewritten as a brittle filesystem dependency.
+1. every runtime resource referenced by path remains inside `skills/cca/` after installation;
+2. no mode depends on removed sibling skill packages or repository-global implementation files;
+3. installation location is not part of CCA semantics;
+4. modes coordinate by semantic mode name, not filesystem package boundaries;
+5. architect and advisor remain separate reference domains even though they share one package.
 
-The intended first-party suite is:
-
-- `architect` mode
-- `scaffold` mode
-- `sync` mode
-- `ingest` mode
-- `query` mode
-- `lint` mode
-
-`architect` mode is the primary entry point for compound architecture/design requests and may lazy-load method/form references before delegating focused operations. It is not a mandatory gateway for an operation whose intent already matches another skill directly.
+`architect` mode is the primary entry point for compound architecture/design requests and may lazy-load form/method references or consult the advisor domain for judgment. It is not a mandatory gateway for an operation whose intent already matches another mode directly.
 
 ## 6. Progressive disclosure
 
-CCA should use Agent Skills progressive disclosure rather than creating a single monolithic skill.
+CCA uses Agent Skills progressive disclosure *inside the single package* rather than splitting tightly coupled operations into separately installable skills or loading all references at activation time.
 
-- skill metadata routes to the appropriate focused capability;
-- `SKILL.md` contains the compact operational procedure;
-- detailed method/profile knowledge remains in skill-local references and is loaded only when relevant;
-- compound architecture work may coordinate multiple skills semantically.
+- `SKILL.md` routes intent to one mode;
+- a mode loads only the core/form/method/advisor references required by the task;
+- detailed methodology knowledge stays behind architect references;
+- advisor references stay behind `advise` or explicit architect consultation;
+- focused operations do not need to load unrelated architecture or advisor material.
 
-Creating a dedicated `cca-para`, `cca-zettelkasten`, or `cca-second-brain` skill is not justified merely to store methodology knowledge. Such knowledge belongs behind the architecture capability unless a future distinct executable operation warrants its own skill.
+Creating dedicated PARA, Zettelkasten, BASB, Scrum, or similar CCA skills is not justified merely to store methodology knowledge. Those external methods remain authorities and are loaded only when the active problem crosses their boundary.
 
 ## 7. Validation
 

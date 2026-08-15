@@ -133,9 +133,9 @@ Every bundled CCA skill must remain a valid Agent Skills package:
 - Detailed material is progressively disclosed through skill-local `references/`, `assets/`, or `scripts/`.
 - File references used for implementation resources are relative to the skill root and do not escape the package.
 
-CCA's first-party skills are intentionally distributed as a **suite of focused capabilities**. Package portability does not mean every skill must be a sensible unrelated product when installed alone. It means installation paths and sibling filesystem layouts are not part of the capability contract.
+CCA is distributed as **one installable `cca` skill with seven lazily loaded modes**. Package portability means every runtime reference, template, and script required by those modes remains inside that one package and installation location is not part of the capability contract.
 
-Cross-skill coordination is therefore allowed by **semantic skill name**, for example `Use lint mode to validate the selected profile`. A skill must not reach into `../lint mode/`, `../../spec/`, or another sibling/repository-global implementation path to perform that delegation.
+Cross-mode coordination uses semantic mode names, for example `Use lint mode to validate the selected profile`; it never relies on removed sibling skill packages or repository-global implementation paths.
 
 `architect` mode may coordinate compound architecture workflows, but it is not a mandatory gateway for already-clear direct operations such as lint, ingest, query, sync, or scaffold.
 
@@ -196,4 +196,4 @@ CCA does not freeze upstream behavior. When ICM, LLM Wiki, AGENTS.md, or Agent S
 
 Method overlays should also be revisited if their canonical/public definitions materially change, but they remain separate from the structural upstream standards matrix unless CCA intentionally adopts a concrete compatibility contract.
 
-See `docs/standards.md` for the tracked upstream surface.
+Repository maintainers should verify the current primary upstream surfaces before changing compatibility semantics and update the skill-local compatibility/specification references together.

@@ -81,6 +81,7 @@ def validate_unified_skill_surface() -> None:
         CCA / "references/architect/forms.md",
         CCA / "references/architect/methods.md",
         CCA / "references/architect/system-map.md",
+        CCA / "references/architect/native-icm-setup.md",
         CCA / "references/advisor/mode.md",
         CCA / "references/advisor/engineering-principles.md",
         CCA / "references/advisor/frameworks-and-methodologies.md",
@@ -172,6 +173,60 @@ def validate_skill_self_containment() -> None:
         for pattern, reason in banned.items():
             if pattern in text:
                 error(f"Installed skill is not self-contained: {path.relative_to(ROOT)} contains {pattern!r} ({reason})")
+
+
+def validate_session_semantics() -> None:
+    """Prevent regressions into the rejected audit conclusions and old package model."""
+    checks = {
+        CCA / "references/architect/forms.md": [
+            ("`AGENTS.md` as the authoritative Layer-0 catalog", "old native-ICM Layer-0 claim"),
+            ("single-line `@AGENTS.md` include only when a harness needs it", "universal native-entry rewrite"),
+        ],
+        CCA / "references/architect/mode.md": [
+            ("`AGENTS.md` as the authoritative Layer-0 catalog", "old native-ICM Layer-0 claim"),
+            ("references/core.md", "stale architect-local path"),
+            ("references/methods.md", "stale architect-local path"),
+            ("references/adapters.md", "stale architect-local path"),
+        ],
+        CCA / "references/core/method-composition.md": [
+            ("suite of focused capabilities", "old multi-package skill model"),
+            ("multiple skills", "old multi-package skill model"),
+        ],
+    }
+    for path, forbidden in checks.items():
+        text = read(path)
+        for pattern, reason in forbidden:
+            if pattern in text:
+                error(f"Session semantic regression in {path.relative_to(ROOT)}: {pattern!r} ({reason})")
+
+    required_fragments = {
+        CCA / "references/architect/system-map.md": ["live", "leftover", "ghost", "Hits", "Does not hit", "Cold-agent walk", "Re-verify"],
+        CCA / "references/architect/forms.md": ["Record Library defaults", "half-created", "frequency", "System Map"],
+        CCA / "references/architect/native-icm-setup.md": ["Bidirectional coverage gate", "Question/answer → use", "Placeholder/field → source", "Conditional stage → condition"],
+        CCA / "references/advisor/mode.md": ["These are seven references, not six."],
+    }
+    for path, fragments in required_fragments.items():
+        text = read(path)
+        for fragment in fragments:
+            if fragment not in text:
+                error(f"Missing session-required semantic in {path.relative_to(ROOT)}: {fragment!r}")
+
+
+def validate_evaluation_cases() -> None:
+    cases = ROOT / "evals/cases"
+    dirs = sorted(path for path in cases.iterdir() if path.is_dir() and re.match(r"^\d{2}-", path.name)) if cases.is_dir() else []
+    expected = [f"{i:02d}" for i in range(1, 15)]
+    found = [path.name[:2] for path in dirs]
+    if found != expected:
+        error(f"Expected evaluation cases 01..14; found {found}")
+        return
+    for path in dirs:
+        for required in ("case.json", "prompt.md", "assertions.json"):
+            if not (path / required).is_file():
+                error(f"Evaluation case missing {required}: {path.relative_to(ROOT)}")
+        fixture = path / "fixture"
+        if not fixture.is_dir() or not any(p.is_file() for p in fixture.rglob("*")):
+            error(f"Evaluation case missing non-empty fixture: {path.relative_to(ROOT)}")
 
 def validate_icm_derived_example() -> None:
     """Validate only the ICM-derived patterns the hybrid example adopts."""
@@ -328,6 +383,8 @@ def main() -> int:
     validate_unified_skill_surface()
     validate_skills()
     validate_skill_self_containment()
+    validate_session_semantics()
+    validate_evaluation_cases()
     validate_icm_derived_example()
     validate_architect_templates()
     validate_example_style()

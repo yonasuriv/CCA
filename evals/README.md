@@ -122,3 +122,31 @@ For native ICM cases, the success condition is not “CCA looks different” or 
 For mixed/existing-workspace cases, CCA can demonstrate capability beyond the ICM baseline if it preserves more authorities, performs fewer unnecessary mutations, reduces context/exploration cost, or improves cold-agent success.
 
 Do not publish “CCA is better than ICM” as a universal result. Report scenario-level evidence and the upstream/model/runtime pins used to obtain it.
+
+## Runner usage
+
+The repository ships `evals/runner.py`; it prepares and grades runs but does not choose or impersonate an agent.
+
+```bash
+# Arm B: CCA-only material. Everything after --command is the real agent command.
+python evals/runner.py \
+  --case 03 \
+  --arm B \
+  --runs /tmp/cca-evals \
+  --cca-skill skills/cca \
+  --command <agent-command> <agent-args>
+
+# Arm A: upstream baseline material must be supplied for cases that require it.
+python evals/runner.py \
+  --case 01 \
+  --arm A \
+  --runs /tmp/cca-evals \
+  --baseline-root /path/to/pinned/icm-material \
+  --command <same-agent-command> <same-agent-args>
+```
+
+The invoked command runs with its working directory set to the isolated `workspace/`. It receives `CCA_EVAL_CASE`, `CCA_EVAL_ARM`, `CCA_EVAL_PROMPT`, and `CCA_EVAL_MATERIAL` environment variables. The caller is responsible for giving both arms the same model/configuration, tool permissions, network policy, context/token budget, tool-call budget, and time/step budget.
+
+Each prepared run writes `result.json` containing command/exit/duration metadata (when a command was actually run) and deterministic filesystem assertion results. `behavioral_run_executed: false` means the runner only prepared/graded a workspace; such output is **not** behavioral evidence.
+
+The 14 fixtures and harness are implemented. Real model A/B results are still unproven until actual external agent commands execute both arms under matched conditions and their artifacts are retained. Report results per scenario; never turn fixture existence or CI success into a universal “CCA is better than ICM” claim.

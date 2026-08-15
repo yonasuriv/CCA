@@ -26,8 +26,8 @@ workspace/
 ├── Projects/                         # PARA organization
 │   └── client-acme/
 │       ├── assessment/              # native ICM boundary
-│       │   ├── CLAUDE.md            # created by directive: '@AGENTS.md' (or native entry preserved)
-│       │   ├── AGENTS.md            # authoritative Layer-0 catalog
+│       │   ├── CLAUDE.md            # native ICM entry semantics preserved
+│       │   ├── AGENTS.md            # optional portable counterpart when useful
 │       │   ├── CONTEXT.md
 │       │   └── stages/
 │       └── code/                    # ordinary coding repository
@@ -120,6 +120,6 @@ For compound architecture work, `cca` in `architect` mode chooses the form and m
 - use `cca` in `query` mode when maintained knowledge must be queried/synthesized;
 - use `cca` in `lint` mode to validate the profiles actually claimed.
 
-Do not reference sibling skill paths or implementation resources. The semantic skill name is the coordination boundary.
+Do not reference sibling skill paths or implementation resources. The semantic mode name is the coordination boundary.
 
-Direct requests still route directly to the focused skill. `cca` in `architect` mode is not required for a request that is already clearly a lint, ingest, query, sync, or scaffold operation.
+Direct requests still route directly to the focused mode. `cca` in `architect` mode is not required for a request that is already clearly a lint, ingest, query, sync, or scaffold operation.
