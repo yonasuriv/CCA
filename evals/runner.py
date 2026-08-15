@@ -33,7 +33,12 @@ def discover_cases(root: Path) -> list[Path]:
 
 
 def suite_root(evals_root: Path, suite: str) -> Path:
-    mapping = {"core": "cases", "methodologies": "methodologies"}
+    mapping = {
+        "core": "cases",
+        "methodologies": "methodologies",
+        "icm-parity": "icm-parity",
+        "cca-extensions": "cca-extensions",
+    }
     try:
         return evals_root / mapping[suite]
     except KeyError as exc:
@@ -56,10 +61,28 @@ def load_case(case_dir: Path) -> dict[str, Any]:
     return data
 
 
+def load_capability_catalog(path: Path) -> list[dict[str, Any]]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    capabilities = payload.get("capabilities")
+    if not isinstance(capabilities, list):
+        raise ValueError(f"capability catalog {path} must contain a capabilities list")
+    return capabilities
+
+
 def _copy_tree(source: Path, destination: Path) -> None:
     if destination.exists():
         shutil.rmtree(destination)
     shutil.copytree(source, destination)
+
+
+def material_path_for_arm(arm: str, run_dir: Path) -> Path | None:
+    if arm == "A":
+        return run_dir / "baseline"
+    if arm == "B":
+        return run_dir / "cca"
+    if arm == "C":
+        return None
+    raise ValueError("arm must be A, B, or C")
 
 
 def prepare_run(
@@ -69,8 +92,8 @@ def prepare_run(
     cca_skill: Path,
     baseline_root: Path | None,
 ) -> Path:
-    if arm not in {"A", "B"}:
-        raise ValueError("arm must be A or B")
+    if arm not in {"A", "B", "C"}:
+        raise ValueError("arm must be A, B, or C")
     case_dir = Path(case["_case_dir"])
     destination = run_root / f"{case['id']}-{arm}"
     if destination.exists():
@@ -89,10 +112,11 @@ def prepare_run(
             if baseline_root is None or not baseline_root.is_dir():
                 raise ValueError(f"case {case['id']} requires baseline material")
             _copy_tree(baseline_root, destination / "baseline")
-    else:
+    elif arm == "B":
         if not (cca_skill / "SKILL.md").is_file():
             raise ValueError("CCA arm requires an installable skill root containing SKILL.md")
         _copy_tree(cca_skill, destination / "cca")
+    # Arm C intentionally receives no tested repository material.
     return destination
 
 
@@ -103,14 +127,7 @@ def run_agent(command: list[str], workspace: Path, env: dict[str, str] | None = 
     if env:
         merged_env.update(env)
     started = time.monotonic()
-    process = subprocess.run(
-        command,
-        cwd=workspace,
-        env=merged_env,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
+    process = subprocess.run(command, cwd=workspace, env=merged_env, text=True, capture_output=True, check=False)
     duration_ms = int((time.monotonic() - started) * 1000)
     return {
         "command": command,
@@ -173,9 +190,9 @@ def write_result(result: dict[str, Any], path: Path) -> None:
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", choices=("core", "methodologies"), default="core")
+    parser.add_argument("--suite", choices=("core", "methodologies", "icm-parity", "cca-extensions"), default="core")
     parser.add_argument("--case", required=True, help="Case directory or two-digit case id")
-    parser.add_argument("--arm", choices=("A", "B"), required=True)
+    parser.add_argument("--arm", choices=("A", "B", "C"), required=True)
     parser.add_argument("--runs", type=Path, default=Path("evals/runs"))
     parser.add_argument("--cca-skill", type=Path, default=Path("skills/cca"))
     parser.add_argument("--baseline-root", type=Path)
@@ -195,6 +212,7 @@ def main() -> int:
     prepared = prepare_run(case, args.arm, args.runs, args.cca_skill, args.baseline_root)
     command_result = None
     if args.command:
+        material = material_path_for_arm(args.arm, prepared)
         command_result = run_agent(
             args.command,
             prepared / "workspace",
@@ -202,7 +220,7 @@ def main() -> int:
                 "CCA_EVAL_CASE": case["id"],
                 "CCA_EVAL_ARM": args.arm,
                 "CCA_EVAL_PROMPT": str((prepared / "prompt.md").resolve()),
-                "CCA_EVAL_MATERIAL": str((prepared / ("baseline" if args.arm == "A" else "cca")).resolve()),
+                "CCA_EVAL_MATERIAL": "" if material is None else str(material.resolve()),
             },
         )
     assertion_result = evaluate_assertions(prepared / "workspace", prepared / "assertions.json")

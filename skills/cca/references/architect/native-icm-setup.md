@@ -1,6 +1,6 @@
 # Native ICM setup mapping
 
-Read this only when creating or materially rebuilding a **full native ICM workspace**. Generic CCA scaffolding and ICM-derived stage use do not require this procedure.
+Read this only when creating, setting up, or materially rebuilding a **full native ICM workspace**. Generic CCA scaffolding and ICM-derived stage use do not require this procedure. For the executable onboarding/build workflow, read `workspace-builder.md`.
 
 Native onboarding is flat, all-at-once, system-level and one-time. The questionnaire is not complete merely because questions were asked: answers must be mapped into the factory/configuration/stage structure they configure.
 
@@ -32,6 +32,12 @@ Before setup is complete verify both directions:
 4. **Derivation → no re-ask:** values inferable from earlier answers or the filesystem are derived, not asked again.
 5. **One-time behavior:** after successful setup, later runs use the configured files and do not repeat onboarding unless the user explicitly resets/reconfigures it.
 
+## Runtime behavior
+
+`setup` is an inherited native behavior implemented by Architect through `workspace-builder.md`. It must collect the generated questionnaire, hydrate direct/derived/default values, resolve conditional sections/stages, verify no unresolved placeholders remain, and avoid repeating setup after successful configuration.
+
+`status` is also inherited runtime behavior: scan real stage outputs, ignore `.gitkeep`, and render COMPLETE/PENDING state. Do not infer status from plans or conversation history.
+
 ## Acceptance
 
-Do not call the native workspace setup-complete until the current upstream questionnaire/placeholder/conditional syntax rules pass together with workspace-builder-equivalent end-to-end validation. This mapping procedure supplements current upstream acceptance; it does not replace it.
+Do not call the native workspace setup-complete until the current upstream questionnaire/placeholder/conditional syntax rules pass together with workspace-builder-equivalent end-to-end validation. CCA's builder performs the workflow; current upstream ICM remains the authority that decides whether the native result is valid.

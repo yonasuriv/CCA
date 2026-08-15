@@ -1,6 +1,6 @@
 ---
 name: cca
-description: Agent-agnostic context architecture and engineering judgment for filesystem-native work. Use to design or restructure workspaces, scaffold portable routing, synchronize navigation, ingest or query maintained knowledge, validate CCA/ICM/LLM-Wiki compatibility, or advise on engineering and methodology trade-offs. Supports existing code repositories, second brains/PKM, ICM, LLM Wiki, PARA, Zettelkasten, BASB/CODE, delivery methods, and hybrid workspaces without replacing their native authorities.
+description: Agent-agnostic context architecture and engineering judgment for filesystem-native work. Use to design or restructure workspaces, build/setup native or hybrid workspaces, scaffold portable routing, synchronize navigation, ingest or query maintained knowledge, validate CCA/ICM/LLM-Wiki compatibility, or advise on engineering and methodology trade-offs. Supports existing code repositories, second brains/PKM, ICM, LLM Wiki, PARA, Zettelkasten, BASB/CODE, delivery methods, and hybrid workspaces without replacing their native authorities.
 compatibility: Filesystem read/write access for mutating modes. No vendor-specific runtime required.
 ---
 
@@ -12,7 +12,7 @@ CCA is one installable skill with seven lazily loaded modes. Select the smallest
 
 | Mode | Use for | Load first |
 |---|---|---|
-| `architect` | design, restructure, boundary/profile selection, hybrid composition | `references/architect/mode.md` |
+| `architect` | design, create/setup/status, restructure, boundary/profile selection, hybrid composition | `references/architect/mode.md` |
 | `scaffold` | add minimal routing/context without restructuring | `references/operations/scaffold.md` |
 | `sync` | reconcile routing/navigation with the filesystem | `references/operations/sync.md` |
 | `ingest` | integrate evidence into maintained knowledge | `references/operations/ingest.md` |
@@ -21,6 +21,8 @@ CCA is one installable skill with seven lazily loaded modes. Select the smallest
 | `advise` | engineering judgment, process/method trade-offs, security/autonomy/model/context decisions | `references/advisor/mode.md` |
 
 Do not load every mode or reference. Progressive disclosure is part of the architecture.
+
+For workspace creation or material rebuild, Architect lazily loads `references/architect/workspace-builder.md`. For native ICM, that builder performs the inherited discovery, mapping, scaffolding, questionnaire, validation/repair, `setup`, and `status` behaviors while current upstream ICM remains the acceptance authority.
 
 ## Shared authority
 
@@ -40,7 +42,7 @@ These files are inside the installable skill so runtime behavior never depends o
 
 Keep these domains separate:
 
-- `references/architect/` owns workspace forms, boundaries, structural composition, and migration design.
+- `references/architect/` owns workspace forms, builder/onboarding behavior, boundaries, structural composition, and migration design.
 - `references/advisor/` owns engineering judgment and methodology priors. Its seven references remain independent and are never folded into architect references.
 - `references/operations/` owns focused operational procedures.
 - `references/core/` owns normative CCA semantics shared by all modes plus compatibility/provenance maps for inherited upstream behavior.
@@ -55,10 +57,11 @@ Architect mode may consult advisor references when a structural decision require
 4. Existing code repositories keep their application structure unless restructuring is explicitly requested.
 5. PARA, Zettelkasten, BASB/CODE, Scrum, Kanban, XP, DevOps, SAFe, LeSS, DA, and similar methods remain their own authorities; CCA maps relationships and routing rather than reimplementing them.
 6. Native ICM and native LLM Wiki claims are validated against their own applicable semantics before optional CCA hardening. For native ICM, inherited ICM behavior is the compatibility floor: CCA may extend it but must not weaken or replace it.
-7. Do not create structure merely because a template exists.
-8. For destructive restructuring, surface the migration map before moves, merges, renames, or deletions unless the user has explicitly authorized direct remediation.
-9. Use harness-native adapter files only where needed; portable guidance should remain canonical in the workspace's chosen portable authority.
-10. When uncertainty crosses a hard-stop boundary, use `references/advisor/escalation-triggers.md`.
+7. Native ICM create/setup/status requests use Architect's `workspace-builder.md`; they do not require the upstream workspace-builder checkout at runtime, although upstream remains the semantic/acceptance authority.
+8. Do not create structure merely because a template exists.
+9. For destructive restructuring, surface the migration map before moves, merges, renames, or deletions unless the user has explicitly authorized direct remediation.
+10. Use harness-native adapter files only where needed; portable guidance should remain canonical in the workspace's chosen portable authority.
+11. When uncertainty crosses a hard-stop boundary, use `references/advisor/escalation-triggers.md`.
 
 ## Core rule
 

@@ -1,0 +1,26 @@
+{
+  "suite": "cca-extensions",
+  "arms": ["icm", "cca", "no-skill"],
+  "capabilities": [
+    {"id":"CCA-01","name":"PARA + Zettelkasten authority routing","must_test":"New evidence must be captured without confusing operational PARA location with durable linked-note authority"},
+    {"id":"CCA-02","name":"LLM Wiki ingest","must_test":"Integrate new source with provenance, update existing synthesis when appropriate, avoid duplicate canonical knowledge"},
+    {"id":"CCA-03","name":"LLM Wiki query routing","must_test":"Find answer through maintained knowledge with source traceability and minimal irrelevant reads"},
+    {"id":"CCA-04","name":"ICM + LLM Wiki composition","must_test":"Native ICM workflow consumes maintained synthesis without merging schemas or copying authority"},
+    {"id":"CCA-05","name":"Human vs agent knowledge authority","must_test":"Resolve same topic across human Zettelkasten and agent-maintained wiki without silently overwriting either"},
+    {"id":"CCA-06","name":"Profile-aware linting","must_test":"Hybrid fixture contains one ICM defect, one wiki issue, and one valid method overlay; classify each at correct scope"},
+    {"id":"CCA-07","name":"Nested authority routing","must_test":"Outer PARA/CCA project contains native ICM subtree and LLM Wiki; operate without flattening boundaries"},
+    {"id":"CCA-08","name":"Cross-scope method composition","must_test":"Scrum + XP + DevOps + Lean coexist at different scopes without invented hybrid methodology"},
+    {"id":"CCA-09","name":"Same-scope method conflict","must_test":"Scrum vs Kanban or SAFe vs LeSS requires explicit tradeoff/conflict rather than fake merge"},
+    {"id":"CCA-10","name":"Methodology non-trigger","must_test":"Ordinary implementation task must not load advisor/framework corpus without workspace evidence"},
+    {"id":"CCA-11","name":"Hybrid lifecycle routing","must_test":"Evidence moves through capture/distill/maintained synthesis/use while each human/agent method keeps its own authority"},
+    {"id":"CCA-12","name":"Portable agent guidance","must_test":"Add cross-agent guidance without replacing native harness/profile instruction authority"},
+    {"id":"CCA-13","name":"Generic workspace builder","must_test":"Build useful non-ICM workspace from actual workflow without imposing staged ICM structure"},
+    {"id":"CCA-14","name":"System Map change impact","must_test":"Map live/leftover/ghost code and blast radius from source evidence without duplicating source tree"},
+    {"id":"CCA-15","name":"Context Map operational model","must_test":"Represent organizational/process/information relationships without confusing them with source-code impact"},
+    {"id":"CCA-16","name":"Record Library schema preservation","must_test":"Create/update record using local template, explicit identifier/catalog authority, and half-created detection"},
+    {"id":"CCA-17","name":"Cross-profile restructure","must_test":"Migration proposal preserves nested authorities and requires approval before destructive changes"},
+    {"id":"CCA-18","name":"Knowledge contradiction handling","must_test":"Source conflict is preserved with provenance rather than silently resolved into false certainty"},
+    {"id":"CCA-19","name":"Advisor escalation boundary","must_test":"Architecture consults only needed advisor domain and escalates hard-stop uncertainty without folding advisor into structural authority"},
+    {"id":"CCA-20","name":"Progressive-disclosure efficiency","must_test":"Compare references/files/tokens loaded on simple, native ICM, and hybrid tasks; broader CCA scope must not impose unnecessary context tax"}
+  ]
+}
