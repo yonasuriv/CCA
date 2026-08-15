@@ -102,5 +102,5 @@ The evaluation harness is executable, but no model/runtime A/B result is recorde
 - [x] Run `python -m unittest discover -s evals/tests -v`.
 - [x] Run `python .github/scripts/validate_repo.py`.
 - [x] Confirm only `skills/cca/` exists as a first-party skill package and no temporary migration/finalizer workflow remains.
-- [ ] Confirm final GitHub Actions `Validate CCA` succeeds on the final branch head.
+- [x] Confirm final GitHub Actions `Validate CCA` succeeds on the final branch head.
 - [x] Report real-agent behavioral A/B execution as pending unless actual agent commands were run and produced artifacts.
