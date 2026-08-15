@@ -20,6 +20,9 @@ jobs:
       - name: Apply migration
         run: python .github/scripts/migrate_unified_skill.py
 
+      - name: Align validator and links
+        run: python .github/scripts/post_migration_fix.py
+
       - name: Validate repository
         run: python .github/scripts/validate_repo.py
 
