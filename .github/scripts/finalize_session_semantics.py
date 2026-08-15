@@ -14,6 +14,12 @@ def replace(path: Path, old: str, new: str) -> None:
     path.write_text(text.replace(old, new), encoding="utf-8")
 
 
+def replace_optional(path: Path, old: str, new: str) -> None:
+    text = path.read_text(encoding="utf-8")
+    if old in text:
+        path.write_text(text.replace(old, new), encoding="utf-8")
+
+
 forms = CCA / "references/architect/forms.md"
 replace(
     forms,
@@ -34,7 +40,7 @@ replace(
     "│       │   ├── CLAUDE.md            # created by directive: '@AGENTS.md' (or native entry preserved)\n│       │   ├── AGENTS.md            # authoritative Layer-0 catalog",
     "│       │   ├── CLAUDE.md            # native ICM entry semantics preserved\n│       │   ├── AGENTS.md            # optional portable counterpart when useful",
 )
-replace(methods, "by semantic skill name", "by semantic mode name")
+replace(methods, "The semantic skill name is the coordination boundary.", "The semantic mode name is the coordination boundary.")
 replace(methods, "Direct requests still route directly to the focused skill.", "Direct requests still route directly to the focused mode.")
 
 mode = CCA / "references/architect/mode.md"
@@ -58,7 +64,7 @@ replace(
     "CCA's first-party skills are intentionally distributed as a **suite of focused capabilities**. Package portability does not mean every skill must be a sensible unrelated product when installed alone. It means installation paths and sibling filesystem layouts are not part of the capability contract.\n\nCross-skill coordination is therefore allowed by **semantic skill name**, for example `Use lint mode to validate the selected profile`. A skill must not reach into `../lint mode/`, `../../spec/`, or another sibling/repository-global implementation path to perform that delegation.",
     "CCA is distributed as **one installable `cca` skill with seven lazily loaded modes**. Package portability means every runtime reference, template, and script required by those modes remains inside that one package and installation location is not part of the capability contract.\n\nCross-mode coordination uses semantic mode names, for example `Use lint mode to validate the selected profile`; it never relies on removed sibling skill packages or repository-global implementation paths.",
 )
-replace(compat, "See `docs/standards.md` for the tracked upstream surface.", "Repository maintainers should verify the current primary upstream surfaces before changing compatibility semantics and update the skill-local compatibility/specification references together.")
+replace_optional(compat, "See `docs/standards.md` for the tracked upstream surface.", "Repository maintainers should verify the current primary upstream surfaces before changing compatibility semantics and update the skill-local compatibility/specification references together.")
 
 composition = CCA / "references/core/method-composition.md"
 start = composition.read_text(encoding="utf-8")
@@ -256,7 +262,6 @@ Before setup is complete verify both directions:
 Do not call the native workspace setup-complete until the current upstream questionnaire/placeholder/conditional syntax rules pass together with workspace-builder-equivalent end-to-end validation. This mapping procedure supplements current upstream acceptance; it does not replace it.
 """, encoding="utf-8")
 
-# Expand evaluation docs with executable usage.
 evals = ROOT / "evals/README.md"
 eval_text = evals.read_text(encoding="utf-8")
 if "## Runner usage" not in eval_text:
@@ -303,7 +308,6 @@ Directories `01-` through `14-` are executable fixture contracts, not recorded m
 """
     cases_readme.write_text(case_text, encoding="utf-8")
 
-# Permanent validator additions.
 validator = ROOT / ".github/scripts/validate_repo.py"
 v = validator.read_text(encoding="utf-8")
 v = v.replace(
