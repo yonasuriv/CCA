@@ -16,22 +16,34 @@ import runner  # type: ignore  # noqa: E402
 
 
 class EvaluationRunnerTests(unittest.TestCase):
-    def test_discovers_exactly_fourteen_numbered_cases(self) -> None:
+    def test_discovers_exactly_fourteen_numbered_core_cases(self) -> None:
         cases = runner.discover_cases(EVALS / "cases")
         self.assertEqual(len(cases), 14)
         self.assertEqual([case.name[:2] for case in cases], [f"{i:02d}" for i in range(1, 15)])
 
+    def test_discovers_exactly_twenty_numbered_methodology_cases(self) -> None:
+        cases = runner.discover_cases(EVALS / "methodologies")
+        self.assertEqual(len(cases), 20)
+        self.assertEqual([case.name[:2] for case in cases], [f"{i:02d}" for i in range(1, 21)])
+
+    def test_suite_root_separates_core_and_methodology_benchmarks(self) -> None:
+        self.assertEqual(runner.suite_root(EVALS, "core"), EVALS / "cases")
+        self.assertEqual(runner.suite_root(EVALS, "methodologies"), EVALS / "methodologies")
+        with self.assertRaises(ValueError):
+            runner.suite_root(EVALS, "unknown")
+
     def test_every_case_has_required_contract(self) -> None:
-        for case_dir in runner.discover_cases(EVALS / "cases"):
-            case = runner.load_case(case_dir)
-            self.assertEqual(case["id"], case_dir.name[:2])
-            self.assertTrue(case["name"])
-            self.assertIn(case["baseline"], {"icm", "icm-architect", "none"})
-            self.assertIsInstance(case["profiles"], list)
-            self.assertTrue(case["expected_behavior"])
-            self.assertTrue((case_dir / "prompt.md").is_file())
-            self.assertTrue((case_dir / "fixture").is_dir())
-            self.assertTrue((case_dir / "assertions.json").is_file())
+        for suite in ("cases", "methodologies"):
+            for case_dir in runner.discover_cases(EVALS / suite):
+                case = runner.load_case(case_dir)
+                self.assertEqual(case["id"], case_dir.name[:2])
+                self.assertTrue(case["name"])
+                self.assertIn(case["baseline"], {"icm", "icm-architect", "none"})
+                self.assertIsInstance(case["profiles"], list)
+                self.assertTrue(case["expected_behavior"])
+                self.assertTrue((case_dir / "prompt.md").is_file())
+                self.assertTrue((case_dir / "fixture").is_dir())
+                self.assertTrue((case_dir / "assertions.json").is_file())
 
     def test_prepare_run_isolates_fixture_and_arm_material(self) -> None:
         case_dir = EVALS / "cases" / "01-native-icm"
