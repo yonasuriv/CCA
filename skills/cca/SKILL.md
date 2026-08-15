@@ -29,7 +29,10 @@ Before making a claim about CCA semantics, compatibility, or composition, use th
 - `spec.md` — normative CCA semantics and operation model;
 - `compatibility.md` — upstream profiles and preservation rules;
 - `method-composition.md` — how methods coexist without being absorbed;
-- `adapters.md` — harness-specific interoperability guidance.
+- `adapters.md` — harness-specific interoperability guidance;
+- `icm-inheritance.md` — provenance map for preserving the current applicable ICM capability floor without redefining ICM.
+
+For native ICM work, `icm-inheritance.md` is a compatibility map only. The current upstream ICM authority and acceptance surface still win if CCA documentation drifts.
 
 These files are inside the installable skill so runtime behavior never depends on repository-global `spec/` files that may not exist after installation.
 
@@ -40,7 +43,7 @@ Keep these domains separate:
 - `references/architect/` owns workspace forms, boundaries, structural composition, and migration design.
 - `references/advisor/` owns engineering judgment and methodology priors. Its seven references remain independent and are never folded into architect references.
 - `references/operations/` owns focused operational procedures.
-- `references/core/` owns normative CCA semantics shared by all modes.
+- `references/core/` owns normative CCA semantics shared by all modes plus compatibility/provenance maps for inherited upstream behavior.
 
 Architect mode may consult advisor references when a structural decision requires engineering/process judgment. That is lazy consultation, not ownership transfer or duplication.
 
@@ -51,7 +54,7 @@ Architect mode may consult advisor references when a structural decision require
 3. Prefer the smallest intervention that solves the routing/context problem.
 4. Existing code repositories keep their application structure unless restructuring is explicitly requested.
 5. PARA, Zettelkasten, BASB/CODE, Scrum, Kanban, XP, DevOps, SAFe, LeSS, DA, and similar methods remain their own authorities; CCA maps relationships and routing rather than reimplementing them.
-6. Native ICM and native LLM Wiki claims are validated against their own applicable semantics before optional CCA hardening.
+6. Native ICM and native LLM Wiki claims are validated against their own applicable semantics before optional CCA hardening. For native ICM, inherited ICM behavior is the compatibility floor: CCA may extend it but must not weaken or replace it.
 7. Do not create structure merely because a template exists.
 8. For destructive restructuring, surface the migration map before moves, merges, renames, or deletions unless the user has explicitly authorized direct remediation.
 9. Use harness-native adapter files only where needed; portable guidance should remain canonical in the workspace's chosen portable authority.
