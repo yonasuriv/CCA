@@ -2,10 +2,12 @@
 """CCA repository regression validator.
 
 Checks mechanical invariants that protect selected ICM-derived patterns,
-Agent Skills package locality, documentation integrity, and the worked example.
-This is a repository regression gate, not a certification of the complete
-native ICM acceptance surface. Uses only the Python standard library so
-contributors and CI can run it without setup.
+Agent Skills package locality, documentation integrity, the unified skill layout,
+and the worked example. This is a repository regression gate, not certification
+of the complete native ICM acceptance surface.
+
+Uses only the Python standard library so contributors and CI can run it without
+setup.
 """
 
 from __future__ import annotations
@@ -17,6 +19,7 @@ from pathlib import Path
 SCRIPT = Path(__file__).resolve().parent
 ROOT = SCRIPT.parents[1]
 SKILLS = ROOT / "skills"
+CCA = SKILLS / "cca"
 EXAMPLE = ROOT / "examples" / "workspaces" / "topic-research"
 
 ERRORS: list[str] = []
@@ -66,9 +69,45 @@ def validate_single_skill_package() -> None:
         error(f"Expected exactly one first-party skill package ['cca']; found {names}")
 
 
+def validate_unified_skill_surface() -> None:
+    required = [
+        CCA / "SKILL.md",
+        CCA / "references/core/spec.md",
+        CCA / "references/core/compatibility.md",
+        CCA / "references/core/method-composition.md",
+        CCA / "references/core/adapters.md",
+        CCA / "references/architect/mode.md",
+        CCA / "references/architect/core.md",
+        CCA / "references/architect/forms.md",
+        CCA / "references/architect/methods.md",
+        CCA / "references/architect/system-map.md",
+        CCA / "references/advisor/mode.md",
+        CCA / "references/advisor/engineering-principles.md",
+        CCA / "references/advisor/frameworks-and-methodologies.md",
+        CCA / "references/advisor/security-and-adversarial-thinking.md",
+        CCA / "references/advisor/agent-system-design.md",
+        CCA / "references/advisor/context-engineering.md",
+        CCA / "references/advisor/ai-ml-practice.md",
+        CCA / "references/advisor/escalation-triggers.md",
+        CCA / "references/operations/scaffold.md",
+        CCA / "references/operations/sync.md",
+        CCA / "references/operations/ingest.md",
+        CCA / "references/operations/query.md",
+        CCA / "references/operations/lint.md",
+        CCA / "assets/templates",
+    ]
+    for path in required:
+        if not path.exists():
+            error(f"Missing unified CCA skill surface: {path.relative_to(ROOT)}")
+
+    # Core owns adapter semantics; architect may consume but must not duplicate it.
+    if (CCA / "references/architect/adapters.md").exists():
+        error("Duplicate adapter authority: architect/adapters.md must not coexist with core/adapters.md")
+
+
 def validate_skills() -> None:
     if not SKILLS.is_dir():
-        error("Skills/ directory is missing")
+        error("skills/ directory is missing")
         return
 
     for skill_dir in sorted(path for path in SKILLS.iterdir() if path.is_dir()):
@@ -103,8 +142,6 @@ def validate_skills() -> None:
             if not target_path.exists():
                 error(f"broken skill-local reference: {skill_dir.name}: {target}")
 
-        # Semantic delegation may name another installed skill, but a package
-        # must never reach into a sibling skill directory by filesystem path.
         if re.search(r"(?:\.\./)+cca-[a-z0-9-]+/", text):
             error(f"Skill uses sibling filesystem dependency: {skill_dir.name}")
 
@@ -135,19 +172,14 @@ def validate_icm_derived_example() -> None:
         if not (stage / "output").is_dir():
             error(f"Stage missing output/ handoff: {stage.relative_to(ROOT)}")
 
-    expected_handoff = EXAMPLE / "stages" / "01-collect" / "output" / "2026-08-11-collect-notes.md"
+    expected_handoff = EXAMPLE / "stages/01-collect/output/2026-08-11-collect-notes.md"
     if not expected_handoff.is_file():
         error("Worked example current-state handoff is missing")
 
 
 def validate_architect_templates() -> None:
-    """Catch regressions in the shipped templates that would violate CCA SPEC §7.1.
-
-    The spec forbids underscore stage variants ('01_collect') and commits to
-    upstream ICM guardrails (no em dashes). Templates are instantiated into
-    workspaces, so they must not teach the forbidden forms.
-    """
-    template_dir = SKILLS / "cca" / "assets" / "templates"
+    """Catch regressions in templates instantiated into ICM-derived workspaces."""
+    template_dir = CCA / "assets/templates"
     if not template_dir.is_dir():
         error("cca templates directory is missing")
         return
@@ -159,12 +191,11 @@ def validate_architect_templates() -> None:
             if underscore_stage.search(line):
                 error(f"underscore stage variant in template {path.name}:{line_no}")
             if "\u2014" in line:
-                error(f"em dash in template {path.name}:{line_no} (ICM guardrail)")
+                error(f"em dash in template {path.name}:{line_no} (native ICM guardrail)")
 
 
 def validate_example_style() -> None:
-    """The shipped example instantiates CCA templates into a workspace-like tree,
-    so it must also respect the no-em-dash guardrail CCA commits to enforce."""
+    """The ICM-derived worked example inherits the native no-em-dash guardrail."""
     for path in sorted(EXAMPLE.rglob("*.md")):
         text = read(path)
         for line_no, line in enumerate(text.splitlines(), start=1):
@@ -172,15 +203,51 @@ def validate_example_style() -> None:
                 error(f"em dash in example {path.relative_to(ROOT)}:{line_no}")
 
 
+def validate_current_documentation_paths() -> None:
+    """Catch stale textual directory maps that Markdown-link checks cannot see."""
+    current_docs = [
+        ROOT / "README.md",
+        ROOT / "AGENTS.md",
+        ROOT / "docs/README.md",
+        ROOT / "docs/getting-started.md",
+        ROOT / "docs/faq.md",
+        ROOT / "docs/method-composition.md",
+        ROOT / "docs/scenarios.md",
+        ROOT / "examples/README.md",
+        ROOT / "examples/publications/blog.md",
+        ROOT / "examples/publications/article.md",
+        ROOT / "examples/publications/paper.md",
+    ]
+    stale_patterns = {
+        "skills/cca-advisor": "removed seven-package skill layout",
+        "skills/cca-architect": "removed seven-package skill layout",
+        "skills/cca-scaffold": "removed seven-package skill layout",
+        "skills/cca-sync": "removed seven-package skill layout",
+        "skills/cca-ingest": "removed seven-package skill layout",
+        "skills/cca-query": "removed seven-package skill layout",
+        "skills/cca-lint": "removed seven-package skill layout",
+        "spec/SPEC.md": "removed repository-level spec path",
+        "spec/compatibility.md": "removed repository-level spec path",
+        "spec/method-composition.md": "removed repository-level spec path",
+        "examples/articles/": "removed examples path",
+        "docs/principles.md": "removed docs path",
+    }
+    for path in current_docs:
+        if not path.exists():
+            continue
+        text = read(path)
+        for pattern, reason in stale_patterns.items():
+            if pattern in text:
+                error(f"Stale documented path in {path.relative_to(ROOT)}: {pattern!r} ({reason})")
+
+
 def validate_markdown_links() -> None:
     for path in sorted(ROOT.rglob("*.md")):
         if ".git" in path.parts:
             continue
-        # Template links intentionally contain placeholders for files that will
-        # exist only after the template is instantiated in a target workspace.
         if "assets" in path.parts and "templates" in path.parts:
             continue
-        # Whitepaper drafts intentionally use repo-root-absolute links.
+        # Paper may use repository-root citations/identifiers that are not local links.
         if path.name in {"paper.md", "paper-brief.md"}:
             continue
 
@@ -203,26 +270,41 @@ def validate_required_docs() -> None:
         ROOT / "AGENTS.md",
         ROOT / "CITATION.cff",
         ROOT / "CONTRIBUTING.md",
-        ROOT / "docs" / "getting-started.md",
-        ROOT / "docs" / "faq.md",
-        ROOT / "docs" / "method-composition.md",
-        ROOT / "docs" / "standards.md",
-        ROOT / "skills" / "cca" / "references" / "core" / "spec.md",
-        ROOT / "skills" / "cca" / "references" / "core" / "compatibility.md",
-        ROOT / "skills" / "cca" / "references" / "core" / "method-composition.md",
+        ROOT / "docs/README.md",
+        ROOT / "docs/getting-started.md",
+        ROOT / "docs/faq.md",
+        ROOT / "docs/scenarios.md",
+        ROOT / "docs/method-composition.md",
+        ROOT / "docs/standards.md",
+        ROOT / "examples/publications/blog.md",
+        ROOT / "examples/publications/article.md",
+        ROOT / "examples/publications/paper.md",
+        ROOT / "evals/README.md",
+        ROOT / "evals/cases/README.md",
     ]
     for path in required:
         if not path.is_file():
             error(f"Missing required repository surface: {path.relative_to(ROOT)}")
 
 
+def validate_publications() -> None:
+    minimum_bytes = {"blog.md": 1000, "article.md": 4000, "paper.md": 12000}
+    for name, minimum in minimum_bytes.items():
+        path = ROOT / "examples/publications" / name
+        if path.is_file() and path.stat().st_size < minimum:
+            error(f"Publication appears incomplete: {path.relative_to(ROOT)} ({path.stat().st_size} < {minimum} bytes)")
+
+
 def main() -> int:
     validate_required_docs()
     validate_single_skill_package()
+    validate_unified_skill_surface()
     validate_skills()
     validate_icm_derived_example()
     validate_architect_templates()
     validate_example_style()
+    validate_current_documentation_paths()
+    validate_publications()
     validate_markdown_links()
 
     if ERRORS:
