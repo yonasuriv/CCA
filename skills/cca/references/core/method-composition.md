@@ -60,19 +60,19 @@ Package portability means:
 1. each skill's implementation resources referenced by file path are contained within that skill package;
 2. no skill reaches into a sibling skill directory or repository-global implementation file by relative path;
 3. installation location must not become part of CCA semantics;
-4. a skill may coordinate with another installed CCA capability by semantic skill name, for example `Use cca-lint to validate the selected profile`;
+4. a skill may coordinate with another installed CCA capability by semantic skill name, for example `Use lint mode to validate the selected profile`;
 5. semantic delegation must not be rewritten as a brittle filesystem dependency.
 
 The intended first-party suite is:
 
-- `cca-architect`
-- `cca-scaffold`
-- `cca-sync`
-- `cca-ingest`
-- `cca-query`
-- `cca-lint`
+- `architect` mode
+- `scaffold` mode
+- `sync` mode
+- `ingest` mode
+- `query` mode
+- `lint` mode
 
-`cca-architect` is the primary entry point for compound architecture/design requests and may lazy-load method/form references before delegating focused operations. It is not a mandatory gateway for an operation whose intent already matches another skill directly.
+`architect` mode is the primary entry point for compound architecture/design requests and may lazy-load method/form references before delegating focused operations. It is not a mandatory gateway for an operation whose intent already matches another skill directly.
 
 ## 6. Progressive disclosure
 
@@ -87,7 +87,7 @@ Creating a dedicated `cca-para`, `cca-zettelkasten`, or `cca-second-brain` skill
 
 ## 7. Validation
 
-`cca-lint` must not invent native PARA, Zettelkasten, or BASB profiles.
+`lint` mode must not invent native PARA, Zettelkasten, or BASB profiles.
 
 It may verify locally declared method-preservation constraints when a workspace explicitly defines them, but those findings must be distinguished from upstream/native compatibility claims.
 

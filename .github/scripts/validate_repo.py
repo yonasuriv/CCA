@@ -146,6 +146,33 @@ def validate_skills() -> None:
             error(f"Skill uses sibling filesystem dependency: {skill_dir.name}")
 
 
+
+def validate_skill_self_containment() -> None:
+    """The installed skill must not depend on removed sibling packages or repo-only runtime paths."""
+    banned = {
+        "cca-advisor": "removed standalone skill id",
+        "cca-architect": "removed standalone skill id",
+        "cca-scaffold": "removed standalone skill id",
+        "cca-sync": "removed standalone skill id",
+        "cca-ingest": "removed standalone skill id",
+        "cca-query": "removed standalone skill id",
+        "cca-lint": "removed standalone skill id",
+        "spec/SPEC.md": "removed repository-level spec path",
+        "spec/compatibility.md": "removed repository-level spec path",
+        "spec/method-composition.md": "removed repository-level spec path",
+        "../docs/": "repository-only path from installed package",
+        "../../docs/": "repository-only path from installed package",
+        "../../../docs/": "repository-only path from installed package",
+        "../../../../docs/": "repository-only path from installed package",
+    }
+    for path in sorted(CCA.rglob("*")):
+        if not path.is_file() or path.suffix not in {".md", ".yaml", ".yml", ".json", ".py", ".sh"}:
+            continue
+        text = read(path)
+        for pattern, reason in banned.items():
+            if pattern in text:
+                error(f"Installed skill is not self-contained: {path.relative_to(ROOT)} contains {pattern!r} ({reason})")
+
 def validate_icm_derived_example() -> None:
     """Validate only the ICM-derived patterns the hybrid example adopts."""
     stages = EXAMPLE / "stages"
@@ -300,6 +327,7 @@ def main() -> int:
     validate_single_skill_package()
     validate_unified_skill_surface()
     validate_skills()
+    validate_skill_self_containment()
     validate_icm_derived_example()
     validate_architect_templates()
     validate_example_style()

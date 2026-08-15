@@ -135,9 +135,9 @@ Every bundled CCA skill must remain a valid Agent Skills package:
 
 CCA's first-party skills are intentionally distributed as a **suite of focused capabilities**. Package portability does not mean every skill must be a sensible unrelated product when installed alone. It means installation paths and sibling filesystem layouts are not part of the capability contract.
 
-Cross-skill coordination is therefore allowed by **semantic skill name**, for example `Use cca-lint to validate the selected profile`. A skill must not reach into `../cca-lint/`, `../../spec/`, or another sibling/repository-global implementation path to perform that delegation.
+Cross-skill coordination is therefore allowed by **semantic skill name**, for example `Use lint mode to validate the selected profile`. A skill must not reach into `../lint mode/`, `../../spec/`, or another sibling/repository-global implementation path to perform that delegation.
 
-`cca-architect` may coordinate compound architecture workflows, but it is not a mandatory gateway for already-clear direct operations such as lint, ingest, query, sync, or scaffold.
+`architect` mode may coordinate compound architecture workflows, but it is not a mandatory gateway for already-clear direct operations such as lint, ingest, query, sync, or scaffold.
 
 ## 7. Method-overlay compatibility
 

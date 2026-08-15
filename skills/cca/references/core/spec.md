@@ -2,7 +2,7 @@
 
 **Version 0.1.0** — Status: Draft, tracking ICM, LLM Wiki, AGENTS.md, and Agent Skills upstream.
 
-Normative. Skills and examples in this repository must conform to this document. Method composition is additionally governed by [`method-composition.md`](method-composition.md).
+Normative. CCA runtime behavior and CCA-conformant examples must conform to this document. Method composition is additionally governed by [`method-composition.md`](method-composition.md).
 
 The key words **must**, **should**, and **may** are to be interpreted as in RFC 2119.
 
@@ -109,7 +109,7 @@ Rules:
 4. Tool-specific instruction files may coexist when required by a harness.
 5. CCA must not claim it can override a harness's native instruction precedence.
 6. Contradictory copies of the same rule across root/adapter files are forbidden by the one-fact-one-home principle.
-7. `AGENTS.md` is the authoritative Layer-0 catalog in CCA-created and CCA-hardened workspaces. Where a harness needs its own entry path (`CLAUDE.md`, `GEMINI.md`, ...), that file is created by directive as a single-line `@ AGENTS.md` include, never a second copy of the routing, and never shipped as a template asset.
+7. In CCA-created or CCA-hardened workspaces that do not already have a stricter native profile, `AGENTS.md` is the preferred canonical portable guidance surface. A harness-native entry may bridge to that guidance using the harness's current supported mechanism. In a native upstream profile such as ICM, preserve the upstream's own entry semantics first; portable guidance is an interoperable counterpart, not a declaration that it overrides the native entry.
 
 When CCA operates on an existing **native ICM** workspace that already has a `CLAUDE.md`, it must not replace or break the native entry merely to make `AGENTS.md` look canonical; preserve it and, when portability is wanted, derive the `AGENTS.md` counterpart so both files interoperate under the open AGENTS.md convention.
 
@@ -183,7 +183,7 @@ When CCA creates, modifies, or validates a workspace that **claims native ICM co
 
 At minimum, native ICM validation must cover the applicable current upstream requirements for:
 
-1. five-layer routing, with `AGENTS.md` as the authoritative Layer-0 catalog; harness entry files such as `CLAUDE.md` are created by directive as single-line `@ AGENTS.md` includes when needed, and an existing upstream workspace keeps its native `CLAUDE.md` entry path;
+1. five-layer routing with the current native ICM Layer-0 entry semantics preserved; when portable `AGENTS.md` guidance is added, it interoperates with rather than replaces or overrides the native `CLAUDE.md` entry path;
 2. one root `CONTEXT.md` and one stage `CONTEXT.md` per stage;
 3. exact stage contract shape and canonical Inputs columns;
 4. lowercase-with-hyphens naming, zero-padded stages, output naming, and `.gitkeep` for intentionally empty persistent folders;
@@ -363,4 +363,4 @@ CCA tracks its upstreams. When ICM, LLM Wiki, AGENTS.md, Agent Skills, or a dire
 
 Method-overlay guidance should likewise be updated when the methods it describes materially change, without silently promoting them to structural compatibility profiles.
 
-See `docs/standards.md` for the tracked compatibility surface and update procedure.
+Repository maintainers should track the current primary upstream compatibility surfaces and update this skill-local specification, compatibility reference, affected modes, templates, examples, and regression checks together. The installed skill must not depend on repository-only documentation to execute correctly.
