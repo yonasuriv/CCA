@@ -1,10 +1,4 @@
----
-name: cca-ingest
-description: Integrate new source material into a filesystem-native maintained knowledge base while preserving its native schema, provenance rules, contradiction handling, and declared method boundaries. Use when the user asks to ingest, process, or incorporate a document, article, paper, transcript, note, or other evidence into an LLM Wiki or CCA knowledge workspace. Discovers the workspace's own maintenance conventions first and never requires a fixed CCA directory taxonomy.
-compatibility: Filesystem read/write access to the target knowledge workspace. No vendor-specific runtime required.
----
-
-# CCA Ingest
+# Ingest mode
 
 Ingestion is integration into maintained knowledge, not one-summary-per-document accumulation.
 
@@ -18,7 +12,7 @@ Before changing anything:
 4. Identify whether nearby material belongs to a method overlay such as Zettelkasten or PARA and whether that material is source/reference, human-authored knowledge, or agent-maintained synthesis.
 5. If the workspace is intentionally CCA-hardened, follow those conventions. If it is a native LLM Wiki implementation, preserve its own schema instead of imposing CCA's preferred layout.
 
-If no maintained-knowledge structure exists, stop and explain what minimum structure is missing. Do not silently invent a full wiki during ingest. For architecture/design of a new knowledge system, use `cca-architect`; for focused in-place creation of an already-decided structure, use `cca-scaffold`.
+If no maintained-knowledge structure exists, stop and explain what minimum structure is missing. Do not silently invent a full wiki during ingest. For architecture/design of a new knowledge system, use `cca` in `architect` mode; for focused in-place creation of an already-decided structure, use `cca` in `scaffold` mode.
 
 ## Procedure
 

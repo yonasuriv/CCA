@@ -163,7 +163,7 @@ flowchart TB
 > Enforcing those principles is outside CCA’s scope and level of abstraction. CCA is not a doctrine. Use judgment and adapt to context, while keeping one core principle in mind: \
 > — **Automation is the means; augmenting human capabilities is the goal.**
 
-See [CCA Advisor skill](skills/cca-advisor/SKILL.md). Documentation lies inside it's references.
+See [CCA Advisor skill](skills/cca/SKILL.md). Documentation lies inside it's references.
 
 ## The Compatibility Model
 
@@ -274,17 +274,17 @@ CCA ships seven focused Agent Skills as one capability suite, following software
 
 | Skill | Purpose |
 | --- | --- |
-| [`cca-advisor`](skills/cca-advisor/) | Priors and judgment guidance for engineering work: artifact design, delivery process, adversarial security reasoning, agent and autonomous system design, learned-system practice, and escalation boundaries. |
-| [`cca-architect`](skills/cca-architect/) | Design/restructure compound workspaces, choose forms, preserve boundaries, and coordinate focused CCA operations. |
-| [`cca-scaffold`](skills/cca-scaffold/) | Add the smallest useful routing/context layer without restructuring existing content. |
-| [`cca-sync`](skills/cca-sync/) | Reconcile routing/navigation with disk while preserving scope and native semantics. |
-| [`cca-ingest`](skills/cca-ingest/) | Integrate new evidence into maintained knowledge using the workspace's own schema. |
-| [`cca-query`](skills/cca-query/) | Query maintained synthesis and verify against source evidence as needed. |
-| [`cca-lint`](skills/cca-lint/) | Validate the correct native/conformance profile and separate failures, method-preservation findings, and optional hardening. |
+| [`cca` in `advise` mode](skills/cca/references/advisor/) | Priors and judgment guidance for engineering work: artifact design, delivery process, adversarial security reasoning, agent and autonomous system design, learned-system practice, and escalation boundaries. |
+| [`cca` in `architect` mode](skills/cca/references/architect/) | Design/restructure compound workspaces, choose forms, preserve boundaries, and coordinate focused CCA operations. |
+| [`cca` in `scaffold` mode](skills/cca/references/operations/scaffold.md) | Add the smallest useful routing/context layer without restructuring existing content. |
+| [`cca` in `sync` mode](skills/cca/references/operations/sync.md) | Reconcile routing/navigation with disk while preserving scope and native semantics. |
+| [`cca` in `ingest` mode](skills/cca/references/operations/ingest.md) | Integrate new evidence into maintained knowledge using the workspace's own schema. |
+| [`cca` in `query` mode](skills/cca/references/operations/query.md) | Query maintained synthesis and verify against source evidence as needed. |
+| [`cca` in `lint` mode](skills/cca/references/operations/lint.md) | Validate the correct native/conformance profile and separate failures, method-preservation findings, and optional hardening. |
 
-The split exists for precise triggering and progressive disclosure. `cca-architect` is the primary entry point for **compound architecture** questions, not a mandatory router for every request. A direct lint request should activate `cca-lint`; a direct ingest request should activate `cca-ingest`.
+The split exists for precise triggering and progressive disclosure. `cca` in `architect` mode is the primary entry point for **compound architecture** questions, not a mandatory router for every request. A direct lint request should activate `cca` in `lint` mode; a direct ingest request should activate `cca` in `ingest` mode.
 
-Cross-skill coordination uses semantic capability names such as `Use cca-lint to validate the selected profile`. A skill must not reach into a sibling skill directory or repository-global implementation file by relative path.
+Cross-skill coordination uses semantic capability names such as `Use `lint` mode to validate the selected profile`. A skill must not reach into a sibling skill directory or repository-global implementation file by relative path.
 
 > These skills are not mandatory, neither they are a requirement, they were created only to make the process more efficient and simple.
 
@@ -318,25 +318,25 @@ You do not need to install a CCA runtime. Use the repository/files with an agent
 
 Keep it as ICM. Do not rename stages, replace `CLAUDE.md`, rewrite contracts, or move references merely to satisfy CCA.
 
-Use `cca-lint` in **ICM native compatibility** mode. Add CCA hardening only after native validation passes.
+Use `cca` in `lint` mode in **ICM native compatibility** mode. Add CCA hardening only after native validation passes.
 
 ### I already have an LLM Wiki
 
-Keep its schema and maintenance model. Use `cca-lint` in **LLM Wiki native compatibility** mode. Add optional CCA routing/provenance conventions only when they solve a real problem.
+Keep its schema and maintenance model. Use `cca` in `lint` mode in **LLM Wiki native compatibility** mode. Add optional CCA routing/provenance conventions only when they solve a real problem.
 
 ### I already use PARA, Zettelkasten, BASB, or another second-brain method
 
-Keep it. Use `cca-architect` when you want to connect/restructure several methods or introduce nested workflow/knowledge boundaries. CCA should preserve the existing method and add only the routing needed for agents to understand it.
+Keep it. Use `cca` in `architect` mode when you want to connect/restructure several methods or introduce nested workflow/knowledge boundaries. CCA should preserve the existing method and add only the routing needed for agents to understand it.
 
 ### I already have a coding project
 
-Use `cca-scaffold` in its default quick mode. A useful change may be only a root `AGENTS.md` plus scoped instructions for subtrees. `CONTEXT.md`, stages, a wiki, `_config/`, or other structures are optional.
+Use `cca` in `scaffold` mode in its default quick mode. A useful change may be only a root `AGENTS.md` plus scoped instructions for subtrees. `CONTEXT.md`, stages, a wiki, `_config/`, or other structures are optional.
 
 Do not reorganize application code around CCA unless the user explicitly wants restructuring.
 
 ### I want to build a new workspace
 
-Use `cca-architect`. Describe the real workflow/knowledge problem first; let the form follow from it.
+Use `cca` in `architect` mode. Describe the real workflow/knowledge problem first; let the form follow from it.
 
 If you want a complete ICM workspace, request the **full native ICM profile**. If you only want sequential stage contracts inside another repository, request **ICM-derived stages** instead.
 
@@ -355,7 +355,7 @@ See [FAQ](docs/faq.md) for a detailed list of common questions, doubts and conce
 - How do BASB, PARA, Zettelkasten, LLM Wiki, and ICM fit together?
 - How does CCA fit into multi-agent systems?
 - What if I already have a coding project?
-- Why are the seven CCA skills a suite rather than one giant skill?
+- Why are the seven CCA modes a suite rather than one giant skill?
 
 ## Design principles
 

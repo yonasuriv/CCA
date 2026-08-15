@@ -138,3 +138,27 @@ flowchart LR
 Another common composition is an outer PARA hierarchy containing coding projects, native ICM roots, Zettelkasten notes, and LLM Wiki synthesis. In that case, **nest boundaries; do not merge schemas merely because they coexist**.
 
 Do not create reverse dependencies merely for symmetry: pipeline stages may consume canonical knowledge, but shared knowledge should not depend on a downstream stage's internals unless the workspace explicitly defines that maintenance operation.
+
+
+## System Map
+
+Use for mutable code/file/vault systems where change-impact reasoning is the
+primary problem. Read `system-map.md`. Do not collapse this into Context Map:
+Context Map models organizational/process/data relationships; System Map models
+concrete mutable objects, processes, effects, and impact.
+
+## Record Library defaults
+
+For a fresh Record Library, treat the record template as the schema: create new
+records by copying it rather than starting blank. Keep identifier/status
+authority in one declared catalog when the library uses those fields, define a
+small lifecycle only when needed, and detect half-created records or schema drift.
+Existing libraries keep their own schema and lifecycle.
+
+## Context Map operational fields
+
+When useful for the actual mapping question, nodes may include `frequency` in
+addition to ownership, value, pain, governance, inputs, outputs, and interfaces.
+Workshop observations are evidence, not automatically canonical truth. Promote a
+pattern only when the workspace's evidence rule is satisfied; three independent
+occurrences is a useful default, not a universal law.

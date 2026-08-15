@@ -20,8 +20,8 @@ CCA is an interoperability and evolution layer for filesystem-native agent conte
 
 ## Routing
 
-- Understand CCA semantics → `spec/SPEC.md`.
-- Check upstream compatibility boundaries → `spec/compatibility.md` and `docs/standards.md`.
+- Understand CCA semantics → `skills/cca/references/core/spec.md`.
+- Check upstream compatibility boundaries → `skills/cca/references/core/compatibility.md` and `docs/standards.md`.
 - Understand how PARA, Zettelkasten, BASB, LLM Wiki, ICM, and CCA compose → `docs/method-composition.md`.
 - Start using CCA → `docs/getting-started.md`.
 - Answer common integration questions → `docs/faq.md`.
@@ -38,8 +38,8 @@ CCA is an interoperability and evolution layer for filesystem-native agent conte
 5. PARA, Zettelkasten, and BASB are **method overlays**, not structural compatibility profiles. Preserve their useful semantics without pretending CCA certifies a universal filesystem schema for them.
 6. Nested native/upstream boundaries remain authoritative. An outer PARA or CCA organization must not rewrite a nested native ICM workspace or native LLM Wiki merely for consistency.
 7. Nested `AGENTS.md` scope is preserved.
-8. CCA skills are distributed as a suite of focused capabilities. Each skill's implementation resources remain package-local; cross-skill coordination uses semantic delegation such as `Use cca-lint`, never sibling filesystem paths.
-9. A skill may directly serve a matching request without routing through `cca-architect`. `cca-architect` coordinates compound architecture/workspace-design flows and lazy-loads methodology knowledge when relevant.
+8. CCA skills are distributed as a suite of focused capabilities. Each skill's implementation resources remain package-local; cross-skill coordination uses semantic delegation such as `Use `lint` mode`, never sibling filesystem paths.
+9. A skill may directly serve a matching request without routing through `cca` in `architect` mode. `cca` in `architect` mode coordinates compound architecture/workspace-design flows and lazy-loads methodology knowledge when relevant.
 10. One fact, one canonical home. Link instead of duplicating normative rules.
 11. Prefer Mermaid for CCA-owned architecture/routing diagrams and text trees for literal filesystem layouts, except where an upstream profile explicitly requires another representation.
 

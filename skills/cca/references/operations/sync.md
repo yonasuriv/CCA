@@ -1,10 +1,4 @@
----
-name: cca-sync
-description: Reconcile filesystem-native routing and navigation files with the actual workspace while preserving instruction scope and native ICM, LLM Wiki, CCA, or declared method-overlay semantics. Use after files move, routing becomes stale, indexes drift, or the user asks to sync AGENTS.md, CONTEXT.md, or knowledge navigation. Updates only catalogs that actually exist or were explicitly requested and never treats CCA-preferred files as mandatory.
-compatibility: Filesystem read/write access to the target workspace. No vendor-specific runtime required.
----
-
-# CCA Sync
+# Sync mode
 
 Sync routing to reality without restructuring the workspace or inventing semantics.
 
@@ -19,7 +13,7 @@ Identify the routing/navigation files that actually govern the workspace:
 - any explicitly adopted CCA history/catalog conventions;
 - declared method-overlay boundaries when they affect routing.
 
-Do not create missing CCA-preferred catalogs merely because sync knows about them. Creation belongs to an explicit scaffold/hardening request; use `cca-scaffold` when that is the actual operation.
+Do not create missing CCA-preferred catalogs merely because sync knows about them. Creation belongs to an explicit scaffold/hardening request; use `cca` in `scaffold` mode when that is the actual operation.
 
 ## Procedure
 

@@ -163,19 +163,19 @@ No for LLM Wiki native compatibility. CCA may recommend frontmatter for lifecycl
 
 CCA also does not require a giant workspace manifest merely to map obvious paths such as Projects, Areas, Resources, Archives, stages, or wiki folders. Infer ordinary filesystem semantics when safe; declare only facts that genuinely need explicit metadata.
 
-## Are the six CCA skills supposed to be installed separately?
+## Are the single CCA skill and its seven modes supposed to be installed separately?
 
 They are **focused Agent Skill packages intended to be distributed as the CCA skill suite**. The package split exists for precise triggering and progressive disclosure, not because each capability is meant to be an unrelated standalone product.
 
-Package portability means implementation file references remain inside the skill package and installation paths do not become architecture. A skill may coordinate another installed CCA capability by semantic name, for example `Use cca-lint`, without reaching into the sibling skill's directory.
+Package portability means implementation file references remain inside the skill package and installation paths do not become architecture. A skill may coordinate another installed CCA capability by semantic name, for example `Use `lint` mode`, without reaching into the sibling skill's directory.
 
-## Is `cca-architect` the router for every CCA operation?
+## Is `cca` in `architect` mode the router for every CCA operation?
 
 No. It is the primary entry point for compound architecture/design requests: choosing forms, combining methods, deciding boundaries, or planning restructuring.
 
-A request that is already clearly an ingest, lint, query, sync, or scaffold operation should route directly to the focused skill. `cca-architect` may semantically delegate those capabilities when they are part of a larger architecture workflow.
+A request that is already clearly an ingest, lint, query, sync, or scaffold operation should route directly to the focused skill. `cca` in `architect` mode may semantically delegate those capabilities when they are part of a larger architecture workflow.
 
-## Why not one giant `cca` or `cca-architect` skill?
+## Why not one giant `cca` or `cca` in `architect` mode skill?
 
 Because Agent Skills progressive disclosure works better when focused capabilities have precise trigger descriptions and lazily loaded resources. A monolithic skill would load unrelated procedures and make routing less precise.
 
@@ -183,7 +183,7 @@ CCA unifies the **methodology and capability model**, not every operation into o
 
 ## Why not create `cca-para`, `cca-zettelkasten`, or `cca-second-brain` skills?
 
-Because those names describe methodologies/forms, not distinct executable operations. Their composition knowledge belongs as a lazy-loaded architecture reference behind `cca-architect` unless a future operation becomes distinct enough to justify its own skill.
+Because those names describe methodologies/forms, not distinct executable operations. Their composition knowledge belongs as a lazy-loaded architecture reference behind `cca` in `architect` mode unless a future operation becomes distinct enough to justify its own skill.
 
 ## Does CCA require Git?
 
@@ -203,7 +203,7 @@ For asynchronous or loose coordination, agents can hand off through durable file
 
 ## How do I know whether a workspace is healthy?
 
-Run `cca-lint` using the correct profile.
+Run `cca` in `lint` mode using the correct profile.
 
 For native ICM, that means the complete applicable current ICM profile and workspace-builder-equivalent acceptance surface. For ICM-derived patterns, validate only what was actually adopted. For LLM Wiki, validate the implementation's maintained-knowledge behavior without forcing CCA's optional schema. Method overlays may produce preservation findings but are not invented native profiles.
 
@@ -214,3 +214,36 @@ Then perform the CCA walk test: a fresh agent should be able to orient, act, and
 That is a core design constraint. CCA should track upstream ICM, LLM Wiki, AGENTS.md, Agent Skills, and relevant adjacent standards. Changes should prefer additive aliases, optional hardening, boundary preservation, and migration guidance over breaking reinterpretations of upstream conventions or user methodologies.
 
 See [`standards.md`](standards.md) for the upstream-change rule and [`method-composition.md`](method-composition.md) for the method-overlay model.
+
+
+## Why one skill instead of seven packages?
+
+The modes share one semantic authority and are commonly composed, while Agent
+Skills already supports progressive disclosure through skill-local references,
+assets, and scripts. One package prevents installation drift and keeps the
+runtime specification available after installation. Internal domain boundaries
+remain strict: architect references do not absorb the advisor corpus.
+
+## What happens in an existing code repository?
+
+CCA preserves the repository first. It may add or improve portable routing such
+as `AGENTS.md`, but it does not introduce ICM stages, PARA folders, a wiki, or a
+CCA manifest unless they solve an actual problem. Existing architecture docs,
+tests, package metadata, issue trackers, and delivery tooling remain authoritative.
+
+## What happens in a second brain?
+
+CCA can preserve PARA as outer action-oriented organization, Zettelkasten as
+linked idea development, BASB/CODE as a lifecycle lens, and an LLM Wiki as
+maintained synthesis. Nested coding projects or native ICM workspaces keep their
+own semantics. CCA maps boundaries and write authority; it does not merge the
+methods into a new taxonomy.
+
+## How does CCA combine with Scrum, Kanban, XP, DevOps, SAFe, LeSS, or DA?
+
+Those methods govern process at their own scope. CCA does not create fake
+`sprints/` or `standups/` folders to "implement Scrum". It records or routes to
+the actual authority (for example Jira for backlog state, Git for code/history,
+CI for delivery state) and may use ICM/CCA forms inside a particular workflow
+only when useful. Process-method judgment comes from the advisor domain;
+workspace structure remains an architect concern.

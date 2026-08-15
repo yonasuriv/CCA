@@ -80,7 +80,7 @@ For pipeline-oriented work, CCA adopts ICM's five-layer architecture when the IC
 
 | Layer | Typical file(s) | Question |
 |---|---|---|
-| 0 | `AGENTS.md` (authoritative Layer-0 catalog), created by directive when needed: `CLAUDE.md` = single-line `@ AGENTS.md` | Where am I? |
+| 0 | native harness entry plus portable guidance (`AGENTS.md` in CCA-hardened workspaces; native `CLAUDE.md` remains authoritative where ICM/harness semantics require it) | Where am I? |
 | 1 | root `CONTEXT.md` (recommended default) | Where do I go? |
 | 2 | stage `CONTEXT.md` (contract per stage) | What do I do? |
 | 3 | references, configuration, skills | What rules apply? |
@@ -285,15 +285,11 @@ Requirements:
 - implementation files referenced by path remain inside that skill package;
 - sibling filesystem paths and repository-global implementation paths are not part of a skill's execution contract.
 
-CCA's first-party skills are distributed as a **suite of focused capabilities**. Package portability means a skill does not depend on where sibling packages happen to be installed; it does not require each capability to be a useful unrelated standalone product.
-
-A skill may coordinate with another installed CCA capability by semantic skill name, for example `Use cca-lint to validate the selected profile`. This is semantic delegation, not a filesystem dependency.
-
-`cca-architect` is the primary coordinator for compound workspace-design requests and may lazy-load detailed method/form references before delegating focused operations. It is not a mandatory gateway for direct requests that already match another focused skill.
+CCA is distributed as **one installable `cca` skill with seven lazily loaded modes**. Six modes are portable workspace operations (`architect`, `scaffold`, `sync`, `ingest`, `query`, `lint`); `advise` is a separate judgment capability inside the same package. Runtime references, templates, and scripts required by those modes must remain skill-local so installation is self-contained. Architect and advisor reference domains remain separate even though they share one package.
 
 ## 12. Operations
 
-CCA currently defines six portable operations:
+CCA defines six portable workspace operations plus one advisory mode:
 
 | Operation | Purpose |
 |---|---|
@@ -303,12 +299,13 @@ CCA currently defines six portable operations:
 | `ingest` | integrate new evidence into maintained synthesis |
 | `query` | navigate maintained synthesis, verify against evidence when needed, and preserve durable new knowledge when useful |
 | `lint` | validate the workspace using the correct compatibility/conformance profile |
+| `advise` | apply engineering/process/security/autonomy/context/model judgment without turning priors into enforcement |
 
 ## 13. Profile-aware linting
 
 Linting must distinguish upstream validity from optional CCA hardening and method overlays.
 
-At minimum, `cca-lint` supports:
+At minimum, `lint` mode supports:
 
 - **ICM native compatibility** — validate the complete applicable current ICM profile and workspace-builder-equivalent acceptance surface.
 - **ICM-derived patterns** — validate borrowed ICM constructs without falsely promoting the host repository to native ICM compatibility.

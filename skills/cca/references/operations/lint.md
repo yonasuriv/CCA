@@ -1,10 +1,4 @@
----
-name: cca-lint
-description: Audit a filesystem-native agent workspace against the correct profile: native ICM compatibility, native LLM Wiki compatibility, intentional CCA conformance, and locally declared method-preservation constraints. Use when the user asks to lint, validate, health-check, audit, or verify a workspace before sharing or after structural changes. Separates upstream compatibility failures from optional CCA hardening and method-overlay findings.
-compatibility: Filesystem read access is required. Write access is optional and used only when repairs are authorized.
----
-
-# CCA Lint
+# Lint mode
 
 Validate the workspace it actually is. Do not fail upstream projects for omitting CCA-specific conventions they never adopted, and do not invent native PARA/Zettelkasten/BASB profiles.
 

@@ -112,14 +112,14 @@ When these methods appear together, determine:
 
 ## Skill coordination
 
-For compound architecture work, `cca-architect` chooses the form and may then semantically delegate focused operations:
+For compound architecture work, `cca` in `architect` mode chooses the form and may then semantically delegate focused operations:
 
-- use `cca-scaffold` to add the selected minimal structure;
-- use `cca-sync` to reconcile existing routing/navigation after approved structural changes;
-- use `cca-ingest` when evidence must be integrated into maintained synthesis;
-- use `cca-query` when maintained knowledge must be queried/synthesized;
-- use `cca-lint` to validate the profiles actually claimed.
+- use `cca` in `scaffold` mode to add the selected minimal structure;
+- use `cca` in `sync` mode to reconcile existing routing/navigation after approved structural changes;
+- use `cca` in `ingest` mode when evidence must be integrated into maintained synthesis;
+- use `cca` in `query` mode when maintained knowledge must be queried/synthesized;
+- use `cca` in `lint` mode to validate the profiles actually claimed.
 
 Do not reference sibling skill paths or implementation resources. The semantic skill name is the coordination boundary.
 
-Direct requests still route directly to the focused skill. `cca-architect` is not required for a request that is already clearly a lint, ingest, query, sync, or scaffold operation.
+Direct requests still route directly to the focused skill. `cca` in `architect` mode is not required for a request that is already clearly a lint, ingest, query, sync, or scaffold operation.

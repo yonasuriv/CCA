@@ -111,8 +111,8 @@ CCA's first-party Agent Skills are distributed as a suite of focused capabilitie
 - skill-local `references/`, `assets/`, and `scripts/` loaded progressively;
 - implementation file paths remain inside the skill package;
 - never reach into a sibling skill directory or repository-global implementation file by relative path;
-- semantic delegation to another installed capability is valid, for example `Use cca-lint to validate the selected profile`;
-- `cca-architect` coordinates compound architecture work but is not a mandatory gateway for an already-clear lint, ingest, query, sync, or scaffold request.
+- semantic delegation to another installed capability is valid, for example `Use `lint` mode to validate the selected profile`;
+- `cca` in `architect` mode coordinates compound architecture work but is not a mandatory gateway for an already-clear lint, ingest, query, sync, or scaffold request.
 
 ## Fresh-agent walk test
 

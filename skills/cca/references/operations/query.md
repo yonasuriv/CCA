@@ -1,10 +1,4 @@
----
-name: cca-query
-description: Answer questions from a filesystem-native maintained knowledge base using its own navigation and provenance conventions, escalating to source evidence when verification is needed. Use when the user asks what a CCA or LLM Wiki workspace knows, requests a comparison or synthesis, or wants a durable finding incorporated back into maintained knowledge. Preserves native schemas, method boundaries, and does not assume fixed wiki/index.md or log.md paths.
-compatibility: Read access to the target knowledge workspace; write access only when persistence is requested or defined by workspace policy.
----
-
-# CCA Query
+# Query mode
 
 Query maintained synthesis first; use source evidence when the answer requires verification.
 

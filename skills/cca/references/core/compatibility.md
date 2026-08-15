@@ -151,7 +151,7 @@ Rules:
 4. Preserve nested native upstream boundaries even when an outer method organizes them.
 5. Determine write authority before treating human knowledge artifacts, including Zettelkasten notes, as agent-maintained synthesis.
 
-See [`method-composition.md`](method-composition.md) for the normative composition rules and [`../docs/method-composition.md`](../docs/method-composition.md) for the explanatory model.
+See [`method-composition.md`](method-composition.md) for the normative composition rules and [`method-composition.md`](method-composition.md) for the explanatory model.
 
 ## 8. Swap guarantees
 

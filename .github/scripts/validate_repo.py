@@ -59,6 +59,13 @@ def parse_frontmatter(path: Path) -> dict[str, str]:
     return values
 
 
+def validate_single_skill_package() -> None:
+    skill_dirs = sorted(path for path in SKILLS.iterdir() if path.is_dir()) if SKILLS.is_dir() else []
+    names = [path.name for path in skill_dirs]
+    if names != ["cca"]:
+        error(f"Expected exactly one first-party skill package ['cca']; found {names}")
+
+
 def validate_skills() -> None:
     if not SKILLS.is_dir():
         error("Skills/ directory is missing")
@@ -140,9 +147,9 @@ def validate_architect_templates() -> None:
     upstream ICM guardrails (no em dashes). Templates are instantiated into
     workspaces, so they must not teach the forbidden forms.
     """
-    template_dir = SKILLS / "cca-architect" / "assets" / "templates"
+    template_dir = SKILLS / "cca" / "assets" / "templates"
     if not template_dir.is_dir():
-        error("cca-architect templates directory is missing")
+        error("cca templates directory is missing")
         return
 
     underscore_stage = re.compile(r"0\d_|01_|0\[N\+?1\]_|0\[N\]_|\d{2}_[a-z]")
@@ -200,9 +207,9 @@ def validate_required_docs() -> None:
         ROOT / "docs" / "faq.md",
         ROOT / "docs" / "method-composition.md",
         ROOT / "docs" / "standards.md",
-        ROOT / "spec" / "SPEC.md",
-        ROOT / "spec" / "compatibility.md",
-        ROOT / "spec" / "method-composition.md",
+        ROOT / "skills" / "cca" / "references" / "core" / "spec.md",
+        ROOT / "skills" / "cca" / "references" / "core" / "compatibility.md",
+        ROOT / "skills" / "cca" / "references" / "core" / "method-composition.md",
     ]
     for path in required:
         if not path.is_file():
@@ -211,6 +218,7 @@ def validate_required_docs() -> None:
 
 def main() -> int:
     validate_required_docs()
+    validate_single_skill_package()
     validate_skills()
     validate_icm_derived_example()
     validate_architect_templates()

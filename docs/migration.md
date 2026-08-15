@@ -54,7 +54,7 @@ CCA cannot override a harness's own precedence rules.
 
 ## Unstructured folder
 
-Use `cca-architect` in restructure mode:
+Use `cca` in `architect` mode in restructure mode:
 
 1. audit the current structure and native conventions;
 2. classify function without forcing relocations;
