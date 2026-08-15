@@ -2,6 +2,10 @@
 
 This directory defines how to test CCA behavior against relevant upstream baselines. It does **not** contain simulated agent plans presented as behavioral evidence.
 
+## Status
+
+The evaluation **protocol and case contract are defined**, but the 14 scenario fixtures have not yet all been implemented or executed. No repository claim of behavioral superiority over ICM should be inferred from this directory until real isolated runs and their results are committed.
+
 ## Purpose
 
 CCA makes two different promises and they must be evaluated separately:
@@ -109,7 +113,7 @@ CCA should not claim improvement merely because it created more structure.
 | `13` | Existing-workspace restructure | Are moves/renames explicit, bounded, and semantics-preserving? |
 | `14` | No-op / already healthy | Does CCA correctly recommend no structural change? |
 
-Case definitions live under [`cases/`](cases/).
+The case contract lives under [`cases/`](cases/). Individual scenario directories and fixtures are added there as they are implemented.
 
 ## Interpretation
 
