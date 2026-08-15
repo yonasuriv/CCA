@@ -1,0 +1,9 @@
+{
+  "id": "10",
+  "name": "Context Map",
+  "baseline": "icm-architect",
+  "profiles": [
+    "context-map"
+  ],
+  "expected_behavior": "Represent organizational/process/information relationships with operational fields and evidence discipline."
+}

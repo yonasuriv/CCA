@@ -1,0 +1,9 @@
+{
+  "id": "05",
+  "name": "PARA second brain",
+  "baseline": "none",
+  "profiles": [
+    "para"
+  ],
+  "expected_behavior": "Preserve PARA actionability categories and add only useful routing."
+}

@@ -1,0 +1,22 @@
+{
+  "assertions": [
+    {
+      "type": "path_exists",
+      "path": "docs/guide.md"
+    },
+    {
+      "type": "path_absent",
+      "path": "legacy/guide.md"
+    },
+    {
+      "type": "file_contains",
+      "path": "README.md",
+      "text": "docs/guide.md"
+    },
+    {
+      "type": "file_contains",
+      "path": "docs/guide.md",
+      "text": "Canonical content."
+    }
+  ]
+}

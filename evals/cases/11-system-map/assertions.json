@@ -1,0 +1,26 @@
+{
+  "assertions": [
+    {
+      "type": "path_exists",
+      "path": "map/CONTEXT.md"
+    },
+    {
+      "type": "path_exists",
+      "path": "map/objects"
+    },
+    {
+      "type": "path_exists",
+      "path": "map/effects/CONTEXT.md"
+    },
+    {
+      "type": "file_contains",
+      "path": "map/CONTEXT.md",
+      "text": "live"
+    },
+    {
+      "type": "file_contains",
+      "path": "map/CONTEXT.md",
+      "text": "ghost"
+    }
+  ]
+}

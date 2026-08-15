@@ -1,0 +1,13 @@
+{
+  "assertions": [
+    {
+      "type": "sha256_equals",
+      "path": "Resources/zettelkasten/context-routing.md",
+      "sha256": "fcffc6819f5712141a3276178ab0df549b76b35dd703c54213e214744f3f8ac8"
+    },
+    {
+      "type": "path_absent",
+      "path": "Resources/zettelkasten/wiki"
+    }
+  ]
+}

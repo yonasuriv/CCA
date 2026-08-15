@@ -1,0 +1,9 @@
+{
+  "id": "09",
+  "name": "Record Library",
+  "baseline": "icm-architect",
+  "profiles": [
+    "record-library"
+  ],
+  "expected_behavior": "Create a record from the declared template/schema, update one catalog authority, and avoid half-created records."
+}

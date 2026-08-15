@@ -1,0 +1,9 @@
+{
+  "id": "07",
+  "name": "Existing LLM Wiki",
+  "baseline": "none",
+  "profiles": [
+    "llm-wiki"
+  ],
+  "expected_behavior": "Preserve implementation-defined maintained-synthesis behavior before optional CCA hardening."
+}

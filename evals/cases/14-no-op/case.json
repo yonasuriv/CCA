@@ -1,0 +1,9 @@
+{
+  "id": "14",
+  "name": "Already healthy no-op",
+  "baseline": "none",
+  "profiles": [
+    "ordinary-project"
+  ],
+  "expected_behavior": "Recognize that no structural change is required and avoid cosmetic CCA artifacts."
+}

@@ -1,0 +1,24 @@
+{
+  "assertions": [
+    {
+      "type": "path_exists",
+      "path": "Projects/site-redesign.md"
+    },
+    {
+      "type": "path_exists",
+      "path": "Areas/health.md"
+    },
+    {
+      "type": "path_exists",
+      "path": "Resources/css.md"
+    },
+    {
+      "type": "path_exists",
+      "path": "Archives/old-project.md"
+    },
+    {
+      "type": "path_absent",
+      "path": "cca.yaml"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "13",
+  "name": "Explicit approved restructure",
+  "baseline": "none",
+  "profiles": [
+    "ordinary-project",
+    "restructure"
+  ],
+  "expected_behavior": "Apply only the explicitly approved move and repair navigation without opportunistic redesign."
+}

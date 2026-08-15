@@ -1,0 +1,10 @@
+{
+  "id": "04",
+  "name": "Code repository with Scrum authority",
+  "baseline": "none",
+  "profiles": [
+    "ordinary-project",
+    "scrum"
+  ],
+  "expected_behavior": "Keep Scrum as process authority and code as code; route between artifacts without filesystem-implementing Scrum."
+}

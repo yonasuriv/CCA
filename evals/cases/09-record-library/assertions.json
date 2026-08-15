@@ -1,0 +1,23 @@
+{
+  "assertions": [
+    {
+      "type": "path_exists",
+      "path": "beta-corp/profile.md"
+    },
+    {
+      "type": "file_contains",
+      "path": "beta-corp/profile.md",
+      "text": "id: beta-corp"
+    },
+    {
+      "type": "file_contains",
+      "path": "beta-corp/profile.md",
+      "text": "status:"
+    },
+    {
+      "type": "file_contains",
+      "path": "index.md",
+      "text": "beta-corp"
+    }
+  ]
+}
