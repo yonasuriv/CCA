@@ -24,13 +24,16 @@ class WorkspaceBuilderParityTests(unittest.TestCase):
             "status",
             "tool prerequisites",
             "skill discovery",
-            "orphan placeholders",
             "fresh-agent",
         ):
             self.assertIn(anchor, text, f"workspace builder missing {anchor!r}")
         self.assertTrue(
             "optional stages" in text and "condition" in text,
             "workspace builder must make optional stages condition-controlled",
+        )
+        self.assertTrue(
+            "unresolved placeholders" in text and "orphan" in text,
+            "workspace builder must detect unresolved/orphaned configuration",
         )
 
     def test_architect_routes_creation_setup_and_status_to_builder(self):
