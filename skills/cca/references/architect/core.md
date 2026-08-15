@@ -4,6 +4,8 @@ Use this reference when designing or restructuring a workspace. CCA converges on
 
 Read `methods.md` when the request involves PARA, Zettelkasten, BASB/CODE, second brains/PKM, or composition among human methods, LLM Wiki, ICM, and ordinary projects.
 
+When the request claims or creates **native ICM**, also read `../core/icm-inheritance.md`. That file is a provenance/compatibility map, not a competing ICM specification. Current upstream ICM remains authoritative.
+
 ## Compatibility states
 
 - **Native-compatible**: CCA can consume an ICM workspace, LLM Wiki, or ordinary project without structural migration.
@@ -19,13 +21,13 @@ PARA, Zettelkasten, and BASB/CODE are method overlays, not additional native com
 Distinguish two cases:
 
 - **Native ICM / full ICM profile**: the workspace claims ICM/MWP compatibility and therefore must satisfy the complete applicable current ICM convention and validation surface.
-- **ICM-derived patterns**: another workspace borrows useful ICM constructs such as numbered stages, `CONTEXT.md` contracts, or output handoffs without claiming to be a complete native ICM workspace.
+- **ICM-derived patterns**: another workspace borrows useful ICM constructs such as numbered stage contracts, `CONTEXT.md` contracts, or output handoffs without claiming to be a complete native ICM workspace.
 
 Do not use “ICM-compatible” as shorthand for “contains ICM-like stage folders.”
 
 For a **full ICM profile**, preserve and validate all applicable current upstream rules, including:
 
-1. the five-layer routing architecture, with `AGENTS.md` as the authoritative Layer-0 catalog and harness entry files (`CLAUDE.md`) created by directive as single-line `@AGENTS.md` includes where a harness path is needed;
+1. the native five-layer routing architecture, preserving upstream Layer-0 `CLAUDE.md` semantics and the current upstream discovery/entry behavior; portable `AGENTS.md` guidance may be added only as an interoperable counterpart when it does not replace or invalidate the native entry path;
 2. one root `CONTEXT.md` and one stage `CONTEXT.md` per stage;
 3. exact stage contract sections `Inputs`, `Process`, `Outputs` and canonical Inputs columns `Source | File/Location | Section/Scope | Why`;
 4. lowercase-with-hyphens naming, zero-padded stage prefixes, output-artifact naming, and `.gitkeep` for intentionally empty persistent folders;
@@ -52,13 +54,13 @@ A native ICM root may be nested inside a broader CCA/PARA/client workspace. The 
 
 ## Portable root guidance
 
-`AGENTS.md` is CCA's preferred portable cross-agent guidance file and the authoritative Layer-0 catalog in CCA-created and CCA-hardened workspaces.
+`AGENTS.md` is CCA's preferred portable cross-agent guidance file and the authoritative Layer-0 catalog only in CCA-created or CCA-hardened workspaces that intentionally adopt that convention. It is not retroactively the native ICM Layer-0 file.
 
 - Preserve nested `AGENTS.md` scopes; the closest applicable file governs its subtree under the AGENTS.md convention.
 - `AGENTS.md` has no mandatory CCA heading schema.
 - Do not assume it overrides a harness-specific instruction file; native harness discovery remains authoritative.
-- Keep one substantive source of truth. When a harness needs its own entry path (`CLAUDE.md`, `GEMINI.md`, ...), create it by directive as a single-line `@AGENTS.md` include, never a second copy of the routing.
-- When operating on an existing native ICM workspace, preserve its native `CLAUDE.md` entry path; do not replace or break it merely to make `AGENTS.md` look canonical. If portability is wanted, derive the `AGENTS.md` counterpart from the native entry so the two interoperate under the open AGENTS.md convention.
+- Keep one substantive source of truth. When a harness supports a bridge/include to portable guidance, use that mechanism only when it is verified and compatible with the active profile; do not duplicate routing merely to create parallel instruction files.
+- When operating on an existing native ICM workspace, preserve its native `CLAUDE.md` entry path and semantics; do not replace or break it merely to make `AGENTS.md` look canonical. If portability is wanted, add an `AGENTS.md` counterpart only where the harness/profile can consume it without invalidating native ICM.
 
 ## Context router file
 
@@ -92,6 +94,8 @@ Roles classify function; they do not mandate locations.
 | chronicle | historical record |
 | dead | unowned/unreferenced material requiring review |
 
+Inside native ICM, preserve the upstream Layer-3 factory/reference versus Layer-4 product/working-artifact distinction. The generic CCA role vocabulary may describe broader workspaces but does not replace that native distinction.
+
 ## Context discipline
 
 - Route before loading broadly.
@@ -104,19 +108,19 @@ Roles classify function; they do not mandate locations.
 
 ## Agent Skills discipline
 
-CCA's first-party Agent Skills are distributed as a suite of focused capabilities. Package portability means implementation paths remain local to each skill package; it does not mean every skill must be a sensible unrelated product when installed alone.
+CCA's first-party Agent Skill is one installable `cca` package with focused lazily loaded modes. Package portability means implementation paths remain local to the skill package; it does not mean every internal mode becomes a separate product.
 
 - valid `SKILL.md` frontmatter;
 - compact activation-time instructions;
 - skill-local `references/`, `assets/`, and `scripts/` loaded progressively;
 - implementation file paths remain inside the skill package;
-- never reach into a sibling skill directory or repository-global implementation file by relative path;
-- semantic delegation to another installed capability is valid, for example `Use `lint` mode to validate the selected profile`;
+- never reach into a removed sibling skill directory or repository-global implementation file by relative path;
+- semantic routing between modes is valid, for example `Use lint mode to validate the selected profile`;
 - `cca` in `architect` mode coordinates compound architecture work but is not a mandatory gateway for an already-clear lint, ingest, query, sync, or scaffold request.
 
 ## Fresh-agent walk test
 
-The CCA walk test supplements profile-specific validation; it does not replace ICM acceptance or another upstream's own rules.
+The CCA walk test inherits and generalizes the cold-agent validation idea while remaining supplemental to profile-specific validation; it does not replace ICM acceptance or another upstream's own rules.
 
 A structured workspace should let a fresh agent:
 
