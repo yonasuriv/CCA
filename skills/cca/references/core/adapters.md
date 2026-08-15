@@ -19,7 +19,7 @@ CCA does not define or override harness instruction precedence. Before creating 
 
 ICM uses `CLAUDE.md` as its native Layer 0 entry point. CCA must not delete or invalidate that entry path merely to make `AGENTS.md` appear canonical.
 
-A CCA-hardened ICM workspace may use `CLAUDE.md` to include or point at shared portable guidance, but the resulting workspace must still behave correctly for an ICM/Claude consumer.
+A CCA-hardened ICM workspace may use `CLAUDE.md` to include or point at shared portable guidance, but the resulting workspace must still behave correctly for a native ICM/Claude consumer.
 
 ## Adapter invariants
 
@@ -32,7 +32,7 @@ A CCA-hardened ICM workspace may use `CLAUDE.md` to include or point at shared p
 
 ## Detecting drift
 
-Lint should flag:
+`lint` mode should flag:
 
 - contradictory instructions across root files;
 - large adapter files that duplicate shared guidance;
@@ -46,4 +46,4 @@ Repair by preserving unique semantics, choosing one canonical source for shared 
 
 Tool-specific instruction filenames and import syntax evolve faster than CCA's filesystem semantics. Keeping static copy-paste adapters in the normative specification would make CCA stale by construction.
 
-The `cca-architect` skill therefore bundles only stable adapter principles. When exact syntax matters, verify the current harness documentation at execution time.
+CCA therefore bundles stable adapter principles in this single core reference. When exact syntax matters, verify current harness documentation at execution time.
