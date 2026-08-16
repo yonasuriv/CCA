@@ -33,6 +33,27 @@ CCA may add optional semantics where upstreams leave implementation open, but it
 4. duplicate canonical rules across adapters or catalogs;
 5. force a pipeline, wiki, database, agent framework, or organizational taxonomy where the work does not need one.
 
+### 2.1 Cold-agent structural isomorphism (ICM skeleton)
+
+A workspace created by CCA and a workspace created by an ICM-oriented builder should remain **walkable the same way** by a fresh agent that has **no skill, no prior chat, and no vendor docs** — only the files on disk.
+
+That means the **behavior** matches even when **names** differ:
+
+| Behavior a cold agent must find | Typical ICM default | Allowed variation |
+|---|---|---|
+| One small entry that says where things live | `CLAUDE.md` / `AGENTS.md` | Either; pointers OK |
+| Role→path map (or obvious defaults) so names are not guessed | often implicit as `CONTEXT.md` | Explicit map in L0 when names differ or CCA hardens |
+| One contract file **inside each working folder** | `CONTEXT.md` | Any mapped name; same job |
+| Contract logic | purpose + Inputs / Process / Outputs / Human check | Same sections (Inputs columns may be the ICM table when stages are used) |
+| Factory apart from product | `_shared/` / references vs `output/` / records | Any mapped L3 vs L4 paths |
+| New unit of work starts from a stamp | `_templates/` copy | Live stamps in the workspace, not only inside installed skills |
+| Status without memory | scan stage `output/` or declared status surface | Declare what to scan when not a pipeline |
+
+**Is this native ICM?** Only if the full upstream pipeline profile is claimed and passes.  
+**Is this ICM-compatible?** Yes when the cold-agent behaviors above hold. CCA does not claim a better method — it keeps the same skeleton so agents do not invent structure.
+
+If a cold agent must know “this was built by CCA” or “look for CONTEXT.md by string” to succeed, the workspace is **not** skeleton-complete.
+
 ## 3. Compatibility states
 
 CCA distinguishes:
@@ -81,19 +102,49 @@ For pipeline-oriented work, CCA adopts ICM's five-layer architecture when the IC
 | Layer | Typical file(s) | Question |
 |---|---|---|
 | 0 | native harness entry plus portable guidance (`AGENTS.md` in CCA-hardened workspaces; native `CLAUDE.md` remains authoritative where ICM/harness semantics require it) | Where am I? |
-| 1 | root `CONTEXT.md` (recommended default) | Where do I go? |
-| 2 | stage `CONTEXT.md` (contract per stage) | What do I do? |
+| 1 | root `CONTEXT.md` (default; see §5.1) | Where do I go? |
+| 2 | stage/folder `CONTEXT.md` (default contract; see §5.1) | What do I do? |
 | 3 | references, configuration, skills | What rules apply? |
 | 4 | working artifacts, previous outputs, user-provided inputs | What am I working with? |
 
 Agents read down the layers and stop when they have enough context for the current task.
 
-The root `CONTEXT.md` is a recommended default for the workspace's context/router file, not an enforced requirement. A CCA-created or CCA-hardened workspace may use a different name for its context/router file when the project's naming makes sense that way. When it does:
+### 5.1 Contract-file naming (roles, not assumptions)
 
-- the alternative name must be declared in the Layer-0 catalog (`AGENTS.md`) with a single pointer line so agents and humans can resolve it without guessing;
-- the file must keep the same mechanics as root `CONTEXT.md` (the same preferred token and line allowances and routing behavior ICM assigns to that layer), treated as recommendations, not requirements.
+CCA distinguishes **roles** from **default filenames**. Agents MUST NOT assume a filename: resolve the path from the Layer-0 skeleton map first; if the map omits that role, use the default below.
 
-Stage `CONTEXT.md` is a per-stage contract that describes that stage's Inputs/Process/Outputs; it is not a routing default and is not interchangeable under this rule.
+| Role | ICM layer | Default filename | Required semantics |
+|---|---|---|---|
+| entry catalog | L0 | `AGENTS.md` (CCA) / `CLAUDE.md` (native ICM) | Where am I; where everything lives; where to go for task X |
+| workspace router | L1 | `CONTEXT.md` | Task → shelf/procedure routing; no payload |
+| folder contract | L2 | `CONTEXT.md` | One folder, one job; states purpose; for working folders: Inputs / Process / Outputs / Human check |
+| factory / stamps | L3 | `_templates/`, `_shared/`, `_config/`, … | Stable across runs; path is workspace-native |
+| product / working | L4 | `output/`, wiki pages, records, … | Per-run or maintained artifacts |
+
+Default filenames are recommendations outside **native ICM**. A CCA-created or CCA-hardened workspace may use different names for the workspace router and/or folder-contract files when the project's naming makes sense, **if and only if**:
+
+1. every override is declared once in the Layer-0 catalog (`AGENTS.md`, or native `CLAUDE.md` when that is the entry authority);
+2. the declaration is a compact role→path map (not scattered prose);
+3. the renamed file keeps the **same role semantics** (routing vs contract vs factory), including Inputs / Process / Outputs / Human check for working-folder contracts;
+4. agents resolve names only through that map — never by guessing.
+
+CCA-created and CCA-hardened workspaces SHOULD include the skeleton map even when every path is still the default, so consumers (including ICM-oriented agents) never invent filenames.
+
+Example L0 map:
+
+```markdown
+## ICM / CCA skeleton map
+| Role | Path in this workspace |
+|---|---|
+| L0 entry | `AGENTS.md` |
+| L1 workspace router | `ROUTER.md` |
+| L2 folder contract | `PURPOSE.md` (one per working folder) |
+| L3 factory stamps | `Resources/knowledge/_templates/` |
+| Form | umbrella + knowledge bundle |
+| Native ICM pipeline | no |
+```
+
+**Native ICM exception:** when the workspace claims **native ICM compatibility**, upstream filenames win (`CLAUDE.md`, root `CONTEXT.md`, per-stage `CONTEXT.md`). Do not rename those while claiming native ICM. Portable `AGENTS.md` may mirror the map for other harnesses but must not redefine native paths.
 
 A workspace may use analogous routing for non-pipeline forms, but it must not force LLM Wiki, PARA, Zettelkasten, BASB, or ordinary repositories into ICM layers merely for cosmetic consistency.
 
@@ -137,7 +188,7 @@ Do not introduce underscore variants such as `01_collect` while claiming to pres
 
 ### 7.2 Stage contracts
 
-Every native ICM stage `CONTEXT.md` uses the canonical sections:
+Every native ICM stage contract file (filename `CONTEXT.md` under native ICM; otherwise resolved via §5.1) uses the canonical sections:
 
 ```markdown
 ## Inputs
@@ -166,7 +217,7 @@ Layer-3 folder names (for example `_config/`, `references/`, `shared/`, `brand-v
 
 ### 7.3 Core pipeline invariants
 
-- One stage, one job.
+- One stage, one job (and more generally: one folder, one job — each working folder states its job in its folder-contract file; default name `CONTEXT.md`, else §5.1 map).
 - One-way cross-references; downstream stages may depend on upstream stages, not vice versa.
 - Inputs tables scope files and, when useful, exact sections.
 - Each stage writes to its own `output/` folder.
@@ -184,13 +235,13 @@ When CCA creates, modifies, or validates a workspace that **claims native ICM co
 At minimum, native ICM validation must cover the applicable current upstream requirements for:
 
 1. five-layer routing with the current native ICM Layer-0 entry semantics preserved; when portable `AGENTS.md` guidance is added, it interoperates with rather than replaces or overrides the native `CLAUDE.md` entry path;
-2. one root `CONTEXT.md` and one stage `CONTEXT.md` per stage;
+2. one root `CONTEXT.md` and one stage `CONTEXT.md` per stage (native ICM keeps these exact filenames; non-native CCA workspaces may use §5.1 equivalents only when not claiming native ICM);
 3. exact stage contract shape and canonical Inputs columns;
 4. lowercase-with-hyphens naming, zero-padded stages, output naming, and `.gitkeep` for intentionally empty persistent folders;
 5. unbroken stage handoffs through per-stage `output/` folders;
 6. cross-reference integrity and an acyclic, one-way dependency graph;
 7. selective section routing and canonical-source discipline;
-8. `CONTEXT.md` purity: routing/process contract, not embedded reference material;
+8. contract-file purity: routing/process contract, not embedded reference material (native ICM: the files named `CONTEXT.md`);
 9. `setup` and `status` trigger behavior as currently defined by ICM;
 10. a flat, all-at-once, system-level setup questionnaire that derives inferable fields and uses sensible defaults/examples;
 11. complete placeholder coverage and valid conditional placeholder blocks where those mechanisms are used;
@@ -258,7 +309,7 @@ CCA uses file roles as an internal reasoning model. They are classifications by 
 | Role | Function |
 |---|---|
 | **catalog** | routes to other context; stores little substantive content |
-| **contract** | defines one unit of work: inputs, process, outputs |
+| **contract** | defines one unit of work: inputs, process, outputs (folder purpose / L2; default filename `CONTEXT.md`, else §5.1) |
 | **factory** | stable constraints, conventions, references, reusable skill material |
 | **source** | durable evidence/input that synthesis should not silently mutate |
 | **synthesis** | maintained derived knowledge |
@@ -266,7 +317,7 @@ CCA uses file roles as an internal reasoning model. They are classifications by 
 | **chronicle** | historical record |
 | **dead** | unowned/unreferenced material that requires review |
 
-A file has one primary role for maintenance purposes, but this classification must not force upstream workspaces to move files solely to match CCA labels.
+A file has one primary role for maintenance purposes, but this classification must not force upstream workspaces to move files solely to match CCA labels. Folder-purpose files are the contract role at folder scope (ICM “one folder, one job”); the filename is not fixed outside native ICM.
 
 ## 10. Canonical sources and adapters
 

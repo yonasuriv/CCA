@@ -20,18 +20,20 @@ An inherited capability is not an "ICM-only" capability merely because it origin
 
 Upstream native ICM defines Layer 0 `CLAUDE.md`, Layer 1 root `CONTEXT.md`, Layer 2 stage `CONTEXT.md`, Layer 3 stable reference/factory material, and Layer 4 per-run working/product artifacts.
 
-CCA classification: **Inherited / extended**. For native ICM, preserve native `CLAUDE.md` Layer-0 entry semantics. `AGENTS.md` may be added as portable cross-agent guidance only when it does not replace or invalidate the native entry path.
+CCA classification: **Inherited / extended**. For native ICM, preserve native `CLAUDE.md` Layer-0 entry semantics and exact `CONTEXT.md` filenames. Outside native ICM, the same layer **roles** apply with default filenames `CONTEXT.md`; alternate names are allowed only when declared in the Layer-0 skeleton map (`../core/spec.md` §5.1). `AGENTS.md` may be added as portable cross-agent guidance only when it does not replace or invalidate the native entry path.
 
 ## ICM pattern inheritance
 
 | Upstream capability | CCA native-ICM requirement | Classification |
 |---|---|---|
 | Stage contracts | Preserve exact `Inputs`, `Process`, `Outputs` semantics and canonical Inputs columns `Source | File/Location | Section/Scope | Why` | Inherited / preserved |
+| Folder contract filename | Default `CONTEXT.md`; under native ICM must remain `CONTEXT.md`; outside native ICM renamable only via L0 map | Inherited / extended |
+| One folder, one job | Each working folder states its job in its folder-contract file | Inherited / preserved |
 | Stage handoffs through `output/` | Preserve predictable downstream handoffs and human-editable artifacts | Inherited / preserved |
 | One-way cross-references | Preserve cycle-free dependency direction | Inherited / preserved |
 | Selective section routing | Preserve section-scoped loading when full files are unnecessary | Inherited / preserved |
 | Canonical sources | Preserve one canonical home per substantive fact/rule | Inherited / preserved |
-| `CONTEXT.md` routing purity | Keep routers/contracts compact; substantive reference material remains outside routers | Inherited / preserved |
+| Contract-file routing purity | Keep routers/contracts compact; substantive reference material remains outside routers | Inherited / preserved |
 | Tool prerequisites | Preserve setup/verification guidance for required system tools | Inherited / preserved |
 | `setup` / `status` triggers | Perform current native behavior through `../architect/workspace-builder.md`; upstream remains acceptance authority | Inherited / preserved |
 | Questionnaire design | Preserve flat, all-at-once, system-level, derive-don't-ask, sensible-default, ask-once behavior | Inherited / preserved |

@@ -245,6 +245,7 @@ The common rule is: **load the smallest context that lets the agent act correctl
 Validate the profile actually claimed:
 
 - native ICM → applicable current ICM acceptance surface;
+- **ICM skeleton** → cold-agent isomorphism (same walk as ICM structure; names via L0 map or default `CONTEXT.md`); not a native pipeline claim;
 - ICM-derived → only the borrowed constructs;
 - native LLM Wiki → its actual maintenance/schema conventions;
 - intentional CCA conformance → adopted CCA requirements;

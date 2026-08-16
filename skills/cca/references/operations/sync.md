@@ -8,7 +8,8 @@ Identify the routing/navigation files that actually govern the workspace:
 
 - root and nested `AGENTS.md` files;
 - native harness instruction files;
-- root/stage `CONTEXT.md` files;
+- the Layer-0 skeleton map when present (`spec.md` §5.1);
+- root/stage contract files resolved from that map, else default `CONTEXT.md`;
 - wiki indexes/maps/schema files;
 - any explicitly adopted CCA history/catalog conventions;
 - declared method-overlay boundaries when they affect routing.
@@ -18,7 +19,7 @@ Do not create missing CCA-preferred catalogs merely because sync knows about the
 ## Procedure
 
 1. **Snapshot relevant disk structure.** Inspect only the directories governed by the catalogs being synchronized.
-2. **Read each catalog in its scope.** Nested `AGENTS.md` files govern their own subtrees; do not flatten their entries into the root.
+2. **Read each catalog in its scope.** Nested `AGENTS.md` files govern their own subtrees; do not flatten their entries into the root. Resolve contract filenames from the L0 skeleton map before assuming `CONTEXT.md`.
 3. **Diff references against disk.** Classify:
    - broken reference — target no longer resolves;
    - missing routing entry — a newly added item clearly belongs in this catalog's declared scope;

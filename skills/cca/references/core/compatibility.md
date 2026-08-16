@@ -18,18 +18,20 @@ PARA, Zettelkasten, and BASB/CODE are **method overlays**, not additional struct
 
 ## 2. Concept mapping
 
-| CCA concept | ICM equivalent | LLM Wiki analogue |
+Roles overlap; default filenames may differ when declared in the Layer-0 skeleton map (`spec.md` §5.1). Agents must not assume names.
+
+| CCA concept | ICM equivalent (default name) | LLM Wiki analogue |
 |---|---|---|
 | Portable root guidance (`AGENTS.md`) | Native Layer 0 is `CLAUDE.md` | Schema/instruction file may be chosen by the implementation |
-| Routing (`CONTEXT.md`) | Layer 1 `CONTEXT.md` | Index/schema-defined navigation |
-| Stage contract | Stage `CONTEXT.md` with Inputs / Process / Outputs | Ingest/query/lint procedures defined by the implementation |
+| L1 workspace router (default `CONTEXT.md`) | Layer 1 `CONTEXT.md` | Index/schema-defined navigation |
+| L2 folder contract (default `CONTEXT.md`) | Stage/folder `CONTEXT.md` with Inputs / Process / Outputs | Ingest/query/lint procedures defined by the implementation |
 | Factory/reference context | Layer 3 reference material | Stable schema/conventions |
 | Working input/product | Layer 4 working artifacts | Query/ingest working material |
 | Raw evidence | User-provided source material | Raw/source material |
 | Maintained synthesis | No direct ICM equivalent | Core LLM Wiki behavior |
 | Chronicle/log | Git/history may provide this | Optional implementation detail unless adopted by the wiki |
 
-The overlap is semantic, not an excuse to force identical directory trees.
+The overlap is semantic, not an excuse to force identical directory trees. Same skeleton roles + declared names = compatibility; CCA does not claim a superior naming scheme.
 
 ## 3. ICM compatibility profile
 
@@ -40,13 +42,13 @@ CCA claims **native ICM compatibility** only when the workspace satisfies the co
 Native ICM validation includes, where applicable:
 
 1. five-layer routing and native Layer 0 `CLAUDE.md`;
-2. root and per-stage `CONTEXT.md` routing;
+2. root and per-stage `CONTEXT.md` routing (exact upstream filenames under native ICM);
 3. exact `Inputs` / `Process` / `Outputs` stage contracts and canonical Inputs columns;
 4. current ICM naming conventions, including zero-padded lowercase-hyphenated stages;
 5. per-stage `output/` handoffs and an unbroken handoff chain;
 6. cross-reference integrity and an acyclic one-way dependency graph;
 7. selective section routing and one canonical home per substantive rule;
-8. `CONTEXT.md` purity;
+8. contract-file purity (`CONTEXT.md` under native ICM);
 9. current `setup` and `status` trigger behavior;
 10. a flat, all-at-once, system-level questionnaire with complete placeholder coverage where setup placeholders are used;
 11. valid conditional placeholder syntax where used;
@@ -76,6 +78,19 @@ A non-ICM workspace may intentionally borrow ICM constructs such as:
 - per-stage output handoffs.
 
 That is **ICM-derived**, not native ICM compatibility, unless the rest of the applicable ICM profile also passes.
+
+### ICM skeleton compatibility
+
+A non-pipeline (or hybrid) workspace may claim **ICM skeleton compatibility** when a **cold agent** (no CCA/ICM skill, no prior chat) can walk it using the same behaviors as an ICM-built workspace (`spec.md` §2.1):
+
+1. Layer 0 declares an explicit role→path map covering at least the L1 workspace router and L2 folder-contract names (or uses only defaults and still lists them);
+2. every working folder has one job and a local folder-contract file at the mapped path with Purpose / Inputs / Process / Outputs / Human check;
+3. factory vs product is structurally separated and mapped; live stamps exist in-workspace;
+4. status without memory is declared (scan surface);
+5. agents never assume filenames — resolve from the map, else default `CONTEXT.md`;
+6. it does **not** claim native ICM `setup`/`status`/stage naming unless those also pass.
+
+This is weaker than native ICM and stronger than “ICM-derived patterns only.” It is structural/behavioral interoperability — **not** a claim that CCA improves on ICM. If stripping skill context breaks the walk, the claim fails.
 
 ### Portable `AGENTS.md` with ICM
 
@@ -171,6 +186,8 @@ Optional hardening may add portable routing, provenance metadata, indexes, or li
 
 If a CCA-conformant workspace claims a **native ICM profile**, that profile must preserve the full applicable current ICM acceptance surface so an ICM consumer can operate it without depending on CCA-only semantics.
 
+If a CCA workspace claims **ICM skeleton compatibility**, an ICM-oriented consumer should read the Layer-0 skeleton map first, then open the mapped router/contract paths (defaulting to `CONTEXT.md` when omitted). CCA does not claim a better naming scheme; it makes the same skeleton roles explicit so agents do not assume filenames.
+
 If a CCA workspace only borrows ICM stage-contract patterns, it must describe that part as **ICM-derived** rather than promise native ICM interchangeability.
 
 ### CCA → LLM Wiki practice
@@ -183,10 +200,11 @@ Validation order is:
 
 1. detect the actual native/upstream profile;
 2. validate that profile against its current upstream rules;
-3. preserve explicitly declared method overlays without promoting them to native profiles;
-4. validate any intentionally adopted CCA conformance;
-5. run the CCA fresh-agent walk test as a supplemental portability check;
-6. report optional hardening separately.
+3. if ICM skeleton compatibility is claimed, validate the L0 role→path map and mapped contracts before treating missing `CONTEXT.md` strings as failures;
+4. preserve explicitly declared method overlays without promoting them to native profiles;
+5. validate any intentionally adopted CCA conformance;
+6. run the CCA fresh-agent walk test as a supplemental portability check;
+7. report optional hardening separately.
 
 CCA must not use a successful walk test to waive a failed upstream acceptance check.
 

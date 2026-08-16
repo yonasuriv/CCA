@@ -8,6 +8,14 @@ For native ICM, CCA preserves the ICM concepts it depends on: the five-layer rou
 
 A native ICM root may live inside a broader CCA, PARA, client, or coding workspace. The outer structure may determine where it lives; it must not rewrite the ICM internals merely for consistency.
 
+### ICM skeleton compatibility (not native ICM)
+
+A CCA-built hybrid or non-pipeline workspace may claim **ICM skeleton compatibility** without being a native ICM pipeline.
+
+Cold-agent bar (`skills/cca/references/core/spec.md` §2.1): strip skills and chat. The workspace should still walk like an ICM skeleton — one small entry, a role→path map (or listed defaults), one folder contract per working folder (Purpose / Inputs / Process / Outputs / Human check), factory apart from product, live stamps, declared status scan. Default contract filename is `CONTEXT.md`; other names are fine **only** when declared in Layer 0 (`AGENTS.md` / native entry). Agents must not assume filenames.
+
+That is structural/behavioral interoperability, not a claim that CCA improves on ICM.
+
 ### Does CCA conflict with ICM's workspace-builder?
 
 It should not.

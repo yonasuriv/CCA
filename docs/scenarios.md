@@ -39,11 +39,14 @@ Expected outcomes (paths are flexible; authorities are not):
 - capture affordance (`inbox/` and/or capture helper);
 - seeded source→wiki citation on empty scaffolds;
 - checkable integrity helpers from `skills/cca/assets/scripts/` when hardening;
-- portable `AGENTS.md` (harness entry files as one-line pointers);
+- portable `AGENTS.md` (harness entry files as one-line pointers) with an **ICM / CCA skeleton map** (even when defaults are `CONTEXT.md`);
+- **one folder contract per working folder** (default `CONTEXT.md`, or the mapped name) with Purpose / Inputs / Process / Outputs / Human check — cold-agent isomorphic with ICM;
+- live factory stamps in the workspace (not only inside installed skills);
+- declared status-without-memory scan surface;
 - day-to-day `README.md` when the user will continue in a new session;
 - daily operation self-describing without mandatory external skill modes.
 
-Behavioral eval: `evals/personal-hybrid-intent/`.
+Behavioral eval: `evals/personal-hybrid-intent/`. Blind ICM-skeleton checks use `cca` lint profile **ICM skeleton compatibility** or an icm-architect walk against the ten invariants without assuming CCA-only filenames.
 
 ## Native ICM
 

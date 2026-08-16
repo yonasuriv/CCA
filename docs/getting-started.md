@@ -186,6 +186,7 @@ flowchart LR
 Run `cca` in `lint` mode with the correct profile:
 
 - **ICM native compatibility**: verify the complete applicable current ICM profile and workspace-builder-equivalent acceptance surface.
+- **ICM skeleton compatibility**: verify cold-agent isomorphism — entry, skeleton map, per-folder contracts (Inputs / Process / Outputs / Human check), factory vs product, live stamps, declared status — without requiring native pipeline naming. Default contract file is `CONTEXT.md`; alternate names must appear in the L0 map.
 - **ICM-derived patterns**: verify the borrowed stage/routing patterns without pretending the host repository is a full native ICM workspace.
 - **LLM Wiki native compatibility**: verify the core maintained-wiki behavior without imposing one concrete implementation.
 - **CCA conformance**: verify the additional CCA conventions the workspace intentionally adopted.

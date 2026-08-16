@@ -18,17 +18,18 @@ PARA, Zettelkasten, and BASB/CODE are method overlays, not additional native com
 
 ## ICM: full profile vs derived patterns
 
-Distinguish two cases:
+Distinguish three cases:
 
 - **Native ICM / full ICM profile**: the workspace claims ICM/MWP compatibility and therefore must satisfy the complete applicable current ICM convention and validation surface.
-- **ICM-derived patterns**: another workspace borrows useful ICM constructs such as numbered stage contracts, `CONTEXT.md` contracts, or output handoffs without claiming to be a complete native ICM workspace.
+- **ICM skeleton compatibility**: same layer roles and walkable contracts; filenames default to ICM names or are declared in the L0 skeleton map (`../core/spec.md` §5.1). Not a claim of native pipeline acceptance.
+- **ICM-derived patterns**: another workspace borrows useful ICM constructs such as numbered stage contracts, folder contracts (default `CONTEXT.md`), or output handoffs without claiming to be a complete native ICM workspace.
 
-Do not use “ICM-compatible” as shorthand for “contains ICM-like stage folders.”
+Do not use “ICM-compatible” as shorthand for “contains ICM-like stage folders.” Prefer the precise profile name. Agents must not assume contract filenames — resolve from the L0 map, else default to `CONTEXT.md`.
 
 For a **full ICM profile**, preserve and validate all applicable current upstream rules, including:
 
 1. the native five-layer routing architecture, preserving upstream Layer-0 `CLAUDE.md` semantics and the current upstream discovery/entry behavior; portable `AGENTS.md` guidance may be added only as an interoperable counterpart when it does not replace or invalidate the native entry path;
-2. one root `CONTEXT.md` and one stage `CONTEXT.md` per stage;
+2. one root `CONTEXT.md` and one stage `CONTEXT.md` per stage (exact upstream filenames);
 3. exact stage contract sections `Inputs`, `Process`, `Outputs` and canonical Inputs columns `Source | File/Location | Section/Scope | Why`;
 4. lowercase-with-hyphens naming, zero-padded stage prefixes, output-artifact naming, and `.gitkeep` for intentionally empty persistent folders;
 5. per-stage `output/` handoffs with an unbroken downstream chain;
@@ -62,14 +63,17 @@ A native ICM root may be nested inside a broader CCA/PARA/client workspace. The 
 - Keep one substantive source of truth. When a harness supports a bridge/include to portable guidance, use that mechanism only when it is verified and compatible with the active profile; do not duplicate routing merely to create parallel instruction files.
 - When operating on an existing native ICM workspace, preserve its native `CLAUDE.md` entry path and semantics; do not replace or break it merely to make `AGENTS.md` look canonical. If portability is wanted, add an `AGENTS.md` counterpart only where the harness/profile can consume it without invalidating native ICM.
 
-## Context router file
+## Contract files (router + folder contracts)
 
-The root `CONTEXT.md` is a recommended default for the workspace's context/router file, not an enforced requirement. A CCA-created or CCA-hardened workspace may use another name when the project's naming calls for it. When it does:
+Default names: root workspace router `CONTEXT.md`; per-working-folder contract `CONTEXT.md`.
 
-- declare the alternative name in `AGENTS.md` with a single pointer line so agents and humans can resolve it;
-- keep the same mechanics ICM assigns to that layer (token/line allowances, routing behavior) as recommendations, not requirements.
+Agents MUST NOT assume those filenames. Resolve paths from the Layer-0 skeleton map first; if a role is omitted from the map, use the default. See `../core/spec.md` §5.1.
 
-A stage `CONTEXT.md` is a per-stage contract, not a routing default, and is not interchangeable under this rule. Native ICM workspaces keep the exact names because the upstream profile requires them.
+Outside **native ICM**, either file may be renamed when declared in that L0 map. Native ICM keeps exact upstream names (`CLAUDE.md`, root `CONTEXT.md`, per-stage `CONTEXT.md`).
+
+Folder contracts (whatever named) must still encode one job and, for working folders, Inputs / Process / Outputs / Human check. Shelves that only route (for example PARA maps) may use a short purpose/catalog file; they must not pretend to be stages.
+
+CCA-created and CCA-hardened workspaces SHOULD include the skeleton map even when every path is still the default, so consumers never invent filenames.
 
 ## Knowledge invariants
 
@@ -134,8 +138,10 @@ The CCA walk test inherits and generalizes the cold-agent validation idea while 
 
 A structured workspace should let a fresh agent:
 
-1. **Orient** — identify the workspace, applicable instruction scope, native profile, and relevant method boundaries.
-2. **Act** — perform one representative operation using routed files.
-3. **Report** — state what changed, what remains, and what is missing or ambiguous.
+1. **Orient** — identify the workspace from L0; resolve L1/L2 filenames from the skeleton map (else default `CONTEXT.md`); note native profile and method boundaries.
+2. **Act** — open one folder contract; load only its Inputs; perform one representative operation; honor Human check.
+3. **Report** — state what changed, what remains, and status from the declared scan surface (pipeline `output/` or hybrid equivalent).
 
 If a required decision exists only in chat history or someone's head, durable context is incomplete.
+
+**ICM skeleton bar:** if the same cold agent could walk an ICM-built workspace of the same form but cannot walk this one without knowing it was “CCA,” the skeleton claim fails (`../core/spec.md` §2.1).

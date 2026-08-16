@@ -82,7 +82,9 @@ For native ICM, scaffold the complete applicable native surface, including:
 
 Keep `CONTEXT.md` as routing/process rather than substantive reference content. Route to exact sections when a whole reference is unnecessary.
 
-CCA may add an `AGENTS.md` portable counterpart only when it improves cross-agent use without replacing or invalidating the native `CLAUDE.md` path.
+CCA may add an `AGENTS.md` portable counterpart only when it improves cross-agent use without replacing or invalidating the native `CLAUDE.md` path. When added under native ICM, its skeleton map should mirror the upstream filenames.
+
+For non-native CCA / hybrid scaffolds, include an L0 skeleton map (roles → paths), defaulting L1/L2 to `CONTEXT.md`, and resolve contract paths only through that map. Emit a mapped folder contract (`assets/templates/folder-context.md`) in every working folder; seed live L3 stamps; declare status-without-memory. The result must remain cold-agent isomorphic with ICM (`../core/spec.md` §2.1): same walk behavior if skill context is stripped.
 
 ## Phase 4: Questionnaire design
 
@@ -181,7 +183,7 @@ When discovery shows a **personal hybrid** (coding projects + notes/research/sec
 
 ### Fresh personal-hybrid acceptance (non-ICM)
 
-Before describing such a scaffold as ready:
+Before describing such a scaffold as ready, it must pass **cold-agent isomorphism** (`../core/spec.md` §2.1): a fresh agent with only the files on disk walks it like an ICM skeleton workspace (names via L0 map or defaults).
 
 1. Projects shelf exists and is allowed to hold normal repos.
 2. Human notes shelf exists and is **not** the immutable source shelf.
@@ -192,8 +194,13 @@ Before describing such a scaffold as ready:
 7. CCA-hardened bundles include a **checkable** integrity path (copy `assets/scripts/verify-sources.py` / `capture-source.py` into the workspace `bin/` or equivalent, or implement the same behavior).
 8. Workspace daily use does not require inventing mandatory external skill modes.
 9. If the user asked for a new-session handoff, `README.md` covers day-to-day flows.
-10. Run the fresh-agent walk: orient → open wiki index → reach the seeded page → follow citation to raw.
+10. Run the fresh-agent walk: orient via L0 → resolve L1/L2 from skeleton map → open wiki index → reach the seeded page → follow citation to raw → open one folder contract and name its Inputs / Human check.
+11. L0 skeleton map present (roles → paths), including defaults so agents do not assume filenames.
+12. **Every working shelf and operable knowledge subfolder** has a local folder contract at the mapped L2 name (copy from `assets/templates/folder-context.md`), with Purpose / Inputs / Process / Outputs / Human check — not README-only, and not nested `AGENTS.md` unless the map says that file **is** L2 and contains those sections.
+13. Root L1 router exists (mapped name) and declares **status without memory** (what to scan).
+14. Live L3 factory stamps exist in the workspace (at least knowledge `_templates/`; Project/Area stubs when those shelves exist). Skills are not the only stamp home.
+15. Primary knowledge procedures are covered by folder or procedure contracts with exact paths and Human check.
 
 Copy scripts and templates from this skill's `assets/` into the workspace; do not leave the workspace depending on the skill path at runtime.
 
-The builder is successful when the resulting workspace is simpler to operate correctly, not when it looks maximally CCA-shaped.
+The builder is successful when a cold agent can operate without knowing CCA or ICM by name — same skeleton behavior as an ICM-built workspace, even if filenames differ via the map.

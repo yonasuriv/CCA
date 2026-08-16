@@ -273,6 +273,74 @@ def score_workspace(root: Path) -> dict:
     contra = any(k in text for k in ("contradict", "disagreement", "do not silently", "preserve both"))
     add("contradiction_policy", 6, contra, "contradiction/preservation language present")
 
+    # --- ICM skeleton / cold-agent isomorphism (path-flexible) ---
+    agent_blob = "\n".join(read_text(p) for p in agent_files).lower()
+    skeleton_map = (
+        "skeleton map" in agent_blob
+        or "l1 workspace router" in agent_blob
+        or ("l2 folder contract" in agent_blob and "context.md" in agent_blob)
+    )
+    add(
+        "skeleton_map_in_entry",
+        10,
+        skeleton_map,
+        "L0 declares role→path map (or equivalent) so agents do not assume filenames",
+    )
+
+    contract_files = [
+        p
+        for p in all_files(root)
+        if p.name.lower() in {"context.md", "purpose.md", "router.md"}
+        or (p.name.upper() == "AGENTS.MD" and p.parent != root)
+    ]
+    shaped = 0
+    for p in contract_files:
+        body = read_text(p).lower()
+        if (
+            "inputs" in body
+            and "process" in body
+            and "outputs" in body
+            and ("human check" in body or "human gate" in body)
+        ):
+            shaped += 1
+    # Root L1 router may omit Human check; require several working-folder contracts
+    add(
+        "folder_contracts_icm_shape",
+        12,
+        shaped >= 4,
+        f"contracts_with_inputs_process_outputs_human_check={shaped}",
+    )
+
+    templates = dir_named_like(root, [r"^_templates$", r"^templates$"])
+    stamp_files = []
+    for tdir in templates:
+        for p in tdir.rglob("*"):
+            if p.is_file() and p.stat().st_size > 20 and p.name not in {".gitkeep"}:
+                stamp_files.append(p)
+    add(
+        "live_factory_stamps",
+        8,
+        len(stamp_files) >= 2,
+        f"template_dirs={len(templates)} stamp_files={len(stamp_files)}",
+    )
+
+    status_scan = any(
+        k in text
+        for k in (
+            "status scan",
+            "without memory",
+            "status without",
+            "scan surfaces",
+            "current state",
+        )
+    ) or ("log.md" in text and "index.md" in text and "status" in text)
+    add(
+        "status_without_memory",
+        6,
+        status_scan,
+        "declared status scan surface for cold agents",
+    )
+
     earned = sum(c["weight"] for c in checks if c["ok"])
     total = sum(c["weight"] for c in checks)
     score = round(100.0 * earned / total, 2) if total else 0.0

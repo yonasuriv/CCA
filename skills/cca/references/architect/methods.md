@@ -119,18 +119,24 @@ Organizational shelves (PARA or similar) answer *where something lives*. Epistem
 
 ### Defaults when the user trusts you
 
-Use the smallest hybrid that preserves the layers above:
+Use the smallest hybrid that preserves the layers above **and** remains cold-agent isomorphic with ICM (`../core/spec.md` §2.1): same walkable skeleton, optional different names via the L0 map.
 
 1. **Outer organization** — PARA (`Projects/`, `Areas/`, `Resources/`, `Archives/`) or an equally clear actionability split. Coding projects stay normal repositories; do not force wiki schema into project internals.
 2. **Nested knowledge bundle** — under Resources (or equivalent): `inbox/` (optional but preferred), immutable `raw/` (or `sources/raw/`), human `notes/` or `zettelkasten/`, growing `wiki/` with `index.md` + `log.md`.
 3. **Portable agent entry** — canonical `AGENTS.md`; harness files (`CLAUDE.md`, …) are one-line pointers, not second hand-maintained copies.
-4. **Immutability is operational, not slogan** — instruct: never rewrite deposited raw files; correct by adding a new source and recording **supersession** in the source index. For CCA-hardened bundles, also install a small checkable integrity path (hash manifest + `verify` script, or equivalent) so violations are detectable.
-5. **Seed a worked example on empty scaffolds** — deposit one real source body, one wiki page that cites it (and ideally one human note if notes were requested), and one `log.md` line. Empty recipes force agents to invent the loop; a tiny chain is the highest-density instruction.
-6. **Self-describing** — daily capture/lookup/project work must work from workspace files alone. Optional `cca` modes may help intentional restructure/ingest/query/lint; do not make uninstalled skill names mandatory for ordinary operation.
-7. **YAGNI** — no numeric ID factories, multi-stage ingest pipelines, or vector DBs until repeated use proves the need. Thin capture → index → optional weave is enough on day one.
-8. **Human day-to-day guide** — when the user will continue in a new session, write `README.md` covering capture, notes, wiki lookup/update, projects, and archive — anything that would otherwise live only in chat.
+4. **ICM skeleton map in L0** — always write the role→path table (defaults `CONTEXT.md` for L1/L2). Cold agents must not guess names.
+5. **One folder contract per working folder** — every working shelf and knowledge subfolder that an agent may operate in (`Projects/`, `Areas/`, `Archives/`, `Resources/`, `inbox/`, `raw/`, `notes/`, `wiki/`, …) gets a local contract file at the **mapped L2 name** (default `CONTEXT.md`). Copy shape from `assets/templates/folder-context.md`: Purpose, Inputs, Process, Outputs, Human check. Do **not** substitute a nested `AGENTS.md` for that contract unless the L0 map explicitly sets L2 = that nested `AGENTS.md` **and** that file contains the same sections.
+6. **Root L1 router** — one workspace router (default `CONTEXT.md`) that only routes tasks to folders/procedures; no payload.
+7. **Repeating knowledge jobs** — capture / deposit / weave / query are either covered by the folder contracts of the folders that own them, or by short procedure contracts the L1 router points at — always with exact paths and Human check. Numbered `01_` stages are optional (YAGNI); missing contracts are not.
+8. **Factory vs product** — live stamps under the mapped L3 path (at least `Resources/knowledge/_templates/` plus stubs for new Project/Area if those shelves exist). Product = wiki/notes/project trees / run outputs. Skills are not the only stamp home.
+9. **Status without memory** — root router (or L0) declares how a cold agent answers “what’s the state?” (e.g. scan `Resources/knowledge/log.md` + wiki index + whether inbox is empty). Do not leave status as “only pipeline `output/`” when there is no pipeline.
+10. **Immutability is operational, not slogan** — never rewrite deposited raw files; correct via **supersession**. For CCA-hardened bundles, install checkable integrity (`bin/capture`, `bin/verify` or equivalent).
+11. **Seed a worked example** — one real source → wiki citation (+ note if notes were requested) + log line.
+12. **Self-describing** — daily use works from workspace files alone; no mandatory external skill names.
+13. **YAGNI** — no numeric ID factories, multi-stage ingest pipelines, or vector DBs until repeated use proves the need.
+14. **Human day-to-day guide** — `README.md` when the user will continue in a new session.
 
-Path names are not normative. The layers, authorities, supersession rule, seed chain, and self-describing operation are.
+Path names are not normative. Cold-agent behaviors (entry, map, per-folder contracts, factory vs product, stamps, declared status) are.
 
 ### Rejected collapses
 
@@ -139,6 +145,9 @@ Path names are not normative. The layers, authorities, supersession rule, seed c
 - Prose "never rewrite raw" with no supersession rule and no way to detect edits
 - Scaffold with zero example source→wiki citation
 - Requiring "use CCA ingest mode" / invented skill names for basic capture
+- Shelf `AGENTS.md` / README **without** a mapped L2 folder contract (cold agent cannot find Inputs / Process / Outputs / Human check)
+- Templates only inside installed skills, not live in the workspace
+- Calling the hybrid ICM-skeleton-compatible when a cold agent must guess filenames or invent missing contracts
 
 ## Architecture questions to resolve
 

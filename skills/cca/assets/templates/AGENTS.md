@@ -33,8 +33,18 @@ List only directories/files that actually exist or are being created now. Do not
 
 `AGENTS.md` is the authoritative Layer-0 catalog in this workspace. It does not override a harness's native discovery rules. If a harness needs its own entry file (`CLAUDE.md`, `GEMINI.md`, ...), that file is created by directive as a single-line `@ AGENTS.md` include, never a second hand-maintained copy of this routing.
 
-## Context router
+## ICM / CCA skeleton map
 
-This workspace's context/router file is the root `CONTEXT.md` by default. If this workspace renames it, the name is declared here as a single line, and the declared file keeps the same mechanics (preferred tokens/lines and routing behavior) ICM assigns to that layer, as recommendations:
+Cold agents MUST NOT assume contract filenames. Resolve each role from this table; if a role is omitted, use the default (`CONTEXT.md` for L1/L2). This map is what makes CCA and ICM workspaces walk the same way when names differ.
 
-- Context router: `CONTEXT.md`
+| Role | Path in this workspace |
+|---|---|
+| L0 entry | `AGENTS.md` |
+| L1 workspace router | `CONTEXT.md` |
+| L2 folder contract | `CONTEXT.md` |
+| L3 factory stamps | `_templates/` |
+| Status scan (no memory) | [e.g. `stages/*/output/` OR `Resources/knowledge/log.md` + wiki index] |
+| Form | [pipeline \| umbrella \| knowledge bundle \| record library \| context map \| system map \| hybrid] |
+| Native ICM pipeline | [yes \| no] |
+
+Rename any non-native default only by editing this table. Keep role semantics unchanged. Under native ICM, keep upstream filenames (`CLAUDE.md`, `CONTEXT.md`) and mirror them here.
