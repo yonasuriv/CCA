@@ -78,6 +78,10 @@ For an inherited capability classify CCA as **PARITY**, **IMPROVEMENT**, or **RE
 
 ICM is not marked as failing for an extension outside its claims. Observe its behavior, classify out-of-scope where appropriate, and compare whether CCA adds value beyond both ICM and the no-skill control.
 
+### `personal-hybrid-intent/` — personal hybrid builder from user intent
+
+Checks that architect/workspace-builder produces a useful projects + notes + immutable-sources + growing-wiki workspace from the same human dialogue prompts **without** hardcoding those prompts into the skill. See [`personal-hybrid-intent/README.md`](personal-hybrid-intent/README.md).
+
 ## Workspace-builder parity
 
 `skills/cca/references/architect/workspace-builder.md` is first-class Architect runtime behavior. For native ICM it preserves the upstream builder contract inside the installed CCA package:

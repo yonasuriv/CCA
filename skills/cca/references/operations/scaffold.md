@@ -42,9 +42,9 @@ Adding ICM-derived stage contracts to an ordinary repository does **not** by its
 
 If the user explicitly requests a complete native ICM workspace, use `cca` in `architect` mode for the architecture/profile decision when available, then scaffold the approved shape. Do not label a partial scaffold as fully ICM-compatible.
 
-**Maintained knowledge:** discover whether the project already has a knowledge schema. If not, create the smallest knowledge structure the user needs. A CCA-hardened `raw/`, `wiki/`, `wiki/index.md`, `log.md` layout is an option, not a universal LLM Wiki requirement.
+**Maintained knowledge:** discover whether the project already has a knowledge schema. If not, create the smallest knowledge structure the user needs. A CCA-hardened `raw/`, `wiki/`, `wiki/index.md`, `log.md` layout is an option, not a universal LLM Wiki requirement. When creating a hardened bundle from scratch, also add human `notes/` (or zettelkasten) if notes were requested, document supersession for raw, seed one source→wiki citation, and copy `assets/scripts/capture-source.py` / `verify-sources.py` into the workspace when hardening immutability.
 
-**Method-organized workspace:** preserve declared PARA/Zettelkasten/BASB organization. Scaffold routing around existing boundaries rather than normalizing them into one CCA tree.
+**Method-organized workspace:** preserve declared PARA/Zettelkasten/BASB organization. Scaffold routing around existing boundaries rather than normalizing them into one CCA tree. For personal hybrids (projects + notes/research + wiki), follow `../architect/methods.md` Personal hybrid defaults.
 
 ## Change safety
 

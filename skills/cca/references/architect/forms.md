@@ -90,17 +90,22 @@ When starting fresh and the user wants an opinionated CCA-hardened layout, one u
 ```text
 brain/
 ├── AGENTS.md
-├── raw/
+├── inbox/           # optional staging before raw
+├── raw/             # write-once evidence + index + integrity manifest
+├── notes/           # or zettelkasten/ — human-owned thinking
 ├── wiki/
 │   └── index.md
-└── log.md
+├── log.md
+└── bin/             # optional capture + verify helpers copied from skill assets
 ```
 
 Additional entity/concept/source/synthesis directories and metadata are optional implementation choices.
 
 A knowledge bundle may coexist beside Zettelkasten notes or inside a PARA Resources tree. Do not silently reinterpret human-authored notes as agent-maintained synthesis; determine authority from the workspace instructions.
 
-Failure modes: isolated summaries instead of integrated synthesis, invented provenance, silent contradiction overwrite, and indexes that drift from the knowledge they route to.
+On an **empty** CCA-hardened scaffold, seed one source file, one citing wiki page, and one log line so a cold agent can pattern-match the loop. Document supersession (add new raw + index row; never rewrite deposited raw). Prefer a small verify script or hash manifest so immutability is checkable.
+
+Failure modes: isolated summaries instead of integrated synthesis, invented provenance, silent contradiction overwrite, indexes that drift from the knowledge they route to, empty scaffolds with only policy prose, and immutability claims with neither supersession nor integrity checks.
 
 ## 5. Context map
 

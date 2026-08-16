@@ -24,6 +24,27 @@ project can contain an ordinary code repository or native ICM workspace. CCA
 preserves each boundary and declares write/authority relationships instead of
 flattening schemas.
 
+## New personal hybrid (projects + notes + research + wiki)
+
+When the user wants coding projects, notes/research/second-brain structure, and
+the LLM Wiki split (immutable sources vs a wiki that grows)—especially under
+deferred trust—use `cca` in `architect` mode and follow the **Personal hybrid**
+defaults in `skills/cca/references/architect/methods.md`.
+
+Expected outcomes (paths are flexible; authorities are not):
+
+- projects shelf for normal repos;
+- human notes distinct from write-once evidence;
+- distinct immutable sources vs growing wiki, with **supersession** (not silent rewrite);
+- capture affordance (`inbox/` and/or capture helper);
+- seeded source→wiki citation on empty scaffolds;
+- checkable integrity helpers from `skills/cca/assets/scripts/` when hardening;
+- portable `AGENTS.md` (harness entry files as one-line pointers);
+- day-to-day `README.md` when the user will continue in a new session;
+- daily operation self-describing without mandatory external skill modes.
+
+Behavioral eval: `evals/personal-hybrid-intent/`.
+
 ## Native ICM
 
 Preserve and validate the complete applicable upstream ICM profile. CCA's

@@ -134,6 +134,7 @@ Choose the smallest form that fits:
 - **ICM-derived pipeline** when explicit stages/handoffs help but the host project does not need the complete ICM workspace profile.
 - **Knowledge bundle** for persistent synthesis that compounds across sessions.
 - **Method-organized PKM/second brain** when PARA, Zettelkasten, BASB, or another human method already expresses the work well.
+- **Personal hybrid** when coding projects, human notes/research, and immutable-sources vs growing-wiki intent appear together (see Personal hybrid in the architect `methods.md` reference; copy capture/verify helpers from `skills/cca/assets/scripts/` when hardening).
 - **Hybrid** when a pipeline consumes or updates maintained knowledge or when several valid boundaries coexist.
 - **Ordinary project routing** when the existing repository structure already expresses the work well.
 

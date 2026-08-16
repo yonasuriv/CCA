@@ -177,4 +177,23 @@ The builder may also construct ordinary code-context workspaces, PARA/PKM arrang
 - do not copy ICM-native trigger/naming/size rules into a non-ICM workspace unless the target deliberately adopts them;
 - preserve nested native boundaries rather than flattening them into one CCA schema.
 
+When discovery shows a **personal hybrid** (coding projects + notes/research/second brain + immutable sources vs growing wiki), load the Personal hybrid section in `methods.md` and satisfy its defaults before calling the workspace ready—especially under deferred trust.
+
+### Fresh personal-hybrid acceptance (non-ICM)
+
+Before describing such a scaffold as ready:
+
+1. Projects shelf exists and is allowed to hold normal repos.
+2. Human notes shelf exists and is **not** the immutable source shelf.
+3. Immutable source area and growing wiki area are distinct; raw rewrite is forbidden; **supersession** is documented.
+4. Capture affordance exists (`inbox/` and/or a capture script).
+5. Agent routing exists (`AGENTS.md` or profile-native entry + portable pointer pattern).
+6. A **seeded** source→wiki citation chain exists (real file bodies, not only empty dirs / `.gitkeep`).
+7. CCA-hardened bundles include a **checkable** integrity path (copy `assets/scripts/verify-sources.py` / `capture-source.py` into the workspace `bin/` or equivalent, or implement the same behavior).
+8. Workspace daily use does not require inventing mandatory external skill modes.
+9. If the user asked for a new-session handoff, `README.md` covers day-to-day flows.
+10. Run the fresh-agent walk: orient → open wiki index → reach the seeded page → follow citation to raw.
+
+Copy scripts and templates from this skill's `assets/` into the workspace; do not leave the workspace depending on the skill path at runtime.
+
 The builder is successful when the resulting workspace is simpler to operate correctly, not when it looks maximally CCA-shaped.

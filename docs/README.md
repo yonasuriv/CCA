@@ -30,6 +30,7 @@ skills/cca/
 │   │   ├── core.md
 │   │   ├── forms.md
 │   │   ├── methods.md
+│   │   ├── workspace-builder.md
 │   │   └── system-map.md
 │   ├── advisor/
 │   │   ├── mode.md
@@ -47,6 +48,7 @@ skills/cca/
 │       ├── query.md
 │       └── lint.md
 └── assets/
+    ├── scripts/          # capture-source.py, verify-sources.py (copy into workspaces)
     └── templates/
 ```
 

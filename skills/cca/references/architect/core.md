@@ -79,6 +79,16 @@ CCA may optionally harden a knowledge workspace with `raw/`, `wiki/`, `wiki/inde
 
 When Zettelkasten, PARA, or another human method is present beside maintained synthesis, determine authority before writing. Do not silently reinterpret human-authored reference notes as agent-maintained wiki content.
 
+For CCA-hardened or freshly built personal hybrids:
+
+- treat human notes and immutable evidence as different layers;
+- forbid silent raw rewrites; correct via **supersession** (new source + index);
+- prefer checkable integrity (manifest/verify) over prose-only immutability;
+- seed a minimal source→wiki citation chain on empty scaffolds;
+- keep daily operation self-describing without mandatory external skill modes.
+
+See `methods.md` (Personal hybrid) when projects, notes, research, and wiki intent appear together.
+
 ## CCA file roles
 
 Roles classify function; they do not mandate locations.

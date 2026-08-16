@@ -225,25 +225,31 @@ Native LLM Wiki compatibility is behavioral, not tied to one directory tree. A c
 CCA may recommend the following implementation when a user wants stronger interoperability and maintenance:
 
 ```text
-raw/             durable source material
-wiki/            maintained synthesis
+inbox/            optional staging before deposit
+raw/              durable source material (write-once)
+notes/            optional human-owned thinking (not raw, not wiki)
+wiki/             maintained synthesis
 wiki/index.md     navigation catalog
 log.md            maintenance chronicle
 ```
 
-Optional hardening may also include YAML frontmatter, lifecycle states, provenance fields, contradiction sections, entity/concept taxonomies, and machine-parseable log prefixes.
+Optional hardening may also include YAML frontmatter, lifecycle states, provenance fields, contradiction sections, entity/concept taxonomies, machine-parseable log prefixes, a source index with supersession rows, and a checkable integrity mechanism (hash manifest and/or verify script).
 
 These are **CCA conventions**, not universal requirements of Karpathy's LLM Wiki idea.
+
+When scaffolding an empty hardened bundle, CCA should seed at least one real source and one citing wiki page so operators can pattern-match the maintenance loop.
 
 ### 8.2 Knowledge invariants
 
 When adopted by a workspace:
 
 - source material should not be silently rewritten by synthesis operations;
+- corrections to evidence should **supersede** (add a new source and record the relationship) rather than mutate deposited raw files;
 - derived claims should retain provenance when the workspace promises evidence traceability;
 - contradictions should be represented rather than silently overwritten;
 - stale or superseded knowledge should remain inspectable when history matters;
-- indexes should route rather than duplicate full page content.
+- indexes should route rather than duplicate full page content;
+- human-authored notes, when present as a separate layer, must not be treated as silently agent-rewritable wiki pages.
 
 ## 9. File roles
 

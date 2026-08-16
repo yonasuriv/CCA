@@ -99,6 +99,47 @@ wiki/
 
 The exact tree is not normative. The important distinction is idea-level linked notes versus maintained synthesis.
 
+## Personal hybrid (projects + notes + research + maintained wiki)
+
+Load this section when the request combines **coding/outcome work** with **notes/research/second-brain** and wants **durable evidence separate from growing synthesis** (the LLM Wiki idea), including when the user defers details ("do what's best").
+
+### Epistemic layers (do not conflate)
+
+These are different authorities even when nested under one PARA/Resources tree:
+
+| Layer | Role | Mutability | Default owner |
+|---|---|---|---|
+| Capture / inbox | Frictionless landing before taxonomy | Mutable | Anyone |
+| Sources / raw | Evidence from the world | **Write-once** after deposit | Capture process |
+| Notes / zettel | The human's own thinking | Mutable | Human (agents cite; rewrite only if asked) |
+| Wiki | Current maintained understanding | Mutable / rewritable | Human + agent |
+| Projects | Outcome-bound building | Project-local | Project / human |
+
+Organizational shelves (PARA or similar) answer *where something lives*. Epistemic layers answer *what kind of knowledge it is*. Keep both; do not file personal notes as immutable evidence, and do not treat wiki synthesis as a source dump.
+
+### Defaults when the user trusts you
+
+Use the smallest hybrid that preserves the layers above:
+
+1. **Outer organization** — PARA (`Projects/`, `Areas/`, `Resources/`, `Archives/`) or an equally clear actionability split. Coding projects stay normal repositories; do not force wiki schema into project internals.
+2. **Nested knowledge bundle** — under Resources (or equivalent): `inbox/` (optional but preferred), immutable `raw/` (or `sources/raw/`), human `notes/` or `zettelkasten/`, growing `wiki/` with `index.md` + `log.md`.
+3. **Portable agent entry** — canonical `AGENTS.md`; harness files (`CLAUDE.md`, …) are one-line pointers, not second hand-maintained copies.
+4. **Immutability is operational, not slogan** — instruct: never rewrite deposited raw files; correct by adding a new source and recording **supersession** in the source index. For CCA-hardened bundles, also install a small checkable integrity path (hash manifest + `verify` script, or equivalent) so violations are detectable.
+5. **Seed a worked example on empty scaffolds** — deposit one real source body, one wiki page that cites it (and ideally one human note if notes were requested), and one `log.md` line. Empty recipes force agents to invent the loop; a tiny chain is the highest-density instruction.
+6. **Self-describing** — daily capture/lookup/project work must work from workspace files alone. Optional `cca` modes may help intentional restructure/ingest/query/lint; do not make uninstalled skill names mandatory for ordinary operation.
+7. **YAGNI** — no numeric ID factories, multi-stage ingest pipelines, or vector DBs until repeated use proves the need. Thin capture → index → optional weave is enough on day one.
+8. **Human day-to-day guide** — when the user will continue in a new session, write `README.md` covering capture, notes, wiki lookup/update, projects, and archive — anything that would otherwise live only in chat.
+
+Path names are not normative. The layers, authorities, supersession rule, seed chain, and self-describing operation are.
+
+### Rejected collapses
+
+- Projects-only (brain trapped in repos) or wiki-only (no home for code)
+- Notes filed only under immutable sources
+- Prose "never rewrite raw" with no supersession rule and no way to detect edits
+- Scaffold with zero example source→wiki citation
+- Requiring "use CCA ingest mode" / invented skill names for basic capture
+
 ## Architecture questions to resolve
 
 When these methods appear together, determine:
