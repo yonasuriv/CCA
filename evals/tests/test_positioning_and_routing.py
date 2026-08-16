@@ -25,9 +25,9 @@ class PositioningAndRoutingTests(unittest.TestCase):
         self.assertIn("Do not use for ordinary implementation", description)
 
     def test_root_router_stops_after_smallest_matching_mode(self):
-        text = SKILL.read_text(encoding="utf-8")
-        self.assertIn("Do not enter `architect`", text)
-        self.assertIn("stop loading CCA references", text.lower())
+        text = SKILL.read_text(encoding="utf-8").lower()
+        self.assertIn("do not enter `architect`", text)
+        self.assertIn("stop loading cca references", text)
 
 
 if __name__ == "__main__":
