@@ -1,4 +1,4 @@
-# {folder-name} — {one job in a few words}
+# {folder-name} -- {one job in a few words}
 
 > Layer 2 folder contract (default filename `CONTEXT.md`; else the L0 skeleton map).
 > One folder, one job. Keep this small. A cold agent should need only this file + listed inputs.

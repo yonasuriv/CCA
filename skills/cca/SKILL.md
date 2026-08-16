@@ -1,12 +1,13 @@
 ---
 name: cca
-description: Agent-agnostic interoperability and context architecture for filesystem-native work. Use to design or restructure context systems, create/setup native or hybrid workspaces, scaffold portable routing, synchronize navigation, ingest or query maintained knowledge, validate CCA/ICM/LLM-Wiki compatibility, or advise on engineering and methodology trade-offs. Supports existing code repositories, human knowledge systems, ICM, LLM Wiki, PARA, Zettelkasten, BASB/CODE, delivery methods, and hybrid workspaces without replacing their native authorities. Do not use for ordinary implementation, coding, editing, or project work when no CCA context, knowledge, compatibility, routing, or advisory operation is needed.
-compatibility: Filesystem read/write access for mutating modes. No vendor-specific runtime required.
+description: Use to design or restructure context systems, create or set up native or hybrid workspaces, scaffold portable routing, synchronize navigation, ingest or query maintained knowledge, validate CCA/ICM/LLM-Wiki compatibility, or advise on engineering judgment, software engineering principle/framework/methodology/process trade-offs, and security, autonomy, model, and context decisions. Supports existing code repositories, human knowledge systems, ICM, LLM Wiki, PARA, Zettelkasten, BASB/CODE, delivery methods, and hybrid workspaces without replacing their native authorities. Trigger whenever a request touches how context, knowledge, or navigation is structured for humans and agents together, even when the user never names CCA. Do not use for ordinary implementation, coding, editing, or project work when no context, knowledge, compatibility, routing, or advisory operation is involved.
 ---
 
 # CCA
 
-CCA is one installable skill with seven lazily loaded modes. Select the smallest mode that directly matches the request, then load only that mode and the references it names.
+CCA (Convergent Context Architecture) is an evolving, agent-agnostic interoperability layer for filesystem-native AI context. It aims to bridge human knowledge work and agentic work by building on open standards, ecosystem conventions, and proven methodologies, protocols and frameworks, based on software engineering principles and fundamentals, to make any workspace, project, or body of human knowledge easier for both humans and AI agents to understand, navigate, and use, without forcing it into a new competing convention. It's goal is to make automation easier in service of augmenting human capabilities, while improving efficiency, reducing technical debt, unnecessary complexity, and lowering compute, usage, and operational costs.
+
+This is one installable skill with seven lazily loaded modes. Select the smallest mode that directly matches the request, then load only that mode and the references it names.
 
 If the task is ordinary implementation, coding, editing, testing, or project work and does not require CCA context architecture, maintained-knowledge operations, compatibility validation, routing, or advisory judgment, do not enter `architect` or another CCA mode. Continue with the task using the workspace's existing authority and stop loading CCA references.
 
@@ -24,7 +25,7 @@ If the task is ordinary implementation, coding, editing, testing, or project wor
 
 Do not load every mode or reference. Progressive disclosure is part of the architecture.
 
-For workspace creation or material rebuild, Architect lazily loads `references/architect/workspace-builder.md`. For native ICM, that builder performs the inherited discovery, mapping, scaffolding, questionnaire, validation/repair, `setup`, and `status` behaviors while current upstream ICM remains the acceptance authority.
+For workspace creation or material rebuild, Architect lazily loads `references/architect/workspace-builder.md`. For native ICM (Interpretable Context Methodology), that builder performs the inherited discovery, mapping, scaffolding, questionnaire, validation/repair, `setup`, and `status` behaviors while current upstream ICM remains the acceptance authority.
 
 ## Shared authority
 
@@ -46,10 +47,10 @@ These files are inside the installable skill so runtime behavior never depends o
 
 Keep these domains separate:
 
-- `references/architect/` owns workspace forms, builder/onboarding behavior, boundaries, structural composition, and migration design.
-- `references/advisor/` owns engineering judgment and methodology priors. Its seven references remain independent and are never folded into architect references.
-- `references/operations/` owns focused operational procedures.
 - `references/core/` owns normative CCA semantics shared by all modes plus compatibility/provenance maps for inherited upstream behavior.
+- `references/advisor/` owns engineering judgment and methodology priors. Its seven references remain independent and are never folded into architect references.
+- `references/architect/` owns workspace forms, builder/onboarding behavior, boundaries, structural composition, and migration design.
+- `references/operations/` owns focused operational procedures.
 
 Architect mode may consult advisor references when a structural decision requires engineering/process judgment. That is lazy consultation, not ownership transfer or duplication.
 
@@ -69,4 +70,10 @@ Architect mode may consult advisor references when a structural decision require
 
 ## Core rule
 
-**Convergence over invention.** Preserve existing standards, frameworks, methodologies, protocols, and knowledge systems as distinct authorities. Make them interoperable through explicit semantics, scopes, mappings, routing, precedence, and compatibility boundaries. Automation is a means; augmenting human capability is the goal.
+Preserve existing standards, frameworks, methodologies, protocols, and knowledge systems as distinct authorities. Make them interoperable through explicit semantics, scopes, mappings, routing, precedence, and compatibility boundaries.
+
+Always advise; never enforce or assume. When a decision is left to you, first determine the user's intent, then choose the path most likely to produce the best possible outcome.
+
+Automation is the means; augmenting human capability is the goal.
+
+For for information, see [CITATION](CITATION.cff).

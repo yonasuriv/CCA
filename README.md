@@ -50,12 +50,12 @@ CCA builds on and interoperates with existing work rather than redefining it.
 
 ### Agent context and maintained knowledge
 
-- **ICM / Model Workspace Protocol** for filesystem structure as agent architecture, staged routing, handoffs, and progressive context loading.
 - **LLM Wiki** as a pattern for persistent, maintained knowledge that compounds across sessions.
+- **ICM / Model Workspace Protocol** for filesystem structure as agent architecture, staged routing, handoffs, and progressive context loading.
 
 ### Open standards and ecosystem conventions
 
-- **AGENTS.md** for portable, scoped agent guidance.
+- **Agent Entry-point / `AGENTS.md`** for portable, scoped agent guidance.
 - **Agent Skills / `SKILL.md`** for progressively disclosed reusable capabilities.
 - **MCP and other runtimes/adapters** as optional execution and tool interfaces.
 
@@ -70,6 +70,8 @@ CCA builds on and interoperates with existing work rather than redefining it.
 CCA can reason about methods such as Scrum, Kanban, XP, DevOps, TDD, Lean, SAFe, LeSS, Disciplined Agile, and others without turning them into CCA-owned filesystem schemas.
 
 Their semantics remain theirs.
+
+> See [References](#references).
 
 ## What CCA is
 
@@ -297,6 +299,10 @@ Read [Getting started](docs/getting-started.md), [FAQ](docs/faq.md), [Scenarios]
 
 See [Design principles](docs/design-principles.md).
 
+## References
+
+See [Citation](CITATION.cff) and [References](docs/references.md) for acknowledgements, inspirations, and citation metadata.
+
 ## Repository documentation
 
 - [Documentation index](docs/README.md)
@@ -307,19 +313,14 @@ See [Design principles](docs/design-principles.md).
 - [Compatibility details](docs/compatibility-details.md)
 - [Standards](docs/standards.md)
 - [Migration](docs/migration.md)
-- [References](docs/references.md)
 
 Non-normative publication forms are under [`examples/publications/`](examples/publications/).
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING](CONTRIBUTING.md).
 
 Compatibility and composition changes should cite the relevant primary authority and update the complete affected surface in the same change.
-
-## Citation
-
-Citation metadata is provided in [CITATION.cff](CITATION.cff).
 
 ## License
 

@@ -51,7 +51,7 @@ That means the **behavior** matches even when **names** differ (and even when th
 
 Outer organization is the user's method overlay; it is not part of the skeleton claim. ICM skeleton compatibility does not require PARA.
 
-**Is this native ICM?** Only if the full upstream pipeline profile is claimed and passes.  
+**Is this native ICM?** Only if the full upstream pipeline profile is claimed and passes.
 **Is this ICM-compatible?** Yes when the cold-agent behaviors above hold. CCA does not claim a better method — it keeps the same skeleton so agents do not invent structure.
 
 If a cold agent must know “this was built by CCA,” “this is PARA,” or “look for CONTEXT.md by string” to succeed, the workspace is **not** skeleton-complete.
