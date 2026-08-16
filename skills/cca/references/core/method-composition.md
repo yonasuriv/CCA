@@ -6,21 +6,31 @@ Normative companion to `SPEC.md` and `compatibility.md`.
 
 CCA may coexist with human knowledge-work methodologies and organizational systems without redefining them as CCA compatibility profiles.
 
-CCA currently recognizes **PARA**, **Zettelkasten**, and **Building a Second Brain (BASB/CODE)** as common method overlays. This list is descriptive rather than closed; another filesystem-compatible method may be composed under the same rules.
+CCA currently recognizes **PARA**, **Zettelkasten**, and **Building a Second Brain (BASB/CODE)** as common method overlays. This list is descriptive rather than closed; another filesystem-compatible method (Eisenhower matrix, GTD, custom domain shelves, team taxonomies, …) may be composed under the same rules.
 
 ## 2. Method overlays
 
 A **method overlay** is a methodology that influences organization, knowledge development, or human workflow without defining a CCA-native structural compatibility profile.
 
-CCA must not treat an overlay as equivalent to native ICM compatibility, native LLM Wiki compatibility, AGENTS.md conformance, or Agent Skills conformance unless that methodology publishes a concrete applicable machine-facing contract that CCA intentionally adopts in a future revision.
+CCA must not treat an overlay as equivalent to native ICM compatibility, ICM skeleton compatibility, native LLM Wiki compatibility, AGENTS.md conformance, or Agent Skills conformance unless that methodology publishes a concrete applicable machine-facing contract that CCA intentionally adopts in a future revision.
 
 Examples:
 
 - **PARA** may organize material into Projects, Areas, Resources, and Archives.
 - **Zettelkasten** may organize knowledge as addressable linked notes.
 - **BASB/CODE** may guide the lifecycle Capture → Organize → Distill → Express.
+- **Eisenhower / GTD / custom shelves** may organize by urgency, next-action, or domain.
 
-CCA may describe a workspace as PARA-organized, Zettelkasten-style, or BASB-guided, but those labels are not additional CCA compatibility states.
+CCA may describe a workspace as PARA-organized, Zettelkasten-style, BASB-guided, or otherwise overlay-shaped, but those labels are not additional CCA compatibility states.
+
+### Overlay + ICM skeleton
+
+Outer overlays answer *where things live*. The **ICM skeleton** (`spec.md` §2.1) answers *how a cold agent walks the workspace*. Architect must:
+
+1. prefer the user's named overlay when they have one;
+2. under deferred trust, choose a small default overlay (often PARA) without claiming it is mandatory;
+3. always apply ICM skeleton roles (entry, map, folder contracts, factory vs product, stamps, status) to the shelves that actually exist;
+4. never require agents to know the overlay's brand name to operate — contracts and the L0 map carry the walk.
 
 ## 3. Boundary composition
 

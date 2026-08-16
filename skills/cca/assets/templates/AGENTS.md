@@ -45,6 +45,7 @@ Cold agents MUST NOT assume contract filenames. Resolve each role from this tabl
 | L3 factory stamps | `_templates/` |
 | Status scan (no memory) | [e.g. `stages/*/output/` OR `Resources/knowledge/log.md` + wiki index] |
 | Form | [pipeline \| umbrella \| knowledge bundle \| record library \| context map \| system map \| hybrid] |
+| Outer method overlay | [PARA \| Zettelkasten \| Eisenhower \| GTD \| custom \| …] |
 | Native ICM pipeline | [yes \| no] |
 
-Rename any non-native default only by editing this table. Keep role semantics unchanged. Under native ICM, keep upstream filenames (`CLAUDE.md`, `CONTEXT.md`) and mirror them here.
+Rename any non-native default only by editing this table. Keep role semantics unchanged. Under native ICM, keep upstream filenames (`CLAUDE.md`, `CONTEXT.md`) and mirror them here. The outer method may change shelf names; skeleton roles do not.

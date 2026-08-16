@@ -37,7 +37,7 @@ CCA may add optional semantics where upstreams leave implementation open, but it
 
 A workspace created by CCA and a workspace created by an ICM-oriented builder should remain **walkable the same way** by a fresh agent that has **no skill, no prior chat, and no vendor docs** — only the files on disk.
 
-That means the **behavior** matches even when **names** differ:
+That means the **behavior** matches even when **names** differ (and even when the outer method overlay differs — PARA, Zettelkasten, Eisenhower, custom domains, …):
 
 | Behavior a cold agent must find | Typical ICM default | Allowed variation |
 |---|---|---|
@@ -49,10 +49,12 @@ That means the **behavior** matches even when **names** differ:
 | New unit of work starts from a stamp | `_templates/` copy | Live stamps in the workspace, not only inside installed skills |
 | Status without memory | scan stage `output/` or declared status surface | Declare what to scan when not a pipeline |
 
+Outer organization is the user's method overlay; it is not part of the skeleton claim. ICM skeleton compatibility does not require PARA.
+
 **Is this native ICM?** Only if the full upstream pipeline profile is claimed and passes.  
 **Is this ICM-compatible?** Yes when the cold-agent behaviors above hold. CCA does not claim a better method — it keeps the same skeleton so agents do not invent structure.
 
-If a cold agent must know “this was built by CCA” or “look for CONTEXT.md by string” to succeed, the workspace is **not** skeleton-complete.
+If a cold agent must know “this was built by CCA,” “this is PARA,” or “look for CONTEXT.md by string” to succeed, the workspace is **not** skeleton-complete.
 
 ## 3. Compatibility states
 

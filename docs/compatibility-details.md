@@ -14,6 +14,8 @@ A CCA-built hybrid or non-pipeline workspace may claim **ICM skeleton compatibil
 
 Cold-agent bar (`skills/cca/references/core/spec.md` §2.1): strip skills and chat. The workspace should still walk like an ICM skeleton — one small entry, a role→path map (or listed defaults), one folder contract per working folder (Purpose / Inputs / Process / Outputs / Human check), factory apart from product, live stamps, declared status scan. Default contract filename is `CONTEXT.md`; other names are fine **only** when declared in Layer 0 (`AGENTS.md` / native entry). Agents must not assume filenames.
 
+Outer organization is a **method overlay** (PARA, Zettelkasten, Eisenhower, GTD, custom domains, …): it adapts to the user. The ICM skeleton does not change when the overlay changes. PARA is a common deferred-trust default, not a requirement.
+
 That is structural/behavioral interoperability, not a claim that CCA improves on ICM.
 
 ### Does CCA conflict with ICM's workspace-builder?

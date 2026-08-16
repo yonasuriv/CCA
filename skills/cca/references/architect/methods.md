@@ -19,6 +19,20 @@ These methods are not interchangeable. Preserve the concern each one owns.
 
 An outer method may organize where a nested workspace lives, but it must not silently redefine the nested workspace's native semantics.
 
+### Two layers: outer method vs ICM skeleton
+
+Keep these concerns separate on every build:
+
+| Layer | Question | Adapts to the user? | Examples |
+|---|---|---|---|
+| **Outer organization** | Where does this kind of thing live? | **Yes** — use their method when they have one | PARA, Zettelkasten, Eisenhower matrix, GTD, BASB shelves, custom domains |
+| **ICM skeleton (walkability)** | How does a cold agent operate? | **No** — same roles every time | L0 entry + role map, L1 router, L2 folder contracts, factory vs product, live stamps, declared status |
+
+- Prefer the **user's named method** for outer shelves when they state one.
+- Under deferred trust ("I don't know / do what's best"), pick the **smallest clear split** that fits the intent (PARA is a common default, not a requirement).
+- Always apply the **ICM skeleton** to whatever shelves you create (`../core/spec.md` §2.1). Agents must not invent walk behavior; they may only customize names via the L0 map.
+- Do **not** mint a CCA lint profile for Eisenhower, GTD, or similar — they remain overlays.
+
 Example:
 
 ```text
@@ -105,7 +119,7 @@ Load this section when the request combines **coding/outcome work** with **notes
 
 ### Epistemic layers (do not conflate)
 
-These are different authorities even when nested under one PARA/Resources tree:
+These are different authorities even when nested under an outer method's shelves (PARA Resources, a custom "Research/" domain, an Eisenhower quadrant, etc.):
 
 | Layer | Role | Mutability | Default owner |
 |---|---|---|---|
@@ -113,30 +127,30 @@ These are different authorities even when nested under one PARA/Resources tree:
 | Sources / raw | Evidence from the world | **Write-once** after deposit | Capture process |
 | Notes / zettel | The human's own thinking | Mutable | Human (agents cite; rewrite only if asked) |
 | Wiki | Current maintained understanding | Mutable / rewritable | Human + agent |
-| Projects | Outcome-bound building | Project-local | Project / human |
+| Projects / outcomes | Outcome-bound building | Project-local | Project / human |
 
-Organizational shelves (PARA or similar) answer *where something lives*. Epistemic layers answer *what kind of knowledge it is*. Keep both; do not file personal notes as immutable evidence, and do not treat wiki synthesis as a source dump.
+**Organizational shelves** (whatever outer method) answer *where something lives*. **Epistemic layers** answer *what kind of knowledge it is*. Keep both; do not file personal notes as immutable evidence, and do not treat wiki synthesis as a source dump.
 
 ### Defaults when the user trusts you
 
-Use the smallest hybrid that preserves the layers above **and** remains cold-agent isomorphic with ICM (`../core/spec.md` §2.1): same walkable skeleton, optional different names via the L0 map.
+Use the smallest hybrid that preserves the epistemic layers above **and** remains cold-agent isomorphic with ICM (`../core/spec.md` §2.1): same walkable skeleton, optional different names via the L0 map.
 
-1. **Outer organization** — PARA (`Projects/`, `Areas/`, `Resources/`, `Archives/`) or an equally clear actionability split. Coding projects stay normal repositories; do not force wiki schema into project internals.
-2. **Nested knowledge bundle** — under Resources (or equivalent): `inbox/` (optional but preferred), immutable `raw/` (or `sources/raw/`), human `notes/` or `zettelkasten/`, growing `wiki/` with `index.md` + `log.md`.
-3. **Portable agent entry** — canonical `AGENTS.md`; harness files (`CLAUDE.md`, …) are one-line pointers, not second hand-maintained copies.
-4. **ICM skeleton map in L0** — always write the role→path table (defaults `CONTEXT.md` for L1/L2). Cold agents must not guess names.
-5. **One folder contract per working folder** — every working shelf and knowledge subfolder that an agent may operate in (`Projects/`, `Areas/`, `Archives/`, `Resources/`, `inbox/`, `raw/`, `notes/`, `wiki/`, …) gets a local contract file at the **mapped L2 name** (default `CONTEXT.md`). Copy shape from `assets/templates/folder-context.md`: Purpose, Inputs, Process, Outputs, Human check. Do **not** substitute a nested `AGENTS.md` for that contract unless the L0 map explicitly sets L2 = that nested `AGENTS.md` **and** that file contains the same sections.
+1. **Outer organization (adapts)** — If the user names a method (PARA, Zettelkasten-first, Eisenhower, GTD, custom domains), use **that** for shelves. If they defer, use PARA (`Projects/`, `Areas/`, `Resources/`, `Archives/`) or another equally clear actionability split — PARA is a convenience default, not a CCA requirement. Coding projects stay normal repositories; do not force wiki schema into project internals.
+2. **Nested knowledge bundle** — under the method's knowledge/resources home (or equivalent): `inbox/` (optional but preferred), immutable `raw/` (or `sources/raw/`), human `notes/` or `zettelkasten/`, growing `wiki/` with `index.md` + `log.md`.
+3. **Portable agent entry** — canonical `AGENTS.md`; harness files (`CLAUDE.md`, …) are one-line pointers, not second hand-maintained copies. Record the outer method name in the skeleton map / directory map so cold agents know the shelf logic without assuming PARA.
+4. **ICM skeleton map in L0** — always write the role→path table (defaults `CONTEXT.md` for L1/L2). Cold agents must not guess names. Skeleton roles do **not** change when the outer method changes.
+5. **One folder contract per working folder** — every working shelf and knowledge subfolder that an agent may operate in gets a local contract file at the **mapped L2 name** (default `CONTEXT.md`). Copy shape from `assets/templates/folder-context.md`: Purpose, Inputs, Process, Outputs, Human check. Do **not** substitute a nested `AGENTS.md` for that contract unless the L0 map explicitly sets L2 = that nested `AGENTS.md` **and** that file contains the same sections.
 6. **Root L1 router** — one workspace router (default `CONTEXT.md`) that only routes tasks to folders/procedures; no payload.
 7. **Repeating knowledge jobs** — capture / deposit / weave / query are either covered by the folder contracts of the folders that own them, or by short procedure contracts the L1 router points at — always with exact paths and Human check. Numbered `01_` stages are optional (YAGNI); missing contracts are not.
-8. **Factory vs product** — live stamps under the mapped L3 path (at least `Resources/knowledge/_templates/` plus stubs for new Project/Area if those shelves exist). Product = wiki/notes/project trees / run outputs. Skills are not the only stamp home.
-9. **Status without memory** — root router (or L0) declares how a cold agent answers “what’s the state?” (e.g. scan `Resources/knowledge/log.md` + wiki index + whether inbox is empty). Do not leave status as “only pipeline `output/`” when there is no pipeline.
+8. **Factory vs product** — live stamps under the mapped L3 path (knowledge `_templates/` plus stubs for new units the outer method creates). Product = wiki/notes/project trees / run outputs. Skills are not the only stamp home.
+9. **Status without memory** — root router (or L0) declares how a cold agent answers “what’s the state?” Do not leave status as “only pipeline `output/`” when there is no pipeline.
 10. **Immutability is operational, not slogan** — never rewrite deposited raw files; correct via **supersession**. For CCA-hardened bundles, install checkable integrity (`bin/capture`, `bin/verify` or equivalent).
 11. **Seed a worked example** — one real source → wiki citation (+ note if notes were requested) + log line.
 12. **Self-describing** — daily use works from workspace files alone; no mandatory external skill names.
 13. **YAGNI** — no numeric ID factories, multi-stage ingest pipelines, or vector DBs until repeated use proves the need.
 14. **Human day-to-day guide** — `README.md` when the user will continue in a new session.
 
-Path names are not normative. Cold-agent behaviors (entry, map, per-folder contracts, factory vs product, stamps, declared status) are.
+Outer path names follow the user's method. Cold-agent behaviors (entry, map, per-folder contracts, factory vs product, stamps, declared status) are normative.
 
 ### Rejected collapses
 
@@ -148,17 +162,20 @@ Path names are not normative. Cold-agent behaviors (entry, map, per-folder contr
 - Shelf `AGENTS.md` / README **without** a mapped L2 folder contract (cold agent cannot find Inputs / Process / Outputs / Human check)
 - Templates only inside installed skills, not live in the workspace
 - Calling the hybrid ICM-skeleton-compatible when a cold agent must guess filenames or invent missing contracts
+- Forcing PARA (or any single overlay) when the user named a different outer method
+- Treating Eisenhower / GTD / custom domains as CCA native lint profiles
 
 ## Architecture questions to resolve
 
 When these methods appear together, determine:
 
-1. What is the outer organizational boundary?
+1. What is the outer organizational boundary (user-named method, or deferred-trust default)?
 2. Which nested directories claim native compatibility with an upstream convention?
 3. Which material is source/reference versus agent-maintained synthesis?
-4. Which workflows are sequential enough to benefit from ICM or ICM-derived stages?
+4. Which workflows are sequential enough to benefit from ICM or ICM-derived stages (and thus may need setup/questionnaire)?
 5. Which methods are merely human organizational overlays and therefore should not become lint profiles?
 6. What is the smallest routing layer needed for a fresh agent to understand the relationships?
+7. Is the ICM skeleton (map, folder contracts, factory, status) applied to the actual shelves, not only to a PARA-shaped example?
 
 ## Skill coordination
 

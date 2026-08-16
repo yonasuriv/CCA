@@ -179,7 +179,7 @@ The builder may also construct ordinary code-context workspaces, PARA/PKM arrang
 - do not copy ICM-native trigger/naming/size rules into a non-ICM workspace unless the target deliberately adopts them;
 - preserve nested native boundaries rather than flattening them into one CCA schema.
 
-When discovery shows a **personal hybrid** (coding projects + notes/research/second brain + immutable sources vs growing wiki), load the Personal hybrid section in `methods.md` and satisfy its defaults before calling the workspace ready—especially under deferred trust.
+When discovery shows a **personal hybrid** (coding projects + notes/research/second brain + immutable sources vs growing wiki), load the Personal hybrid section in `methods.md` and satisfy its defaults before calling the workspace ready—especially under deferred trust. Prefer the user's named outer method; apply ICM skeleton roles to those shelves. Do not force PARA when another overlay was requested.
 
 ### Fresh personal-hybrid acceptance (non-ICM)
 

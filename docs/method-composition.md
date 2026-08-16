@@ -15,7 +15,9 @@ CCA does not flatten these systems into one taxonomy. They solve different probl
 | **Agent Skills** | portable capabilities | package focused operational procedures with progressive disclosure |
 | **CCA** | interoperability and composition | preserve those boundaries and let agents route across them without forcing one universal tree |
 
-BASB, PARA, and Zettelkasten are **method overlays** in CCA terminology. They are not structural compatibility profiles equivalent to native ICM compatibility. CCA does not claim a universal filesystem acceptance test for them.
+BASB, PARA, and Zettelkasten are **method overlays** in CCA terminology. They are not structural compatibility profiles equivalent to native ICM compatibility or ICM skeleton compatibility. The overlay list is open: Eisenhower, GTD, custom domain shelves, and similar filesystem-compatible methods use the same rules. CCA does not claim a universal filesystem acceptance test for them.
+
+**Two layers:** the outer overlay adapts to the user (where things live); the **ICM skeleton** stays stable (how a cold agent walks: entry, map, folder contracts, factory vs product, stamps, status). Prefer the user's named method; under deferred trust, PARA is a convenience default, not a requirement.
 
 ## How the methods relate
 
@@ -144,7 +146,7 @@ CCA keeps its compatibility vocabulary narrow:
 - **CCA-conformant** — the workspace intentionally adopts CCA requirements.
 - **ICM-derived** — selected ICM patterns are used without claiming full native ICM compatibility.
 
-PARA, Zettelkasten, and BASB do not create additional native compatibility states. A workspace may instead be described informally as **PARA-organized**, **Zettelkasten-style**, or **BASB-guided** when that is useful.
+PARA, Zettelkasten, and BASB do not create additional native compatibility states. A workspace may instead be described informally as **PARA-organized**, **Zettelkasten-style**, **BASB-guided**, **Eisenhower-organized**, or similarly when that is useful. ICM skeleton compatibility is separate: same walkable roles regardless of which overlay named the shelves.
 
 ## Skill routing
 

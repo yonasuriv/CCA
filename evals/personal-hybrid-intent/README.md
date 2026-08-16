@@ -24,6 +24,6 @@ python3 -m unittest evals/personal-hybrid-intent.tests.test_score_intent -v
 
 Path-flexible intent properties derived from the human prompts (projects, notes, immutable sources, growing wiki, agent navigation, README day-to-day), plus consequences of those claims (supersession or checkable integrity, seeded source→wiki chain, capture affordance, self-describing operation).
 
-Also scores **ICM skeleton / cold-agent isomorphism** (path-flexible): L0 skeleton map, folder contracts with Inputs / Process / Outputs / Human check, live factory stamps, declared status-without-memory scan. This does **not** require a native ICM pipeline.
+Also scores **ICM skeleton / cold-agent isomorphism** (path-flexible): L0 skeleton map, folder contracts with Inputs / Process / Outputs / Human check, live factory stamps, declared status-without-memory scan. This does **not** require a native ICM pipeline or PARA shelf names — outer organization may be any overlay.
 
 The skill must **not** contain the human prompt text. Resolution must come from architect/methods personal-hybrid guidance.

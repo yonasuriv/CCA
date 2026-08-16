@@ -12,7 +12,9 @@ Its goal is to make automation easier in service of augmenting human capabilitie
 
 CCA does not ask every project to become a new kind of project.
 
-A code repository can remain a code repository. A PARA second brain can remain PARA. A Zettelkasten can remain a Zettelkasten. A native ICM workspace can remain ICM. Scrum can remain the team's delivery framework. Git can remain source/history authority. An LLM Wiki can remain the maintained-knowledge layer.
+A code repository can remain a code repository. A PARA second brain can remain PARA. A Zettelkasten can remain a Zettelkasten. An Eisenhower or GTD layout can remain that layout. A native ICM workspace can remain ICM. Scrum can remain the team's delivery framework. Git can remain source/history authority. An LLM Wiki can remain the maintained-knowledge layer.
+
+When CCA builds or hardens a hybrid, **outer organization adapts to the user's method**; the **ICM skeleton** (entry, map, folder contracts, factory vs product, stamps, status) stays walkable for cold agents. PARA is a common deferred-trust default, not a required tree.
 
 CCA adds only the compatibility, routing, and context semantics needed so humans and agents can determine:
 
