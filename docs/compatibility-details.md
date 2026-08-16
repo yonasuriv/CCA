@@ -55,7 +55,7 @@ PARA, Zettelkasten, and BASB are **method overlays**, not CCA native compatibili
 
 For example, an outer PARA workspace can contain an ordinary coding repository, a native ICM client workflow, Zettelkasten notes, and an LLM Wiki. If one nested directory is a native ICM root, an ICM-only consumer must still be able to open that directory and operate it as ICM.
 
-Read [method composition doc`](method-composition.md) for the full model and [method composition spec](../spec/method-composition.md) for the normative rules.
+Read [method composition doc`](method-composition.md) for the full model and [method composition spec](../skills/cca/references/core/method-composition.md) for the normative rules.
 
 ## Choose the smallest workspace form
 

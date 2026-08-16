@@ -1,0 +1,21 @@
+{
+  "assertions": [
+    {
+      "type": "sha256_equals",
+      "path": "src/service.py",
+      "sha256": "859cb6b0c69f0e06bb5ae054c70fb7148c1955b918465157dbc4882c71830125"
+    },
+    {
+      "type": "path_exists",
+      "path": "backlog.md"
+    },
+    {
+      "type": "path_absent",
+      "path": "Scrum"
+    },
+    {
+      "type": "path_absent",
+      "path": "stages"
+    }
+  ]
+}

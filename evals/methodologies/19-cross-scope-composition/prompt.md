@@ -1,0 +1,1 @@
+Advise whether these approaches can coexist. Write decision.md with Scope, Recommendation, Preserve, and Avoid. Preserve their distinct scopes rather than naming the combination as a new CCA methodology.

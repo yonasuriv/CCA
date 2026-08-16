@@ -1,0 +1,9 @@
+{
+  "id": "01",
+  "name": "Native ICM repair",
+  "baseline": "icm",
+  "profiles": [
+    "native-icm"
+  ],
+  "expected_behavior": "Repair native contract drift while preserving native Layer-0 authority."
+}

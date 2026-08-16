@@ -1,0 +1,20 @@
+{
+  "assertions": [
+    {
+      "type": "path_exists",
+      "path": "Projects/client/assessment/CLAUDE.md"
+    },
+    {
+      "type": "path_exists",
+      "path": "Projects/client/code/src/app.py"
+    },
+    {
+      "type": "path_exists",
+      "path": "Resources/wiki/index.md"
+    },
+    {
+      "type": "path_absent",
+      "path": "Projects/client/code/stages"
+    }
+  ]
+}

@@ -5,12 +5,12 @@
 | Field | Value |
 | --- | --- |
 | **Document type** | Whitepaper (non-normative) |
-| **Version** | DRAFT — 0.1 |
-| **Status** | Working draft |
-| **Date** | *(fill in)* |
-| **Authors** | *(fill in)* |
-| **Normative counterpart** | `spec/` |
-| **License** | *(fill in)* |
+| **Version** | Draft 0.1 |
+| **Status** | Working draft; non-normative |
+| **Date** | 2026-08-15 |
+| **Authors** | Jonathan Di Rico |
+| **Normative counterpart** | `skills/cca/references/core/` |
+| **License** | MIT |
 
 ## Abstract
 
@@ -33,7 +33,7 @@ The core contribution is a three-state compatibility model — *native-compatibl
 7. [Context Routing](#7-context-routing)
 8. [Compatibility Profiles](#8-compatibility-profiles)
 9. [Selecting a Workspace Form](#9-selecting-a-workspace-form)
-10. [Reference Implementation: The CCA Skill Suite](#10-reference-implementation-the-cca-skill-suite)
+10. [Reference Implementation: One CCA Skill, Seven Modes](#10-reference-implementation-one-cca-skill-seven-modes)
 11. [Validation Model](#11-validation-model)
 12. [Rationale: Why Plain Files](#12-rationale-why-plain-files)
 13. [Limitations and Boundaries](#13-limitations-and-boundaries)
@@ -49,7 +49,7 @@ The core contribution is a three-state compatibility model — *native-compatibl
 
 ### 1.1 Document status and normative scope
 
-This whitepaper is **non-normative**. It presents the motivation, architecture, and rationale behind CCA. Normative requirements — the rules an implementation must satisfy to claim conformance — live in the `spec/` directory, principally `spec/method-composition.md`.
+This whitepaper is **non-normative**. It presents the motivation, architecture, and rationale behind CCA. Normative requirements — the rules an implementation must satisfy to claim conformance — ship inside the installable skill under `skills/cca/references/core/`, principally `spec.md`, `compatibility.md`, and `method-composition.md`.
 
 Where this document and the normative specification disagree, the specification governs. Where the specification and a current upstream convention disagree, **the upstream convention governs and CCA is expected to change toward it.** This precedence order is itself a design commitment, discussed in §4.
 
@@ -167,7 +167,7 @@ CCA **is**:
 
 - a compatibility and composition layer for filesystem-native agent context;
 - a set of shared semantics for routing, durable knowledge, handoffs, authority boundaries, and portability;
-- a focused Agent Skills suite for designing, scaffolding, maintaining, querying, and validating workspaces;
+- one focused Agent Skill with progressively disclosed modes for architecture, maintenance, validation, and engineering judgment;
 - a way to add cross-agent guidance without destroying native tool behavior;
 - a framework for deciding when to preserve, harden, intentionally conform, or simply compose existing methods.
 
@@ -356,7 +356,7 @@ An outer PARA workspace may contain an ordinary coding repository, a native ICM 
 
 This is the operational test for whether composition succeeded.
 
-*Full model: [`docs/method-composition.md`](docs/method-composition.md). Normative rules: [`spec/method-composition.md`](spec/method-composition.md).*
+*Full explanatory model: `docs/method-composition.md`. Normative runtime rules: `skills/cca/references/core/method-composition.md`.*
 
 ## 9. Selecting a Workspace Form
 
@@ -377,12 +377,12 @@ CCA ships six focused Agent Skills as a single capability suite. No runtime inst
 
 | Skill | Purpose |
 | --- | --- |
-| [`cca-architect`](skills/cca-architect/) | Design and restructure compound workspaces, choose forms, preserve boundaries, coordinate focused CCA operations |
-| [`cca-scaffold`](skills/cca-scaffold/) | Add the smallest useful routing and context layer without restructuring existing content |
-| [`cca-sync`](skills/cca-sync/) | Reconcile routing and navigation with disk while preserving scope and native semantics |
-| [`cca-ingest`](skills/cca-ingest/) | Integrate new evidence into maintained knowledge using the workspace's own schema |
-| [`cca-query`](skills/cca-query/) | Query maintained synthesis and verify against source evidence as needed |
-| [`cca-lint`](skills/cca-lint/) | Validate the correct native or conformance profile; separate hard failures, method-preservation findings, and optional hardening |
+| [`cca-architect`](skills/cca/references/architect/) | Design and restructure compound workspaces, choose forms, preserve boundaries, coordinate focused CCA operations |
+| [`cca-scaffold`](skills/cca/references/operations/scaffold.md) | Add the smallest useful routing and context layer without restructuring existing content |
+| [`cca-sync`](skills/cca/references/operations/sync.md) | Reconcile routing and navigation with disk while preserving scope and native semantics |
+| [`cca-ingest`](skills/cca/references/operations/ingest.md) | Integrate new evidence into maintained knowledge using the workspace's own schema |
+| [`cca-query`](skills/cca/references/operations/query.md) | Query maintained synthesis and verify against source evidence as needed |
+| [`cca-lint`](skills/cca/references/operations/lint.md) | Validate the correct native or conformance profile; separate hard failures, method-preservation findings, and optional hardening |
 
 **Figure 4 — Capability grouping.**
 
@@ -574,7 +574,7 @@ The measure of success is negative rather than positive. A CCA workspace should 
 
 ### Internal references
 
-- [`spec/method-composition.md`](spec/method-composition.md) — normative composition rules
+- [`skills/cca/references/core/method-composition.md`](skills/cca/references/core/method-composition.md) — normative composition rules
 - [`docs/method-composition.md`](docs/method-composition.md) — full composition model
 - [`docs/getting-started.md`](docs/getting-started.md) — adoption paths
 - [`docs/standards.md`](docs/standards.md) — profile details

@@ -1,0 +1,13 @@
+{
+  "id": "12",
+  "name": "Hybrid nested authorities",
+  "baseline": "icm",
+  "profiles": [
+    "para",
+    "native-icm",
+    "ordinary-project",
+    "llm-wiki",
+    "hybrid"
+  ],
+  "expected_behavior": "Route across nested authorities while leaving each independently interpretable."
+}

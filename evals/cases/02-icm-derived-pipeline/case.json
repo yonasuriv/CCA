@@ -1,0 +1,10 @@
+{
+  "id": "02",
+  "name": "ICM-derived pipeline repair",
+  "baseline": "icm",
+  "profiles": [
+    "icm-derived",
+    "ordinary-project"
+  ],
+  "expected_behavior": "Repair borrowed stage mechanics without promoting the host project to native ICM."
+}

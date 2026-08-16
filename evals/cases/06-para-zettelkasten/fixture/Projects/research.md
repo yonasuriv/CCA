@@ -1,0 +1,1 @@
+Outcome: publish note.

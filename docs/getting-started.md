@@ -2,7 +2,7 @@
 
 CCA is a filesystem-native interoperability layer for agent context. You do not install a runtime to use it. Start from the workspace you already have, then add only the structure that improves routing or portability.
 
-CCA's first-party Agent Skills are intended as a **suite of focused capabilities**. `cca-architect` handles compound workspace-design questions; direct lint, ingest, query, sync, or scaffold requests can route straight to their focused skill.
+CCA's first-party Agent Skills are intended as a **suite of focused capabilities**. `cca` in `architect` mode handles compound workspace-design questions; direct lint, ingest, query, sync, or scaffold requests can route straight to their focused skill.
 
 ## Choose your starting point
 
@@ -18,12 +18,12 @@ flowchart TD
     B --> F["Validate full native ICM profile"]
     C --> G["Validate native wiki behavior"]
     P --> I["Use cca-architect for composition changes"]
-    D --> H["Use cca-scaffold"]
+    D --> H["Use `scaffold` mode"]
     E --> I
 
     F --> J["Optionally add CCA hardening"]
     G --> J
-    H --> K["Use cca-lint for adopted profiles"]
+    H --> K["Use `lint` mode for adopted profiles"]
     I --> K
     K --> J
 ```
@@ -101,11 +101,11 @@ workspace/
 
 The key rule is **nest boundaries; do not merge schemas merely because they coexist**. If `assessment/` is a native ICM root, validate and operate that directory as ICM even though PARA determines where it lives.
 
-Use `cca-architect` when you want to design/restructure this composition. Read [`method-composition.md`](method-composition.md) for the full model.
+Use `cca` in `architect` mode when you want to design/restructure this composition. Read [`method-composition.md`](method-composition.md) for the full model.
 
 ## 4. Existing coding project
 
-Use `cca-scaffold` in quick mode. It should add context routing without reorganizing application code.
+Use `cca` in `scaffold` mode in quick mode. It should add context routing without reorganizing application code.
 
 A minimal result may be:
 
@@ -126,7 +126,7 @@ If you add numbered ICM-style stages to a coding repository but do not implement
 
 ## 5. New workspace
 
-Use `cca-architect` and start from the work, not from a preferred folder tree.
+Use `cca` in `architect` mode and start from the work, not from a preferred folder tree.
 
 Choose the smallest form that fits:
 
@@ -159,7 +159,7 @@ flowchart TD
     A -. "semantic delegation" .-> L
 ```
 
-Cross-skill coordination is by semantic skill name, never by reaching into sibling skill directories. Package portability means implementation references stay inside each skill package; the six CCA capabilities are intended to be distributed as a suite.
+Cross-skill coordination is by semantic skill name, never by reaching into sibling skill directories. Package portability means implementation references stay inside each skill package; the seven CCA modes are intended to be distributed as a suite.
 
 ## How CCA routes context
 
@@ -182,7 +182,7 @@ flowchart LR
 
 ## Validate before calling it done
 
-Run `cca-lint` with the correct profile:
+Run `cca` in `lint` mode with the correct profile:
 
 - **ICM native compatibility**: verify the complete applicable current ICM profile and workspace-builder-equivalent acceptance surface.
 - **ICM-derived patterns**: verify the borrowed stage/routing patterns without pretending the host repository is a full native ICM workspace.
@@ -211,10 +211,19 @@ CCA is less useful when the problem is primarily real-time message passing, high
 ## Next reading
 
 - [`../README.md`](../README.md) — project overview, mental model, and compatibility model.
-- [`../spec/SPEC.md`](../spec/SPEC.md) — normative CCA specification.
-- [`../spec/compatibility.md`](../spec/compatibility.md) — compatibility boundaries.
-- [`../spec/method-composition.md`](../spec/method-composition.md) — normative method-overlay and skill-suite rules.
+- [`../skills/cca/references/core/spec.md`](../skills/cca/references/core/spec.md) — normative CCA specification.
+- [`../skills/cca/references/core/compatibility.md`](../skills/cca/references/core/compatibility.md) — compatibility boundaries.
+- [`../skills/cca/references/core/method-composition.md`](../skills/cca/references/core/method-composition.md) — normative method-overlay and skill-suite rules.
 - [`method-composition.md`](method-composition.md) — explanatory composition model and examples.
 - [`migration.md`](migration.md) — optional hardening/migration paths.
 - [`faq.md`](faq.md) — common usage questions.
 - [`standards.md`](standards.md) — upstream conventions CCA tracks.
+
+
+## One skill, seven modes
+
+Install `skills/cca/`. The package is self-contained: its normative CCA semantics,
+compatibility rules, architect references, advisor corpus, operation procedures,
+templates, and validation material live inside the skill. Modes are selected
+lazily so a lint request does not load architecture or advisor material, and an
+advice request does not load workspace templates.

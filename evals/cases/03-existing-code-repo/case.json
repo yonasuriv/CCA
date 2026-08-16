@@ -1,0 +1,9 @@
+{
+  "id": "03",
+  "name": "Existing healthy code repository",
+  "baseline": "none",
+  "profiles": [
+    "ordinary-project"
+  ],
+  "expected_behavior": "Preserve healthy code structure; add only routing that solves a demonstrated need."
+}

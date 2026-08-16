@@ -1,0 +1,17 @@
+{
+  "assertions": [
+    {
+      "type": "sha256_equals",
+      "path": "KNOWLEDGE/index.md",
+      "sha256": "42d6157e68cecea371331ddc9836f3afcb8cce9594e95cb6f8760f9677266c4f"
+    },
+    {
+      "type": "path_exists",
+      "path": "SOURCES/source-a.md"
+    },
+    {
+      "type": "path_absent",
+      "path": "raw"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "assertions": [
+    {
+      "type": "path_exists",
+      "path": "decision.md"
+    },
+    {
+      "type": "file_contains",
+      "path": "decision.md",
+      "text": "Scope:"
+    },
+    {
+      "type": "file_contains",
+      "path": "decision.md",
+      "text": "Recommendation:"
+    },
+    {
+      "type": "file_contains",
+      "path": "decision.md",
+      "text": "Preserve:"
+    },
+    {
+      "type": "file_contains",
+      "path": "decision.md",
+      "text": "Avoid:"
+    },
+    {
+      "type": "file_contains",
+      "path": "decision.md",
+      "text": "feature"
+    },
+    {
+      "type": "file_contains",
+      "path": "decision.md",
+      "text": "domain"
+    },
+    {
+      "type": "path_absent",
+      "path": "features/"
+    }
+  ]
+}

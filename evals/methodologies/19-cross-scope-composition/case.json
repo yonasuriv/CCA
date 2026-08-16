@@ -1,0 +1,10 @@
+{
+  "id": "19",
+  "name": "Cross-scope composition",
+  "baseline": "none",
+  "profiles": [
+    "advisor",
+    "methodology"
+  ],
+  "expected_behavior": "Use the relevant method at its own scope, preserve independent authorities, and avoid unnecessary structural implementation of process guidance."
+}

@@ -1,0 +1,31 @@
+{
+  "assertions": [
+    {
+      "type": "sha256_equals",
+      "path": "AGENTS.md",
+      "sha256": "68035ebfb1b94c0f6d5c2a6444a62cc8c933909e246f96eeae559681286744aa"
+    },
+    {
+      "type": "sha256_equals",
+      "path": "src/app.py",
+      "sha256": "c24989485daa9c8a30ae1f674a415ccd43fb9163013023a7ae2dfcdd5548dd9a"
+    },
+    {
+      "type": "path_absent",
+      "path": "CONTEXT.md"
+    },
+    {
+      "type": "path_absent",
+      "path": "stages"
+    },
+    {
+      "type": "path_absent",
+      "path": "wiki"
+    },
+    {
+      "type": "glob_count",
+      "pattern": "*",
+      "count": 3
+    }
+  ]
+}

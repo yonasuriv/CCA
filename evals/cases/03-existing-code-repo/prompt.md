@@ -1,0 +1,1 @@
+Make this repository easier for agents to work in without restructuring application code. If its current structure is already sufficient, prefer a no-op or minimal portable guidance over new methodology folders.

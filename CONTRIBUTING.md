@@ -80,9 +80,9 @@ In particular:
 - keep `SKILL.md` compact and progressively disclose detailed material through skill-local resources;
 - implementation file references must stay inside the skill package;
 - never reach into a sibling skill directory or repository-global implementation file by relative path;
-- cross-skill coordination may use semantic skill names such as `Use cca-lint`;
+- cross-skill coordination may use semantic skill names such as `Use `lint` mode`;
 - do not collapse focused operations into one monolithic skill merely to centralize routing;
-- `cca-architect` may coordinate compound architecture flows but is not a mandatory gateway for direct lint/ingest/query/sync/scaffold requests.
+- `cca` in `architect` mode may coordinate compound architecture flows but is not a mandatory gateway for direct lint/ingest/query/sync/scaffold requests.
 
 ## Validation
 

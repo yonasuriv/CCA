@@ -168,9 +168,9 @@ flowchart TD
     A -. "semantic delegation when needed" .-> L
 ```
 
-`cca-architect` is the primary entry point for compound architecture questions such as "combine PARA, Zettelkasten, LLM Wiki, and an ICM client workflow." It is **not** a mandatory gateway for direct operations. A request to lint should route directly to `cca-lint`; an ingest request should route directly to `cca-ingest`.
+`cca` in `architect` mode is the primary entry point for compound architecture questions such as "combine PARA, Zettelkasten, LLM Wiki, and an ICM client workflow." It is **not** a mandatory gateway for direct operations. A request to lint should route directly to `cca` in `lint` mode; an ingest request should route directly to `cca` in `ingest` mode.
 
-Cross-skill coordination is semantic, for example `Use cca-lint to validate the selected profile.` A skill must not reach into `../cca-lint/` or another sibling's implementation files.
+Cross-skill coordination is semantic, for example `Use `lint` mode to validate the selected profile.` A skill must not reach into `../cca-lint/` or another sibling's implementation files.
 
 ## Metadata discipline
 

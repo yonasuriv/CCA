@@ -1,0 +1,20 @@
+{
+  "assertions": [
+    {
+      "type": "path_exists",
+      "path": "knowledge/KNOWLEDGE/index.md"
+    },
+    {
+      "type": "path_exists",
+      "path": "workflow/CLAUDE.md"
+    },
+    {
+      "type": "path_exists",
+      "path": "workflow/stages/01-use-knowledge/CONTEXT.md"
+    },
+    {
+      "type": "path_absent",
+      "path": "knowledge/stages"
+    }
+  ]
+}

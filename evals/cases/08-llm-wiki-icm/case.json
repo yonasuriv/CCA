@@ -1,0 +1,11 @@
+{
+  "id": "08",
+  "name": "LLM Wiki plus native ICM",
+  "baseline": "icm",
+  "profiles": [
+    "llm-wiki",
+    "native-icm",
+    "hybrid"
+  ],
+  "expected_behavior": "Keep synthesis and staged workflow as distinct nested authorities with explicit routing between them."
+}

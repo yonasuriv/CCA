@@ -1,0 +1,18 @@
+{
+  "assertions": [
+    {
+      "type": "file_contains",
+      "path": "map/workflows/intake.md",
+      "text": "frequency"
+    },
+    {
+      "type": "file_contains",
+      "path": "map/workflows/intake.md",
+      "text": "observations.md"
+    },
+    {
+      "type": "path_absent",
+      "path": "map/effects"
+    }
+  ]
+}

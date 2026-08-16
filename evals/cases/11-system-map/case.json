@@ -1,0 +1,9 @@
+{
+  "id": "11",
+  "name": "System Map",
+  "baseline": "icm-architect",
+  "profiles": [
+    "system-map"
+  ],
+  "expected_behavior": "Build a source-backed change-impact map for a mutable code tree without duplicating source."
+}

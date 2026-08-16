@@ -1,0 +1,10 @@
+{
+  "id": "06",
+  "name": "PARA plus Zettelkasten",
+  "baseline": "none",
+  "profiles": [
+    "para",
+    "zettelkasten"
+  ],
+  "expected_behavior": "Preserve outer actionability and inner linked-note/write-authority semantics."
+}
