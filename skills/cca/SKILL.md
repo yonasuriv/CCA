@@ -1,12 +1,14 @@
 ---
 name: cca
-description: Agent-agnostic context architecture and engineering judgment for filesystem-native work. Use to design or restructure workspaces, build/setup native or hybrid workspaces, scaffold portable routing, synchronize navigation, ingest or query maintained knowledge, validate CCA/ICM/LLM-Wiki compatibility, or advise on engineering and methodology trade-offs. Supports existing code repositories, second brains/PKM, ICM, LLM Wiki, PARA, Zettelkasten, BASB/CODE, delivery methods, and hybrid workspaces without replacing their native authorities.
+description: Agent-agnostic interoperability and context architecture for filesystem-native work. Use to design or restructure context systems, create/setup native or hybrid workspaces, scaffold portable routing, synchronize navigation, ingest or query maintained knowledge, validate CCA/ICM/LLM-Wiki compatibility, or advise on engineering and methodology trade-offs. Supports existing code repositories, human knowledge systems, ICM, LLM Wiki, PARA, Zettelkasten, BASB/CODE, delivery methods, and hybrid workspaces without replacing their native authorities. Do not use for ordinary implementation, coding, editing, or project work when no CCA context, knowledge, compatibility, routing, or advisory operation is needed.
 compatibility: Filesystem read/write access for mutating modes. No vendor-specific runtime required.
 ---
 
 # CCA
 
 CCA is one installable skill with seven lazily loaded modes. Select the smallest mode that directly matches the request, then load only that mode and the references it names.
+
+If the task is ordinary implementation, coding, editing, testing, or project work and does not require CCA context architecture, maintained-knowledge operations, compatibility validation, routing, or advisory judgment, do not enter `architect` or another CCA mode. Continue with the task using the workspace's existing authority and stop loading CCA references.
 
 ## Modes
 
@@ -26,7 +28,7 @@ For workspace creation or material rebuild, Architect lazily loads `references/a
 
 ## Shared authority
 
-Before making a claim about CCA semantics, compatibility, or composition, use the skill-local canonical material under `references/core/`:
+Before making a claim about CCA semantics, compatibility, or composition, use only the skill-local canonical material needed for that claim under `references/core/`:
 
 - `spec.md` — normative CCA semantics and operation model;
 - `compatibility.md` — upstream profiles and preservation rules;
@@ -34,9 +36,11 @@ Before making a claim about CCA semantics, compatibility, or composition, use th
 - `adapters.md` — harness-specific interoperability guidance;
 - `icm-inheritance.md` — provenance map for preserving the current applicable ICM capability floor without redefining ICM.
 
+Do not preload the whole core set. Load a core reference when the current operation actually depends on its authority.
+
 For native ICM work, `icm-inheritance.md` is a compatibility map only. The current upstream ICM authority and acceptance surface still win if CCA documentation drifts.
 
-These files are inside the installable skill so runtime behavior never depends on repository-global `spec/` files that may not exist after installation.
+These files are inside the installable skill so runtime behavior never depends on repository-global specification files that may not exist after installation.
 
 ## Domain boundaries
 
@@ -65,4 +69,4 @@ Architect mode may consult advisor references when a structural decision require
 
 ## Core rule
 
-**Convergence over invention.** Preserve existing standards, frameworks, methodologies, and knowledge systems as distinct authorities. Make them interoperable through explicit semantics, scopes, mappings, routing, precedence, and compatibility boundaries. Automation is a means; augmenting human capability is the goal.
+**Convergence over invention.** Preserve existing standards, frameworks, methodologies, protocols, and knowledge systems as distinct authorities. Make them interoperable through explicit semantics, scopes, mappings, routing, precedence, and compatibility boundaries. Automation is a means; augmenting human capability is the goal.
