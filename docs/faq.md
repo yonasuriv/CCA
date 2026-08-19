@@ -29,7 +29,9 @@ See [`method-composition.md`](method-composition.md).
 
 No. CCA treats them as **method overlays**.
 
-They can influence organization, knowledge development, and human workflow, but CCA does not invent a universal native conformance test for them. A workspace may be described as PARA-organized, Zettelkasten-style, or BASB-guided while its nested ICM/LLM Wiki/coding boundaries retain their own semantics.
+They can influence organization, knowledge development, and human workflow, but CCA does not invent a universal native conformance test for them. A workspace may be described as PARA-organized, Zettelkasten-style, BASB-guided, Eisenhower-organized, or similarly while its nested ICM/LLM Wiki/coding boundaries retain their own semantics. The overlay list is open.
+
+**Outer method vs ICM skeleton:** shelves adapt to the user's method; cold-agent walkability (entry, map, folder contracts, factory, stamps, status) stays ICM-skeleton-shaped. Prefer the user's named method; PARA is only a deferred-trust default.
 
 ## Can I use PARA with CCA?
 

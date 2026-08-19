@@ -12,7 +12,9 @@ Its goal is to make automation easier in service of augmenting human capabilitie
 
 CCA does not ask every project to become a new kind of project.
 
-A code repository can remain a code repository. A PARA second brain can remain PARA. A Zettelkasten can remain a Zettelkasten. A native ICM workspace can remain ICM. Scrum can remain the team's delivery framework. Git can remain source/history authority. An LLM Wiki can remain the maintained-knowledge layer.
+A code repository can remain a code repository. A PARA second brain can remain PARA. A Zettelkasten can remain a Zettelkasten. An Eisenhower or GTD layout can remain that layout. A native ICM workspace can remain ICM. Scrum can remain the team's delivery framework. Git can remain source/history authority. An LLM Wiki can remain the maintained-knowledge layer.
+
+When CCA builds or hardens a hybrid, **outer organization adapts to the user's method**; the **ICM skeleton** (entry, map, folder contracts, factory vs product, stamps, status) stays walkable for cold agents. PARA is a common deferred-trust default, not a required tree.
 
 CCA adds only the compatibility, routing, and context semantics needed so humans and agents can determine:
 
@@ -48,12 +50,12 @@ CCA builds on and interoperates with existing work rather than redefining it.
 
 ### Agent context and maintained knowledge
 
-- **ICM / Model Workspace Protocol** for filesystem structure as agent architecture, staged routing, handoffs, and progressive context loading.
 - **LLM Wiki** as a pattern for persistent, maintained knowledge that compounds across sessions.
+- **ICM / Model Workspace Protocol** for filesystem structure as agent architecture, staged routing, handoffs, and progressive context loading.
 
 ### Open standards and ecosystem conventions
 
-- **AGENTS.md** for portable, scoped agent guidance.
+- **Agent Entry-point / `AGENTS.md`** for portable, scoped agent guidance.
 - **Agent Skills / `SKILL.md`** for progressively disclosed reusable capabilities.
 - **MCP and other runtimes/adapters** as optional execution and tool interfaces.
 
@@ -68,6 +70,8 @@ CCA builds on and interoperates with existing work rather than redefining it.
 CCA can reason about methods such as Scrum, Kanban, XP, DevOps, TDD, Lean, SAFe, LeSS, Disciplined Agile, and others without turning them into CCA-owned filesystem schemas.
 
 Their semantics remain theirs.
+
+> See [References](#references).
 
 ## What CCA is
 
@@ -245,6 +249,7 @@ The common rule is: **load the smallest context that lets the agent act correctl
 Validate the profile actually claimed:
 
 - native ICM → applicable current ICM acceptance surface;
+- **ICM skeleton** → cold-agent isomorphism (same walk as ICM structure; names via L0 map or default `CONTEXT.md`); not a native pipeline claim;
 - ICM-derived → only the borrowed constructs;
 - native LLM Wiki → its actual maintenance/schema conventions;
 - intentional CCA conformance → adopted CCA requirements;
@@ -294,6 +299,10 @@ Read [Getting started](docs/getting-started.md), [FAQ](docs/faq.md), [Scenarios]
 
 See [Design principles](docs/design-principles.md).
 
+## References
+
+See [Citation](CITATION.cff) and [References](docs/references.md) for acknowledgements, inspirations, and citation metadata.
+
 ## Repository documentation
 
 - [Documentation index](docs/README.md)
@@ -304,19 +313,14 @@ See [Design principles](docs/design-principles.md).
 - [Compatibility details](docs/compatibility-details.md)
 - [Standards](docs/standards.md)
 - [Migration](docs/migration.md)
-- [References](docs/references.md)
 
 Non-normative publication forms are under [`examples/publications/`](examples/publications/).
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING](CONTRIBUTING.md).
 
 Compatibility and composition changes should cite the relevant primary authority and update the complete affected surface in the same change.
-
-## Citation
-
-Citation metadata is provided in [CITATION.cff](CITATION.cff).
 
 ## License
 

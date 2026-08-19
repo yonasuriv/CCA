@@ -8,7 +8,8 @@ Survey only enough of the project to understand its current routing and organiza
 
 - root and nested `AGENTS.md` files;
 - native harness instruction files such as `CLAUDE.md`;
-- root/stage `CONTEXT.md` files;
+- the Layer-0 skeleton map when present;
+- root/stage contract files resolved from that map, else default `CONTEXT.md`;
 - existing wiki/schema instructions;
 - obvious method overlays such as PARA Projects/Areas/Resources/Archives or Zettelkasten note collections;
 - top-level application, documentation, test, and configuration directories.
@@ -24,19 +25,20 @@ If the request is actually about choosing among several methods/forms or restruc
 Use when the repository layout already works.
 
 1. Build a compact map of the directories and existing instruction scopes.
-2. Add or improve a root `AGENTS.md` only when portable guidance is useful.
+2. Add or improve a root `AGENTS.md` only when portable guidance is useful. When creating or updating it, include an ICM / CCA skeleton map (roles → paths), even if every path is still the default `CONTEXT.md`.
 3. Preserve nested `AGENTS.md` scope. Do not flatten subtree-specific instructions into the root.
-4. Add a small root `CONTEXT.md` only when explicit intent-to-context routing materially reduces exploration. It is optional for ordinary coding repositories.
-5. Externalize stable conventions into a dedicated reference/config file only when those conventions already exist and would otherwise be duplicated. Do not invent `_config/` merely to satisfy a template.
-6. If a harness-specific instruction file contains unique rules, preserve them until a safe canonicalization plan is clear. Never erase native behavior just to make `AGENTS.md` canonical on paper.
-7. Preserve recognizable method organization. Do not add CCA metadata merely to restate obvious PARA, Zettelkasten, project, or wiki paths.
-8. Report every file created or changed and why it was necessary.
+4. Add a small root workspace router (default `CONTEXT.md`, or the mapped name) only when explicit intent-to-context routing materially reduces exploration. It is optional for ordinary coding repositories. If using a non-default name, update the L0 skeleton map in the same edit.
+5. When adding folder contracts, write the mapped L2 filename (default `CONTEXT.md`) and keep the L0 map in sync.
+6. Externalize stable conventions into a dedicated reference/config file only when those conventions already exist and would otherwise be duplicated. Do not invent `_config/` merely to satisfy a template.
+7. If a harness-specific instruction file contains unique rules, preserve them until a safe canonicalization plan is clear. Never erase native behavior just to make `AGENTS.md` canonical on paper.
+8. Preserve recognizable method organization. Do not add CCA metadata merely to restate obvious PARA, Zettelkasten, project, or wiki paths.
+9. Report every file created or changed and why it was necessary.
 
 ### Full mode
 
 Use only when the project actually needs a new capability and the desired architecture is already clear.
 
-**Pipeline:** add ICM-derived stages using lowercase hyphenated names such as `stages/01-collect/`. Every stage gets a small `CONTEXT.md` with the exact ICM `Inputs` / `Process` / `Outputs` shape and its own `output/` handoff folder.
+**Pipeline:** add ICM-derived stages using lowercase hyphenated names such as `stages/01-collect/`. Every stage gets a small folder contract (default `CONTEXT.md`, or the L0-mapped name outside native ICM) with the exact ICM `Inputs` / `Process` / `Outputs` shape and its own `output/` handoff folder. Keep the L0 skeleton map updated.
 
 Adding ICM-derived stage contracts to an ordinary repository does **not** by itself make that repository a native ICM workspace. Only claim **ICM native compatibility** after the full applicable ICM profile passes: five-layer routing, native `CLAUDE.md`, root routing, setup/status behavior, questionnaire rules, naming, handoffs, one-way references, selective loading, CONTEXT purity, quality guardrails, and all other applicable current ICM conventions and workspace-builder validation checks.
 
@@ -66,6 +68,7 @@ Before writing:
 - Do not claim CCA conformance unless the workspace intentionally adopted the relevant CCA profile and was validated against it.
 - Do not claim native ICM compatibility for a repository that merely borrows ICM stage-contract patterns.
 - Do not invent PARA, Zettelkasten, or BASB native compatibility claims.
+- Do not assume contract filenames: resolve from the L0 skeleton map, else default to `CONTEXT.md`.
 
 ## Verification
 

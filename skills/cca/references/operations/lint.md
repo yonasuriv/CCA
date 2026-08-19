@@ -7,6 +7,7 @@ Validate the workspace it actually is. Do not fail upstream projects for omittin
 Determine one or more applicable profiles from the workspace files and instructions:
 
 - **ICM native compatibility**
+- **ICM skeleton compatibility**
 - **ICM-derived patterns only**
 - **LLM Wiki native compatibility**
 - **CCA conformance**
@@ -26,7 +27,8 @@ These checks apply where relevant regardless of profile:
 - nested instruction scopes are preserved rather than flattened;
 - nested native/method boundaries remain identifiable;
 - adapters do not contradict the canonical guidance they route to;
-- files required by an explicitly adopted contract actually exist.
+- files required by an explicitly adopted contract actually exist;
+- contract filenames are not assumed: resolve L1/L2 paths from the Layer-0 skeleton map when present, else default to `CONTEXT.md` (`spec.md` §5.1).
 
 ## 3. ICM native compatibility checks
 
@@ -62,6 +64,22 @@ At minimum verify:
 If only ICM-derived stage patterns are present, report whether those borrowed patterns are internally valid, but mark **ICM native compatibility: N/A** unless the full profile is actually claimed and present.
 
 CCA-only wiki metadata and outer method organization are irrelevant to the native ICM profile unless they break the nested ICM boundary.
+
+## 3b. ICM skeleton compatibility checks
+
+When the workspace claims ICM skeleton compatibility (or CCA generates a hybrid and asserts skeleton portability), validate **cold-agent isomorphism** (`spec.md` §2.1):
+
+1. Layer 0 contains an explicit role→path map covering L1 workspace router and L2 folder-contract names.
+2. Every working folder has a local contract at the mapped name with Purpose / Inputs / Process / Outputs / Human check (not README-only).
+3. Nested `AGENTS.md` counts as L2 only if the map says so **and** those sections are present.
+4. Do **not** fail merely because the mapped name is not the string `CONTEXT.md`.
+5. Fail if alternate names are used without a map (agents would have to assume).
+6. Fail **native ICM** if any of those names diverge from upstream `CONTEXT.md` / `CLAUDE.md`.
+7. Factory vs product separation is declared; live `_templates/` (or mapped L3) exists in the workspace.
+8. Status-without-memory surface is declared for non-pipelines.
+9. Fail the claim if a cold agent must know CCA or ICM by name to find the next file.
+
+Mark **ICM skeleton compatibility: N/A** when neither claimed nor asserted by generation.
 
 ## 4. LLM Wiki native compatibility checks
 
@@ -145,6 +163,7 @@ When remediation is authorized, automatically repair only changes whose intent i
 
 Profiles detected:
 - ICM native compatibility: PASS | FAIL | N/A
+- ICM skeleton compatibility: PASS | FAIL | N/A
 - ICM-derived patterns: PASS | FAIL | N/A
 - LLM Wiki native compatibility: PASS | FAIL | N/A
 - CCA conformance: PASS | PARTIAL | N/A

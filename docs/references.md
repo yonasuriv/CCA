@@ -5,6 +5,7 @@ Agent Context Methodologies:
 - [Andrej Karpathy](https://en.wikipedia.org/wiki/Andrej_Karpathy)[LLM Wiki idea](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f "Andrej Karpathy's idea pattern for LLM-maintained persistent knowledge bases")
 - [ICM](https://github.com/RinDig/Interpretable-Context-Methodology)
   - [ICM Paper](https://arxiv.org/pdf/2603.16021 "Jake Van Clief & David McDermott (2026). *Interpretable Context Methodology: Folder Structure as Agent Architecture*. Arxiv.")
+- [CCA](https://github.com/yonasuriv/CCA)
 
 Personal Knowledge Management Methodologies:
 
