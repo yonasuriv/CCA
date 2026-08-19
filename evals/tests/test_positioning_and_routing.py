@@ -12,7 +12,7 @@ class PositioningAndRoutingTests(unittest.TestCase):
     def test_readme_states_cca_on_its_own_terms(self):
         text = README.read_text(encoding="utf-8")
         self.assertIn("bridge human knowledge work and agentic work", text.lower())
-        self.assertIn("without forcing it into a new competing convention", text.lower())
+        self.assertIn("without forcing existing systems into a new competing convention", text.lower())
         self.assertIn("reducing technical debt", text.lower())
         self.assertIn("operational costs", text.lower())
         self.assertNotIn("## Is CCA better than ICM?", text)
