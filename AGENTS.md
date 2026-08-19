@@ -11,6 +11,8 @@ I really like the ICM (Interoprable COntext Methodology), but I don't think its 
 I want the most elite and professional answer, no sugar coating, don't treat me like the average, I want the best scalable without technical debt possible of achieving this, so this later can grow indifnitely and agents will never get lost or grep through 9000 files to answer a question
 
 Its authors already flag this exact fear as a known limitation: the flat-file approach does not scale naturally to workspaces with thousands of reference documents, and the lack of programmatic validation means contract errors aren't caught until runtime
+
+REF: https://rainmakers.pl/posts/171_interpretable_context_methodology/ and https://arxiv.org/html/2603.16021v2
 -->
 
 # AGENTS.md — CCA repository
