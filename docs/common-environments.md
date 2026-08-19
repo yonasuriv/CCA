@@ -86,4 +86,4 @@ Methods remain authorities at their own scopes. Scrum does not become a filesyst
 
 CCA helps agents identify which method governs which decision and how those scopes interact, and route agents toward their relevant artifacts or rules.
 
-See [Scenarios](docs/scenarios.md) and [Method composition](docs/method-composition.md).
+See [Scenarios](./scenarios.md) and [Method composition](./method-composition.md).

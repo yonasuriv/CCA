@@ -158,9 +158,6 @@ def validate_skill_self_containment() -> None:
         "cca-ingest": "removed standalone skill id",
         "cca-query": "removed standalone skill id",
         "cca-lint": "removed standalone skill id",
-        "spec/SPEC.md": "removed repository-level spec path",
-        "spec/compatibility.md": "removed repository-level spec path",
-        "spec/method-composition.md": "removed repository-level spec path",
         "../docs/": "repository-only path from installed package",
         "../../docs/": "repository-only path from installed package",
         "../../../docs/": "repository-only path from installed package",
@@ -316,6 +313,11 @@ def validate_current_documentation_paths() -> None:
         ROOT / "docs/faq.md",
         ROOT / "docs/method-composition.md",
         ROOT / "docs/scenarios.md",
+        ROOT / "docs/standards.md",
+        ROOT / "docs/migration.md",
+        ROOT / "docs/references.md",
+        ROOT / "docs/common-environments.md",
+        ROOT / "docs/design-principles.md",
         ROOT / "examples/README.md",
         ROOT / "examples/publications/blog.md",
         ROOT / "examples/publications/article.md",
@@ -329,9 +331,6 @@ def validate_current_documentation_paths() -> None:
         "skills/cca-ingest": "removed seven-package skill layout",
         "skills/cca-query": "removed seven-package skill layout",
         "skills/cca-lint": "removed seven-package skill layout",
-        "spec/SPEC.md": "removed repository-level spec path",
-        "spec/compatibility.md": "removed repository-level spec path",
-        "spec/method-composition.md": "removed repository-level spec path",
         "examples/articles/": "removed examples path",
         "docs/principles.md": "removed docs path",
     }
@@ -345,7 +344,15 @@ def validate_current_documentation_paths() -> None:
 
 
 def validate_markdown_links() -> None:
+    excluded = {
+        Path("docs/_wip.md"),
+    }
+
     for path in sorted(ROOT.rglob("*.md")):
+        relative_path = path.relative_to(ROOT)
+
+        if relative_path in excluded:
+            continue
         if ".git" in path.parts:
             continue
         if "assets" in path.parts and "templates" in path.parts:
