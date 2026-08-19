@@ -1,3 +1,18 @@
+<!-- THIS REPO SHOULD FILL THE GAP THAT CURRENTLY ICM/MWP HAS
+
+The main goal and problem: CCA SHOULD use ICM as the skeleton, but I wanna create a workspace where I can work only from within this workspace, where I can have:
+- my raw shit such as random notes, toughts, clippings, transcripts, urls, repos, etc
+- my projects
+- my wiki, where all curated knowledge lives and is maintained by the agents
+- maybe a bookmarks or a quick access folder where i can have things such as TODO, planner, daily tasks, PDP, etc
+
+I really like the ICM (Interoprable COntext Methodology), but I don't think its adaptable 100% to me, as it's currently structured/shipped, so I really want to shape it to work it for me, so I can start tackling everything properly, improving not only agent routing, but my visibility, organization and productivity.
+
+I want the most elite and professional answer, no sugar coating, don't treat me like the average, I want the best scalable without technical debt possible of achieving this, so this later can grow indifnitely and agents will never get lost or grep through 9000 files to answer a question
+
+Its authors already flag this exact fear as a known limitation: the flat-file approach does not scale naturally to workspaces with thousands of reference documents, and the lack of programmatic validation means contract errors aren't caught until runtime
+-->
+
 # AGENTS.md — CCA repository
 
 > Portable root guidance for contributors and agents working in this repository. Keep this file small; detailed behavior belongs in the canonical skill-local spec or the relevant reference.
