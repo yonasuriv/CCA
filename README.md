@@ -27,9 +27,9 @@ _In plain English_
 - [Compatibility details](docs/compatibility-details.md)
 - [Migration](docs/migration.md)
 - [FAQ](docs/faq.md)
-- [Work in progress](docs/_wip.md) _(Braindump text content that may or may not be aligned with the goal of the repo, must be processed first.)_
 
-> Non-normative publication forms are under [`examples/publications/`](examples/publications/).
+> _Braindump file that may or may not be aligned with the current goal of the repo is under [docs/_wip.md](docs/_wip.md) (must be processed first)_ \
+> _Non-normative publication forms are under [examples/publications/](examples/publications/)._
 
 ## Why CCA exists
 
