@@ -1,4 +1,71 @@
-# Upstream standards tracked by CCA
+# Standards
+
+## Foundations
+
+### Software engineering fundamentals
+
+CCA applies established engineering principles to context architecture rather than treating AI workspaces as an entirely new discipline.
+
+These include, but not limited to:
+
+- **separation of concerns** — context, knowledge, state, execution, and artifacts should not become one undifferentiated layer;
+- **explicit boundaries** — independent systems should expose clear interfaces and authority instead of relying on path guessing;
+- **canonical authority** — substantive facts and rules should have one authoritative home;
+- **loose coupling and high cohesion** — boundaries should depend on stable contracts rather than internal implementation details;
+- **stable interfaces over implementations** — semantic roles remain stable even when their concrete bindings change;
+- **progressive disclosure** — load the minimum context required for the current task;
+- **least privilege** — agents should receive only the scope and mutation authority required for the operation;
+- **recoverability** — durable mutations should be reversible, reconstructable, or explicitly superseded;
+- **derived state over duplicated state** — indexes, dashboards, caches, and reports should be generated from canonical sources where practical;
+- **deterministic validation** — checkable invariants should be validated mechanically rather than left entirely to runtime interpretation;
+- **graceful fallback** — broad search should be a fallback when routing fails, not the default discovery mechanism;
+- **portability** — durable context should remain understandable without requiring a proprietary model, runtime, database, or vendor.
+
+### Open standards and ecosystem conventions
+
+- **Agent entry points — `AGENTS.md`** for portable, scoped agent guidance.
+- **Agent Skills — `SKILL.md`** for progressively disclosed reusable capabilities.
+- **MCP and other runtimes/adapters** as optional execution and tool interfaces.
+
+CCA preserves the authority and precedence rules of the environments in which these conventions operate rather than assuming it can override them.
+
+### Agent context and maintained knowledge
+
+- **ICM / Model Workspace Protocol** for filesystem structure as agent architecture, staged routing, handoffs, contracts, and progressive context loading.
+- **LLM Wiki** as a pattern for persistent, maintained knowledge that compounds across sessions rather than being repeatedly reconstructed from raw sources.
+
+CCA may compose with these systems or use patterns derived from them, but partial adoption does not imply native compatibility.
+
+### Human knowledge work
+
+- **PARA** for action-oriented organization across Projects, Areas, Resources, and Archives.
+- **BASB / CODE** for the lifecycle of capturing, organizing, distilling, and expressing knowledge.
+- **Zettelkasten** for durable, addressable, linked idea development.
+- **Personal planning and execution techniques** such as GTD, Timeboxing, the Pomodoro Technique, and the Eisenhower Matrix.
+
+CCA can map and route across their scopes without redefining their semantics or turning them into CCA-owned filesystem schemas. These remain independent methods.
+
+### Engineering and delivery methods
+
+CCA can reason about and compose with engineering and delivery methods such as ASD, Disciplined Agile, DevOps, DSDM, FDD, IID, Kanban, Lean Software Development, LeSS, MDE, MSF, PSP, RAD, RUP, SAFe, Scrum, SEMAT, TDD, TSP, UP, XP, and others.
+
+CCA may identify which method governs a decision, workflow, artifact, or boundary and how that scope interacts with others. It does not absorb those methods into a universal CCA process. Their semantics remain theirs.
+
+> See [References](#references).
+
+## Core rule
+
+**Convergence over invention.**
+
+CCA must not replace, absorb, supersede, or silently redefine an existing framework, methodology, standard, protocol, convention, or knowledge system merely to make everything appear uniform.
+
+Preserve distinct authorities.
+
+Connect them through explicit semantics, boundaries, bindings, mappings, routing, precedence, and compatibility rules.
+
+If an existing workspace is already clear, navigable, maintainable, and interoperable, doing nothing is a valid CCA outcome.
+
+## Upstream standards tracked by CCA
 
 CCA converges on existing conventions where they already solve the problem. This file is the maintenance surface for standards/upstreams that materially constrain CCA. It is not a catalog of every AI or knowledge-management method.
 

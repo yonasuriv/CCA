@@ -1,22 +1,57 @@
 # Convergent Context Architecture
 
-> **CCA (Convergent Context Architecture)** is an evolving, agent-agnostic interoperability layer for filesystem-native AI context. It aims to bridge human knowledge work and agentic work by building on open standards, ecosystem conventions, and proven methodologies, protocols, and frameworks, grounded in software-engineering principles and fundamentals.
+> **Convergent Context Architecture (CCA)** is an evolving, agent-agnostic interoperability architecture for filesystem-native AI context. It helps humans and AI agents understand, navigate, and operate across workspaces, projects, and bodies of knowledge by defining stable semantic roles, scoped boundaries, and configurable bindings that preserve meaning even when their concrete paths or implementations change.
 
-CCA helps make any workspace, project, or body of human knowledge easier for both humans and AI agents to understand, navigate, and use **without forcing it into a new competing convention**.
+CCA aims to bridge human knowledge work and agentic work without forcing existing systems into a new competing convention, by building on open standards, ecosystem conventions, established methodologies, protocols and frameworks, and based on software-engineering principles and fundamentals.
 
-Its goal is to make automation easier in service of augmenting human capabilities while improving efficiency, reducing technical debt and unnecessary complexity, and lowering compute, usage, and operational costs.
+Its goal is to make automation easier in service of augmenting human capabilities while improving efficiency, reducing technical debt and unnecessary complexity, and lowering compute, context, usage, and operational costs.
 
-**Automation is the means; augmenting human capabilities is the goal.**
+<!-- ADD THE "IN PLAIN ENGLISH EXPLAINATION" --
+_In plain English_
 
-## In plain English
+<TEXT HERE>
+-->
 
-CCA does not ask every project to become a new kind of project.
+> **Automation is the means; augmenting human capabilities is the goal.**
 
-A code repository can remain a code repository. A PARA second brain can remain PARA. A Zettelkasten can remain a Zettelkasten. An Eisenhower or GTD layout can remain that layout. A native ICM workspace can remain ICM. Scrum can remain the team's delivery framework. Git can remain source/history authority. An LLM Wiki can remain the maintained-knowledge layer.
+## Documentation
 
-When CCA builds or hardens a hybrid, **outer organization adapts to the user's method**; the **ICM skeleton** (entry, map, folder contracts, factory vs product, stamps, status) stays walkable for cold agents. PARA is a common deferred-trust default, not a required tree.
+- [Documentation index](docs/README.md)
+- [Getting started](docs/getting-started.md)
+- [Scenarios](docs/scenarios.md)
+- [References](docs/references.md)
+- [Standards](docs/standards.md)
+- [Design principles](docs/design-principles.md)
+- [Method composition](docs/method-composition.md)
+- [Common environments](docs/common-environments.md)
+- [Compatibility details](docs/compatibility-details.md)
+- [Migration](docs/migration.md)
+- [FAQ](docs/faq.md)
+- [Work in progress](docs/_wip.md) _(Braindump text content that may or may not be aligned with the goal of the repo, must be processed first.)_
 
-CCA adds only the compatibility, routing, and context semantics needed so humans and agents can determine:
+> Non-normative publication forms are under [`examples/publications/`](examples/publications/).
+
+## Why CCA exists
+
+AI-assisted work increasingly depends on filesystem-native context: project instructions, routers, source material, maintained knowledge, reusable skills, configuration, working artifacts, human edits, outputs, tasks, decisions, memory, and execution state.
+
+At the same time, humans already use established knowledge-management, planning, engineering, and delivery methods, while agent ecosystems are converging on their own standards and conventions.
+
+These systems often solve different parts of the same problem, operate at different scopes, and define different authorities. They are not automatically interoperable.
+
+CCA defines shared ground between them.
+
+The objective is not one universal directory tree, workflow, knowledge model, or methodology. The objective is:
+
+- **interoperability** across heterogeneous systems;
+- **navigability** without broad filesystem search;
+- **portability** across tools, models, and runtimes;
+- **explicit boundaries and authority** over context and state;
+- **durable human control** over canonical information;
+- **minimum sufficient context** for the task at hand;
+- **recoverable and deterministic operations** where possible.
+
+CCA builds on and interoperates with existing work rather than redefining it and adds only the compatibility, routing, and context semantics needed so humans and agents can determine:
 
 1. **Where am I?**
 2. **What already governs this boundary?**
@@ -24,122 +59,146 @@ CCA adds only the compatibility, routing, and context semantics needed so humans
 4. **What can I change safely?**
 5. **How does this boundary connect to the others?**
 
-If the workspace is already clear, navigable, durable, and interoperable, doing nothing is a valid CCA result.
+Its filesystem-native context foundations are strongly influenced by Van Clief and McDermott's *Interpretable Context Methodology: Folder Structure as Agentic Architecture* and its Model Workspace Protocol (MWP), which treat filesystem structure, routing, stage contracts, handoffs, and progressive context loading as part of the agent architecture.
 
-## Core rule
+CCA extends these ideas to broader and more heterogeneous environments: workspaces containing multiple projects, long-lived responsibilities, source repositories, raw notes, clippings, transcripts, documents, research, maintained knowledge, operational state, restricted material, reusable capabilities, and nested systems with their own native semantics.
 
-**Convergence over invention.**
+At this scale, paths alone are not enough. Agents need to understand not only **where something is**, but also:
 
-CCA must not replace, absorb, supersede, or silently redefine an existing framework, methodology, standard, protocol, or knowledge system merely to make everything look uniform.
+- What semantic role it serves;
+- What may modify it;
+- How concurrent mutation is handled;
+- How it can be recovered or rebuilt;
+- Which boundary it belongs to;
+- Which authority governs it;
+- Whether it is durable, derived, or disposable;
+- Whether freshness matters;
+- Whether it is required by the active contract.
 
-Preserve distinct authorities. Connect them through explicit semantics, scopes, mappings, routing, precedence, and compatibility boundaries.
+CCA addresses this through a small semantic model:
 
-## Why CCA exists
+```mermaid
+---
+config:
+  flowchart:
+    wrappingWidth: 500
+---
+flowchart LR
+    A["Boundary + Semantic Role"]
+    B["Binding"]
+    C["Authority · Capabilities · Concurrency"]
+    D["Durability · Recovery · Freshness · Requiredness"]
 
-AI-assisted work increasingly depends on filesystem-native context: project instructions, routers, stage contracts, source material, maintained knowledge, reusable skills, configuration, working artifacts, human edits, and outputs.
+    A --> B --> C --> D
+```
 
-At the same time, humans already use established knowledge-management and delivery methods, while agent ecosystems are converging on their own standards and conventions. These systems often solve different parts of the same problem, but they operate at different scopes and are not automatically interoperable.
+Semantic roles remain stable while bindings may change.
 
-CCA defines shared ground between them.
+For example, `state.tasks` may resolve to `TASKS.md`, a directory, a structured file, or another locally declared implementation without changing what the role means.
 
-The objective is not one universal directory tree or one universal methodology. The objective is **interoperability, navigability, portability, durable human control, and minimum sufficient context**.
-
-## Foundations
-
-CCA builds on and interoperates with existing work rather than redefining it.
-
-### Agent context and maintained knowledge
-
-- **LLM Wiki** as a pattern for persistent, maintained knowledge that compounds across sessions.
-- **ICM / Model Workspace Protocol** for filesystem structure as agent architecture, staged routing, handoffs, and progressive context loading.
-
-### Open standards and ecosystem conventions
-
-- **Agent Entry-point / `AGENTS.md`** for portable, scoped agent guidance.
-- **Agent Skills / `SKILL.md`** for progressively disclosed reusable capabilities.
-- **MCP and other runtimes/adapters** as optional execution and tool interfaces.
-
-### Human knowledge work
-
-- **PARA** for action-oriented organization.
-- **BASB / CODE** for knowledge-work lifecycle.
-- **Zettelkasten** for durable, linked idea development.
-
-### Engineering and delivery methods
-
-CCA can reason about methods such as Scrum, Kanban, XP, DevOps, TDD, Lean, SAFe, LeSS, Disciplined Agile, and others without turning them into CCA-owned filesystem schemas.
-
-Their semantics remain theirs.
-
-> See [References](#references).
+Stable object identifiers may additionally be used where rename-independent identity materially matters, such as durable notes, decisions, tasks, or records. They are not required for every file or directory.
 
 ## What CCA is
 
 CCA is:
 
 - an interoperability and composition architecture for filesystem-native context;
-- a semantic layer for routing, authority, handoffs, maintained knowledge, and portability;
-- a portable Agent Skill with focused, progressively disclosed modes;
-- a way to preserve native behavior while connecting otherwise separate human and agent systems;
-- a framework for deciding when to preserve, compose, validate, harden, scaffold, or deliberately restructure;
-- an evolving compatibility layer that should adapt as its upstream standards and ecosystems evolve.
+- a semantic layer for boundaries, roles, bindings, routing, authority, mutation, durability, recovery, and freshness;
+- a way to preserve native systems while making their relationships explicit;
+- a model for deterministic context discovery before broad search;
+- a framework for deciding when to preserve, compose, validate, harden, scaffold, index, or deliberately restructure;
+- a portable Agent Skill with focused, progressively disclosed capabilities;
+- an evolving compatibility layer that should adapt as its upstream standards, conventions, and ecosystems evolve.
 
 CCA is **not**:
 
+- a universal directory tree;
+- a replacement knowledge-management methodology;
 - an agent runtime or orchestration framework;
 - a real-time multi-agent message bus;
 - a scheduler or queue;
 - a vector database or retrieval engine;
 - a replacement for MCP;
-- a replacement for ICM, LLM Wiki, AGENTS.md, Agent Skills, PARA, BASB/CODE, Zettelkasten, Scrum, Kanban, XP, DevOps, SAFe, LeSS, DA, or other established systems;
-- a requirement that every repository use `CONTEXT.md`, `stages/`, a wiki, a manifest, or any fixed directory tree.
+- a replacement for ICM, LLM Wiki, `AGENTS.md`, Agent Skills, PARA, BASB/CODE, Zettelkasten, Scrum, Kanban, XP, DevOps, SAFe, LeSS, Disciplined Agile, or other established systems;
+- a requirement that every repository use `CONTEXT.md`, `stages/`, a wiki, a manifest, frontmatter, stable object IDs, or any fixed directory structure.
 
 ## Convergence model
 
+CCA sits between existing authorities and the filesystem-native boundaries in which humans and agents operate.
+
+It does not own those authorities or flatten them into a common schema. It provides the semantic contract required to identify boundaries, resolve roles, preserve authority, and route to the minimum relevant context while allowing each nested system to retain its native behavior.
+
+<!-- Composition + interoperability semantics -->
 ```mermaid
+---
+config:
+  flowchart:
+    wrappingWidth: 500
+    defaultRenderer: elk
+---
 flowchart TB
-    subgraph HUMAN["Human knowledge work"]
-        PARA["PARA"]
-        BASB["BASB / CODE"]
-        ZK["Zettelkasten"]
+    subgraph UPSTREAM["Upstream"]
+        direction TB
+        STANDARDS["Standards"]
+        PRINCIPLES["Principles"]
+        FRAMEWORKS["Frameworks"]
+        CONVENTIONS["Conventions"]
+        METHODOLOGIES["Methodologies"]
     end
 
-    subgraph AGENT["Agent context and knowledge"]
-        ICM["ICM / MWP"]
-        WIKI["LLM Wiki"]
+    subgraph CONSUMERS["Consumers"]
+        direction LR
+        AGENTS["Agents"]
+        HUMANS["Humans"]
     end
 
-    subgraph METHODS["Engineering and delivery methods"]
-        DELIVERY["Scrum · Kanban · XP · Lean"]
-        SCALE["SAFe · LeSS · DA"]
-        LIFECYCLE["TDD · DevOps · RUP/UP · others"]
+    subgraph CCA_CONTAINER["CCA"]
+        direction LR
+        SPEC["<b>STRUCTURE</b><br/>Specification <br>↓<br> Boundary + Semantic Role <br>↓<br> Binding<br/>↓<br>Authority · Capabilities · Concurrency<br/>↓<br>Durability · Recovery · Freshness · Requiredness"]
+        RESOLVER["<b>RESOLVE</b><br/>Route before search"]
+        LINT["<b>LINT</b><br/>Static + Runtime enforcement"]
+        SPEC --> LINT
+        SPEC --> RESOLVER
     end
 
-    subgraph STANDARDS["Standards and ecosystem conventions"]
-        AGENTS["AGENTS.md"]
-        SKILLS["Agent Skills / SKILL.md"]
-        MCP["MCP · runtimes · adapters"]
+    subgraph CONTAINER["Workspace Container"]
+        direction LR
+        subgraph WORKSPACE_LAYER[" "]
+            direction TB
+            GENERAL["<b>Portable Workspaces</b><br>PKM / Second brains<br/>Coding projects<br/>Research systems<br/>Hybrid workspaces"]
+            CONFIDENTIAL["<b>Restricted Workspaces</b><br>Client workspaces<br/>Confidential workspaces<br/><i>Gated · Not globally indexed</i>"]
+        end
+        subgraph SYSTEM_LAYER["System Layer"]
+            direction TB
+            SYS_ND["Index<br/>Cache<br/>Reports<br/><i>Generated · Rebuildable</i>"]
+            SYS_ST["Scripts<br/>Templates<br/>Internal conventions<br><i>Automation · Support</i>"]
+        end
     end
 
-    CCA["CCA\ninteroperability + composition"]
+    UPSTREAM --> SPEC
+    PRINCIPLES --> SPEC
+    FRAMEWORKS --> SPEC
+    CONVENTIONS --> SPEC
+    METHODOLOGIES --> SPEC
 
-    HUMAN --> CCA
-    AGENT --> CCA
-    METHODS --> CCA
-    STANDARDS --> CCA
+    CONSUMERS -- "Intent" --> RESOLVER
+    RESOLVER -- "Resolved context" --> CONSUMERS
 
-    CCA --> CODE["Code repositories"]
-    CCA --> PKM["Knowledge systems"]
-    CCA --> RESEARCH["Research"]
-    CCA --> DELIVERYWORK["Delivery workspaces"]
-    CCA --> HYBRID["Hybrid boundaries"]
+    LINT -. "Governs" .-> GENERAL
+    LINT -.-> CONFIDENTIAL
+    SPEC -. "Defines" .-> SYS_ST
+
+    RESOLVER -- "Default scope" --> GENERAL
+    RESOLVER -. "Explicit scope" .-> CONFIDENTIAL
+    RESOLVER -- "Reads index" --> SYS_ND
+
+    classDef restricted stroke-dasharray:4 3
+    class CONFIDENTIAL restricted
 ```
 
-The arrows mean CCA can understand and connect these authorities. They do **not** mean CCA owns, replaces, or reimplements them.
+## Supporting skill
 
-## One installable skill, seven modes
-
-CCA ships as one self-contained Agent Skill under [`skills/cca/`](skills/cca/).
+CCA ships with one self-contained Agent Skill under [`skills/cca/`](skills/cca/) that provides a portable operational interface to the architecture.
 
 ```text
 skills/cca/
@@ -147,180 +206,56 @@ skills/cca/
 ├── references/
 │   ├── core/          # normative CCA semantics and compatibility
 │   ├── architect/     # workspace forms, boundaries, builders
-│   ├── advisor/       # engineering/process judgment
+│   ├── advisor/       # engineering and process judgment
 │   └── operations/    # scaffold, sync, ingest, query, lint
 └── assets/
     └── templates/
 ```
 
-| Mode | Responsibility |
-|---|---|
-| `architect` | Design or restructure context architecture, forms, boundaries, and compositions. |
-| `scaffold` | Add the smallest useful routing/context layer without reorganizing existing content. |
-| `sync` | Reconcile routing/navigation with the real filesystem. |
-| `ingest` | Integrate evidence into maintained knowledge using the workspace's own schema. |
-| `query` | Navigate and synthesize maintained knowledge. |
-| `lint` | Validate only the compatibility/conformance profile actually claimed. |
-| `advise` | Apply engineering, process, security, agent-system, context, and AI/ML judgment. |
+The root [`SKILL.md`](skills/cca/SKILL.md) acts as a compact router. It selects the smallest applicable mode and loads only the references that operation requires. It should select the smallest applicable mode and progressively load only the references required for the current operation.
 
-The root [`SKILL.md`](skills/cca/SKILL.md) is a compact router. It should select the smallest applicable mode and load only the references required for the current operation.
+Implementation work that needs no context architecture, knowledge operation, validation, or advice should never reach deeper CCA material.
+> Progressive disclosure is architectural, not packaging: **This applies to both context and capability.**
 
-**Progressive disclosure is part of the architecture, not merely a packaging detail.** Ordinary implementation work that does not require CCA context architecture, knowledge operations, validation, or advice should not activate deeper CCA reference material.
+| Mode        | Responsibility                                                                             |
+| ----------- | ------------------------------------------------------------------------------------------ |
+| `architect` | Design or restructure boundaries, semantic roles, bindings, authorities, and compositions. |
+| `scaffold`  | Add the smallest useful CCA surface without unnecessarily restructuring native content.    |
+| `sync`      | Reconcile declared bindings, routing, indexes, and the real filesystem.                    |
+| `ingest`    | Integrate source material into the authority that owns maintained knowledge.               |
+| `query`     | Resolve and synthesize relevant knowledge through declared boundaries and native systems.  |
+| `lint`      | Validate adopted CCA semantics and the compatibility profiles actually claimed.            |
+| `advise`    | Apply engineering, process, security, agent-system, context, and AI/ML judgment.           |
 
-## Runtime authority
+The skill is an implementation of CCA, not the definition of CCA itself:
+- A CCA workspace must remain understandable from its durable files and declared semantics without requiring a particular model, harness, or installed skill.
+- CCA documentation should never override the active upstream authority for a native profile.
 
-Normative CCA semantics are carried inside the installable skill:
+### Normative Authority
 
-- [`core/spec.md`](skills/cca/references/core/spec.md) — CCA semantics and operation model;
-- [`core/compatibility.md`](skills/cca/references/core/compatibility.md) — upstream/native compatibility boundaries;
-- [`core/method-composition.md`](skills/cca/references/core/method-composition.md) — composition semantics;
-- [`core/adapters.md`](skills/cca/references/core/adapters.md) — harness interoperability;
-- [`core/icm-inheritance.md`](skills/cca/references/core/icm-inheritance.md) — compatibility/provenance map for inherited ICM behavior.
+Normative CCA semantics are maintained inside the portable skill package, not in this README:
 
-CCA-owned documentation never overrides the active upstream authority for a native profile.
+| Reference                                                                        | Governs                                      |
+| -------------------------------------------------------------------------------- | -------------------------------------------- |
+| [`core/spec.md`](skills/cca/references/core/spec.md)                             | CCA semantics and operation model            |
+| [`core/compatibility.md`](skills/cca/references/core/compatibility.md)           | Upstream and native compatibility boundaries |
+| [`core/method-composition.md`](skills/cca/references/core/method-composition.md) | Composition semantics                        |
+| [`core/adapters.md`](skills/cca/references/core/adapters.md)                     | Harness interoperability                     |
+| [`core/icm-inheritance.md`](skills/cca/references/core/icm-inheritance.md)       | Provenance map for inherited ICM behavior    |
 
-## How CCA handles common environments
+CCA-owned specifications govern only CCA semantics.
 
-### Existing code repository
-
-Preserve the project first. Inspect its existing instructions, source tree, tests, build/package configuration, architecture documentation, backlog system, and tool-native guidance.
-
-CCA may add compact routing when it materially improves navigation. It should not introduce pipelines, wikis, PARA folders, manifests, or other structures merely because CCA knows how to work with them.
-
-### Human knowledge workspace
-
-PARA, BASB/CODE, and Zettelkasten can coexist at different layers. CCA records how their boundaries relate rather than flattening them into a new taxonomy.
-
-An LLM Wiki or other maintained agent knowledge system may coexist with human-authored durable knowledge without silently taking ownership of it.
-
-### Native ICM
-
-Keep it native ICM.
-
-CCA is built on ICM principles and preserves current applicable ICM semantics when a workspace claims native ICM compatibility. Native entry behavior, routing, stage contracts, handoffs, setup/status behavior, progressive disclosure, validation, and other upstream requirements remain governed by ICM itself.
-
-CCA may add interoperability around a native ICM boundary, but compatibility does not make that workspace CCA-owned.
-
-### LLM Wiki
-
-Discover and preserve the implementation's own schema and maintenance model. CCA may connect it to other workspace boundaries, but does not impose one universal LLM Wiki taxonomy.
-
-### Delivery and engineering methods
-
-Methods remain authorities at their own scopes. Scrum does not become a filesystem schema. TDD does not become project organization. DevOps does not become a knowledge taxonomy.
-
-CCA helps agents identify which method governs which decision and how those scopes interact.
-
-See [Scenarios](docs/scenarios.md) and [Method composition](docs/method-composition.md).
-
-## Compatibility model
-
-CCA separates three states:
-
-| State | Meaning |
-|---|---|
-| **Native-compatible** | CCA can work with the upstream/native workspace without requiring structural migration, and any generated/materially rewritten native profile satisfies the applicable upstream authority. |
-| **CCA-hardened** | Optional CCA routing, portability, provenance, or maintenance conventions were added without replacing native semantics. |
-| **CCA-conformant** | A workspace intentionally adopts CCA-specific semantics. |
-
-Compatibility is not ownership. An ICM workspace, LLM Wiki, codebase, PARA hierarchy, or other system does not become “CCA” merely because CCA can understand it.
-
-## Context routing
-
-CCA does not impose one universal router.
-
-```mermaid
-flowchart LR
-    U["User intent"] --> E["Existing/native entry"]
-    E --> B{"Boundary / profile"}
-
-    B -->|"Native context system"| N["Native router + selected context"]
-    B -->|"Knowledge system"| K["Native index/schema + relevant synthesis"]
-    B -->|"Ordinary project"| F["Existing filesystem + scoped guidance"]
-
-    E --> M["CCA mode only when needed"]
-    M --> R["Minimum required references"]
-```
-
-The common rule is: **load the smallest context that lets the agent act correctly.**
-
-## Validation
-
-Validate the profile actually claimed:
-
-- native ICM → applicable current ICM acceptance surface;
-- **ICM skeleton** → cold-agent isomorphism (same walk as ICM structure; names via L0 map or default `CONTEXT.md`); not a native pipeline claim;
-- ICM-derived → only the borrowed constructs;
-- native LLM Wiki → its actual maintenance/schema conventions;
-- intentional CCA conformance → adopted CCA requirements;
-- PARA/Zettelkasten/BASB/Scrum/etc. → their declared/local semantics rather than invented CCA certification profiles.
-
-After profile-specific checks, CCA can apply its portability walk test:
-
-> Can a fresh agent with no chat memory **orient, act, and report** from durable workspace context alone?
-
-That test supplements native validation; it does not replace it.
-
-## Getting started
-
-1. Install or expose [`skills/cca/`](skills/cca/) to an Agent Skills-compatible agent.
-2. Describe the real workspace or problem rather than requesting a CCA-shaped tree.
-3. Let the skill choose the smallest applicable mode.
-4. Preserve existing authorities first.
-5. Validate native compatibility before optional hardening.
-
-Examples:
-
-- “Review this repository and add only the context routing it actually needs.” → `scaffold` / possibly `architect`.
-- “Can PARA, Zettelkasten, and an LLM Wiki coexist here?” → `architect`.
-- “Integrate these papers into the maintained knowledge base.” → `ingest`.
-- “Validate whether this workspace satisfies its declared native profile.” → `lint`.
-- “Which process or engineering trade-off should we choose?” → `advise`.
-
-Read [Getting started](docs/getting-started.md), [FAQ](docs/faq.md), [Scenarios](docs/scenarios.md), and [Method composition](docs/method-composition.md).
-
-## Design principles
-
-1. **Convergence over invention.** Preserve existing authorities before adding CCA semantics.
-2. **Human agency first.** Automation serves augmentation, not the reverse.
-3. **Plain files as a durable interface.** Humans and agents can inspect the same state.
-4. **Route the right context.** Minimum sufficient context beats indiscriminate loading.
-5. **One fact, one canonical home.** Point rather than duplicate authoritative rules.
-6. **Use structure only when it earns its cost.** Avoid unnecessary complexity and technical debt.
-7. **Preserve native semantics before hardening.** Compatibility comes first.
-8. **Compose boundaries; do not flatten methods.** Coexistence is not schema merger.
-9. **Infer before serializing metadata.** Do not build manifests that merely restate obvious paths.
-10. **Human-editable files are valid handoff surfaces.** Human steering remains durable.
-11. **Persistent synthesis when knowledge should compound.** Avoid rebuilding durable understanding from scratch.
-12. **Stable context plane, replaceable execution plane.** Models, runtimes, and providers must not own durable context.
-13. **Progressive disclosure.** Load only the capability and context required for the current task.
-14. **Optional infrastructure stays optional.** Databases, vector stores, MCP, queues, and orchestration may extend CCA without defining it.
-15. **Efficiency is architectural.** Reduce unnecessary context, compute, usage, operational cost, and maintenance burden where correctness is preserved.
-
-See [Design principles](docs/design-principles.md).
+When a boundary declares or inherits an external authority, that authority remains authoritative within its scope. CCA may describe, route to, validate, or compose with it, but must not silently override it.
 
 ## References
 
 See [Citation](CITATION.cff) and [References](docs/references.md) for acknowledgements, inspirations, and citation metadata.
 
-## Repository documentation
-
-- [Documentation index](docs/README.md)
-- [Getting started](docs/getting-started.md)
-- [FAQ](docs/faq.md)
-- [Scenarios](docs/scenarios.md)
-- [Method composition](docs/method-composition.md)
-- [Compatibility details](docs/compatibility-details.md)
-- [Standards](docs/standards.md)
-- [Migration](docs/migration.md)
-
-Non-normative publication forms are under [`examples/publications/`](examples/publications/).
-
 ## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md).
 
-Compatibility and composition changes should cite the relevant primary authority and update the complete affected surface in the same change.
+Changes affecting compatibility, composition, boundary semantics, or external authorities should cite the relevant primary authority and update the complete affected normative surface in the same change.
 
 ## License
 
