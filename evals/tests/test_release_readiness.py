@@ -1,0 +1,65 @@
+from __future__ import annotations
+
+import re
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+class ReleaseReadinessTests(unittest.TestCase):
+    def read(self, relative: str) -> str:
+        return (ROOT / relative).read_text(encoding="utf-8")
+
+    def test_normative_spec_is_1_0_0_stable(self) -> None:
+        spec = self.read("skills/cca/references/core/spec.md")
+        self.assertIn("**Version 1.0.0**", spec)
+        self.assertRegex(spec, r"\bStatus:\s*Stable\b")
+        self.assertNotIn("Status: Draft", spec)
+
+    def test_public_readme_has_no_release_placeholder(self) -> None:
+        readme = self.read("README.md")
+        self.assertNotIn('ADD THE "IN PLAIN ENGLISH EXPLAINATION"', readme)
+        self.assertNotIn("<TEXT HERE>", readme)
+
+    def test_current_package_maps_include_hybrid_workspace(self) -> None:
+        readme = self.read("README.md")
+        docs_index = self.read("docs/README.md")
+        for text in (readme, docs_index):
+            self.assertIn("hybrid-workspace.md", text)
+            self.assertIn("assets/hybrid-workspace", text)
+
+    def test_whitepaper_describes_current_hybrid_v2(self) -> None:
+        paper = self.read("examples/publications/paper.md")
+        self.assertIn("current bundled profile schema is v2", paper.lower())
+        self.assertIn("reference.curated", paper)
+        self.assertIn("reference.collected", paper)
+        self.assertNotIn("profile uses a frozen-v1 `WORKSPACE.yaml` semantic/policy matrix", paper)
+        self.assertNotIn("`CONTEXT.md` is only its frozen-v1 default binding", paper)
+
+    def test_reference_markdown_targets_do_not_contain_stray_quotes(self) -> None:
+        text = self.read("docs/references.md")
+        targets = re.findall(r"\[[^\]]+\]\(([^)]+)\)", text)
+        malformed = [target for target in targets if target.strip().endswith(('"', "'"))]
+        self.assertEqual([], malformed, f"Malformed Markdown targets: {malformed}")
+        self.assertNotRegex(text, r"\]\([^)]*\)\[[^\]]+\]\(")
+
+    def test_release_citation_metadata_is_consistent(self) -> None:
+        root_cff = self.read("CITATION.cff")
+        skill_cff = self.read("skills/cca/CITATION.cff")
+        for text in (root_cff, skill_cff):
+            self.assertIn("version: '1.0.0'", text)
+            self.assertIn("date-released: '2026-08-21'", text)
+            self.assertIn("CCA is an agent-agnostic interoperability architecture", text)
+        self.assertEqual(root_cff.split("# Citation File Format", 1)[-1].strip(), skill_cff.strip())
+
+    def test_release_history_exists(self) -> None:
+        changelog = ROOT / "CHANGELOG.md"
+        self.assertTrue(changelog.is_file(), "CHANGELOG.md is required for the 1.0.0 release")
+        text = changelog.read_text(encoding="utf-8")
+        self.assertIn("## 1.0.0 - 2026-08-21", text)
+
+
+if __name__ == "__main__":
+    unittest.main()
