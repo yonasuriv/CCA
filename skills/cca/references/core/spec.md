@@ -219,7 +219,7 @@ When a boundary uses or claims compatibility with an LLM Wiki-style maintained-k
 1. durable source material/evidence or an explicit durable source home;
 2. maintained synthesis that persists across sessions;
 3. explicit maintenance behavior for integrating new material and querying existing knowledge;
-4. a human-inspectable and human-editable filesystem representation.
+4. a human-inspectable filesystem representation whose write ownership follows the boundary's own schema/maintenance contract.
 
 CCA hardening MAY add a capture inbox, raw/reference layer, human notes, wiki, index, maintenance log, provenance fields, contradiction tracking, lifecycle state, integrity manifests, or other useful structure. Those are CCA implementation/profile choices unless an upstream explicitly requires them.
 
