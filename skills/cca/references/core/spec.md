@@ -165,6 +165,16 @@ Derived indexes MAY improve scale but are rebuildable accelerators, never replac
 
 Available context is not automatically useful context. CCA SHOULD load the minimum sufficient context for the active task and fix under-specified routing before solving context bloat by loading more files.
 
+### 6.1 Local routing and scale
+
+CCA routing is federated by boundary. A root bootstrap/router MUST NOT require one root manifest to enumerate arbitrary descendants merely so the workspace can grow.
+
+As a collection grows, a boundary MAY expose local routers, catalogs, indexes, or search adapters that describe only their own scope. Nested boundaries MAY repeat the same pattern recursively. A consumer should descend through the smallest applicable routing surface before searching the bounded collection.
+
+Derived catalogs, search indexes, embeddings, caches, and graph projections MUST remain rebuildable views over canonical durable state unless a separately declared authority explicitly owns that data. Their loss MUST NOT erase the semantic identity or canonical content they index.
+
+CCA does not prescribe one scale threshold or retrieval engine. At hundreds, tens of thousands, or hundreds of thousands of artifacts, implementations MAY introduce progressively stronger local indexing/search infrastructure while preserving the same boundary/role/binding semantics and avoiding a mandatory universe-wide manifest.
+
 ## 7. ICM relationship and profile
 
 ICM currently supplies CCA's strongest filesystem-native navigation foundation. CCA SHOULD use ICM directly where ICM already supplies the better abstraction rather than mint a competing CCA convention.
@@ -200,13 +210,13 @@ This is a CCA portability objective, not a universal requirement that every CCA-
 
 When a named CCA profile explicitly adopts ICM-style cold-agent behavior, that profile MUST define its own required router/contracts and acceptance surface. The Hybrid Workspace Profile does this through semantic-key bindings and its bundled validation tooling.
 
-## 8. Knowledge profile
+## 8. Maintained-knowledge interoperability
 
-CCA adopts the LLM Wiki core idea of persistent maintained synthesis over durable source material.
+CCA can interoperate with the LLM Wiki idea pattern of persistent maintained synthesis over durable source material without making a wiki mandatory for CCA compatibility.
 
-A compatible implementation SHOULD provide:
+When a boundary uses or claims compatibility with an LLM Wiki-style maintained-knowledge pattern, it SHOULD provide:
 
-1. durable source material/evidence;
+1. durable source material/evidence or an explicit durable source home;
 2. maintained synthesis that persists across sessions;
 3. explicit maintenance behavior for integrating new material and querying existing knowledge;
 4. a human-inspectable and human-editable filesystem representation.
