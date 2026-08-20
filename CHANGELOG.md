@@ -4,7 +4,12 @@ This changelog records released CCA milestones and pending user-visible changes.
 
 ## Unreleased
 
-No changes yet. New user-visible, compatibility, semantic, profile, packaging, or release-relevant changes should be recorded here before the next release.
+### Repository governance
+
+- Added structured GitHub Issue Forms for concrete bug reports and CCA change proposals while keeping blank issues available for exceptional cases.
+- Expanded the pull-request template into an evidence-backed change-summary contract covering rationale, scope/non-goals, authority, compatibility/version impact, verification, and known follow-up debt.
+- Documented when to open an issue versus proceeding with a direct pull request, and routed fresh agents/contributors through the same governance surfaces.
+- Added regression coverage for the GitHub contribution-governance contract.
 
 ## 1.0.0 - 2026-08-21
 
