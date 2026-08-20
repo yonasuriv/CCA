@@ -53,6 +53,7 @@ required = [
     "references/core/spec.md",
     "references/core/compatibility.md",
     "references/core/method-composition.md",
+    "references/architect/core.md",
     "references/architect/hybrid-workspace.md",
     "references/operations/scaffold.md",
     "references/operations/sync.md",
@@ -89,19 +90,35 @@ for phrase in ('parser.add_argument("--target"', "target must be outside the ins
     if phrase not in audit:
         fail(f"hybrid audit missing explicit-target safeguard: {phrase!r}")
 
+# Removed architecture vocabulary may not survive anywhere in the installable
+# package. This is stricter than the curated-doc gate because skills/cca is the
+# actual portable authority users receive.
+stale_skill = (
+    "Native-compatible",
+    "cca-architect",
+    "cca-scaffold",
+    "cca-sync",
+    "cca-ingest",
+    "cca-query",
+    "cca-lint",
+    "cca-advisor",
+    "six first-party skills",
+    "suite of focused Agent Skills",
+)
+for path in SKILL.rglob("*.md"):
+    text = path.read_text(encoding="utf-8")
+    for pattern in stale_skill:
+        if pattern in text:
+            fail(f"{path.relative_to(ROOT)} contains stale installed-skill vocabulary {pattern!r}")
+
 # Current curated human-facing docs must describe the installed architecture.
 # Underscore-prefixed WIP files and non-normative publication snapshots are not
 # curated authority and are intentionally excluded from this vocabulary gate.
 doc_files = [ROOT / "CONTRIBUTING.md"] + [p for p in sorted((ROOT / "docs").glob("*.md")) if not p.name.startswith("_")]
-stale = (
-    "cca-architect", "cca-scaffold", "cca-sync", "cca-ingest", "cca-query", "cca-lint", "cca-advisor",
-    "six first-party skills", "suite of focused Agent Skills",
-    "focused Agent Skill packages intended to be distributed as the CCA skill suite",
-    "Native-compatible",
-)
+stale_docs = stale_skill + ("focused Agent Skill packages intended to be distributed as the CCA skill suite",)
 for path in doc_files:
     text = read(path)
-    for pattern in stale:
+    for pattern in stale_docs:
         if pattern in text:
             fail(f"{path.relative_to(ROOT)} contains stale architecture vocabulary {pattern!r}")
 
