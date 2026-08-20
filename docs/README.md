@@ -7,15 +7,19 @@ CCA keeps runtime authority inside the installable `skills/cca/` package. Reposi
 - [Getting started](getting-started.md) — choose the smallest useful CCA mode for an existing or new workspace.
 - [FAQ](faq.md) — common integration and compatibility questions.
 - [Scenarios](scenarios.md) — expected behavior for code repositories, second brains, ICM, mixed methods, and no-op cases.
+- [Common environments](common-environments.md) — how CCA applies across common workspace types without imposing one tree.
+- [Compatibility details](compatibility-details.md) — explanatory framework/methodology compatibility using the current composable vocabulary.
 - [Method composition](method-composition.md) — how human, agent, delivery, and engineering methods coexist without being flattened.
 - [Design principles](design-principles.md) — reasoning behind the architecture.
 - [Standards](standards.md) — tracked upstream compatibility surfaces.
 - [References](references.md) — upstream, methodology, and citation links.
 - [Migration](migration.md) — preserving existing structures while adopting CCA guidance.
-- [Contributing](../CONTRIBUTING.md) — contribution rules and the complete validation suite.
+- [Contributing](../CONTRIBUTING.md) — contribution workflow and the complete validation suite.
 - [Pull request template](../.github/PULL_REQUEST_TEMPLATE.md) — review checklist for authority, compatibility, documentation, and validation.
 - [Evaluation protocol](../evals/README.md) — behavioral-evaluation contracts, release-test boundaries, and benchmark methodology.
-- [Changelog](../CHANGELOG.md) — released CCA milestones.
+- [Changelog](../CHANGELOG.md) — released CCA milestones and the current unreleased change bucket.
+
+The root [`README.md`](../README.md) is the public product overview. This file is the exhaustive documentation/repository index. Both must link every current public page under `docs/`; they should not duplicate the same explanatory content.
 
 ## Runtime authority
 
@@ -99,6 +103,6 @@ CCA/
         └── validate_distribution.py
 ```
 
-`examples/` and `docs/` are explanatory/non-normative unless a file explicitly says otherwise. Normative CCA runtime semantics live under `skills/cca/references/core/` so they remain available after the skill is installed. `docs/_wip.md` is development material and must not be treated as normative or current release authority.
+`examples/` and `docs/` are explanatory/non-normative unless a file explicitly says otherwise. Normative CCA runtime semantics live under `skills/cca/references/core/` so they remain available after the skill is installed. `docs/_wip.md` is historical/development material and must not be treated as normative or current release authority.
 
 `evals/` and `.github/` are repository-development surfaces rather than installed CCA runtime authority. They exist to exercise behavioral claims, release-readiness invariants, Hybrid profile behavior, and distribution integrity against the exact repository candidate.

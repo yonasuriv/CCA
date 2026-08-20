@@ -31,6 +31,19 @@ class ReleaseReadinessTests(unittest.TestCase):
             self.assertIn("hybrid-workspace.md", text)
             self.assertRegex(text, r"assets/[\s\S]{0,300}hybrid-workspace/")
 
+    def test_root_and_docs_indexes_cover_all_public_docs(self) -> None:
+        readme = self.read("README.md")
+        docs_index = self.read("docs/README.md")
+        public_docs = sorted(
+            path.name
+            for path in (ROOT / "docs").glob("*.md")
+            if path.name not in {"README.md", "_wip.md"}
+        )
+        self.assertTrue(public_docs)
+        for name in public_docs:
+            self.assertIn(f"docs/{name}", readme, f"root README missing docs/{name}")
+            self.assertIn(f"({name})", docs_index, f"docs index missing {name}")
+
     def test_documentation_index_includes_release_development_surfaces(self) -> None:
         docs_index = self.read("docs/README.md")
         for required in (
@@ -57,6 +70,17 @@ class ReleaseReadinessTests(unittest.TestCase):
         for command in required_commands:
             self.assertIn(command, contributing, command)
 
+    def test_contributing_defines_end_to_end_change_workflow(self) -> None:
+        contributing = self.read("CONTRIBUTING.md")
+        for required in (
+            "every repository change",
+            "PULL_REQUEST_TEMPLATE.md",
+            "CHANGELOG.md",
+            "Unreleased",
+            "exact PR head",
+        ):
+            self.assertIn(required, contributing, required)
+
     def test_pull_request_template_covers_cca_release_contract(self) -> None:
         path = ROOT / ".github/PULL_REQUEST_TEMPLATE.md"
         self.assertTrue(path.is_file(), "CCA requires a pull request template")
@@ -70,10 +94,10 @@ class ReleaseReadinessTests(unittest.TestCase):
         ):
             self.assertIn(required, text, required)
 
-    def test_agents_routes_complete_repository_validation(self) -> None:
+    def test_agents_requires_contributing_before_repository_changes(self) -> None:
         agents = self.read("AGENTS.md")
+        self.assertIn("Before modifying repository content", agents)
         self.assertIn("CONTRIBUTING.md", agents)
-        self.assertIn("evals/", agents)
         self.assertIn("PULL_REQUEST_TEMPLATE.md", agents)
         self.assertIn("complete validation suite", agents)
 
@@ -124,6 +148,7 @@ class ReleaseReadinessTests(unittest.TestCase):
         changelog = ROOT / "CHANGELOG.md"
         self.assertTrue(changelog.is_file(), "CHANGELOG.md is required for the 1.0.0 release")
         text = changelog.read_text(encoding="utf-8")
+        self.assertIn("## Unreleased", text)
         self.assertIn("## 1.0.0 - 2026-08-21", text)
 
 

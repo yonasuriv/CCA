@@ -1,6 +1,10 @@
 # Changelog
 
-This changelog records released CCA milestones. Normative semantics remain governed by the versioned specification and compatibility references inside `skills/cca/`.
+This changelog records released CCA milestones and pending user-visible changes. Normative semantics remain governed by the versioned specification and compatibility references inside `skills/cca/`.
+
+## Unreleased
+
+No changes yet. New user-visible, compatibility, semantic, profile, packaging, or release-relevant changes should be recorded here before the next release.
 
 ## 1.0.0 - 2026-08-21
 
@@ -32,5 +36,5 @@ First stable CCA specification release.
 
 - Validates upstream/native claims separately from CCA/profile claims and optional hardening.
 - Includes repository evaluation tests, Hybrid Workspace regression/adversarial tests, exhaustive frozen-contract mutation checks, repository validation, and portable-distribution validation in CI.
-- Aligns the public README, documentation index, references, publications, citation metadata, and release terminology with the stable 1.0.0 specification.
+- Aligns the public README, exhaustive documentation index, references, publications, citation metadata, contribution workflow, pull-request template, evaluation documentation, and release terminology with the stable 1.0.0 specification.
 - Preserves pre-1.0 exploratory material through Git history while removing obsolete design vocabulary from current release guidance.
