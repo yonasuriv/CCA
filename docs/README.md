@@ -13,6 +13,8 @@ CCA keeps runtime authority inside the installable `skills/cca/` package. Reposi
 - [References](references.md) — upstream, methodology, and citation links.
 - [Migration](migration.md) — preserving existing structures while adopting CCA guidance.
 - [Contributing](../CONTRIBUTING.md) — contribution rules and the complete validation suite.
+- [Pull request template](../.github/PULL_REQUEST_TEMPLATE.md) — review checklist for authority, compatibility, documentation, and validation.
+- [Evaluation protocol](../evals/README.md) — behavioral-evaluation contracts, release-test boundaries, and benchmark methodology.
 - [Changelog](../CHANGELOG.md) — released CCA milestones.
 
 ## Runtime authority
