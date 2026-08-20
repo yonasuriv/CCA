@@ -18,21 +18,21 @@ class WorkspaceBuilderParityTests(unittest.TestCase):
             "discovery",
             "mapping",
             "scaffolding",
-            "questionnaire design",
+            "questionnaire/onboarding",
             "validation and repair",
             "setup",
             "status",
             "tool prerequisites",
-            "skill discovery",
+            "agent skills",
             "fresh-agent",
         ):
             self.assertIn(anchor, text, f"workspace builder missing {anchor!r}")
         self.assertTrue(
-            "optional stages" in text and "condition" in text,
-            "workspace builder must make optional stages condition-controlled",
+            "optional" in text and "condition" in text,
+            "workspace builder must make optional behavior condition-controlled where applicable",
         )
         self.assertTrue(
-            "unresolved placeholders" in text and "orphan" in text,
+            "unresolved" in text and "orphan" in text,
             "workspace builder must detect unresolved/orphaned configuration",
         )
 

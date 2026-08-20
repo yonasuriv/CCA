@@ -1,20 +1,3 @@
-<!-- THIS REPO SHOULD FILL THE GAP THAT CURRENTLY ICM/MWP HAS
-
-The main goal and problem: CCA SHOULD use ICM as the skeleton, but I wanna create a workspace where I can work only from within this workspace, where I can have:
-- my raw shit such as random notes, toughts, clippings, transcripts, urls, repos, etc
-- my projects
-- my wiki, where all curated knowledge lives and is maintained by the agents
-- maybe a bookmarks or a quick access folder where i can have things such as TODO, planner, daily tasks, PDP, etc
-
-I really like the ICM (Interoprable COntext Methodology), but I don't think its adaptable 100% to me, as it's currently structured/shipped, so I really want to shape it to work it for me, so I can start tackling everything properly, improving not only agent routing, but my visibility, organization and productivity.
-
-I want the most elite and professional answer, no sugar coating, don't treat me like the average, I want the best scalable without technical debt possible of achieving this, so this later can grow indifnitely and agents will never get lost or grep through 9000 files to answer a question
-
-Its authors already flag this exact fear as a known limitation: the flat-file approach does not scale naturally to workspaces with thousands of reference documents, and the lack of programmatic validation means contract errors aren't caught until runtime
-
-REF: https://rainmakers.pl/posts/171_interpretable_context_methodology/ and https://arxiv.org/html/2603.16021v2
--->
-
 # AGENTS.md — CCA repository
 
 > Portable root guidance for contributors and agents working in this repository. Keep this file small; detailed behavior belongs in the canonical skill-local spec or the relevant reference.
@@ -54,8 +37,8 @@ CCA is an agent-agnostic interoperability and evolution layer for filesystem-nat
 
 1. **Convergence over invention.** Never replace, absorb, supersede, or redefine an existing framework, methodology, standard, or knowledge system merely to make it look like CCA.
 2. Native ICM and LLM Wiki compatibility comes before optional CCA hardening.
-3. Distinguish **native ICM** from **ICM-derived** patterns. Borrowing stage contracts alone does not establish native compatibility.
-4. Native ICM preserves the complete applicable upstream profile, including its native harness entry semantics. Portable `AGENTS.md` guidance may coexist without erasing a native `CLAUDE.md` authority.
+3. Distinguish **upstream-native ICM** from **ICM-derived** patterns. Borrowing stage contracts alone does not establish native compatibility.
+4. Upstream-native ICM preserves the complete applicable upstream profile, including its native harness entry semantics. Portable `AGENTS.md` guidance may coexist without erasing a native `CLAUDE.md` authority.
 5. LLM Wiki remains implementation-flexible; CCA-specific schemas are optional hardening unless explicitly adopted.
 6. PARA, Zettelkasten, BASB/CODE, Scrum, Kanban, XP, DevOps, SAFe, LeSS, DA, and similar methods remain authorities at their own scopes. CCA maps and routes their relationships; it does not implement them as a universal filesystem taxonomy.
 7. Nested native/upstream boundaries remain authoritative. Outer organization must not rewrite nested semantics merely for consistency.

@@ -1,61 +1,70 @@
 # CCA Method Composition
 
-Normative companion to `SPEC.md` and `compatibility.md`.
+Normative companion to `spec.md` and `compatibility.md`.
 
 ## 1. Purpose
 
 CCA may coexist with human knowledge-work methodologies and organizational systems without redefining them as CCA compatibility profiles.
 
-CCA currently recognizes **PARA**, **Zettelkasten**, and **Building a Second Brain (BASB/CODE)** as common method overlays. This list is descriptive rather than closed; another filesystem-compatible method (Eisenhower matrix, GTD, custom domain shelves, team taxonomies, …) may be composed under the same rules.
+CCA currently recognizes **PARA**, **Zettelkasten**, and **Building a Second Brain (BASB/CODE)** as common method overlays. This list is descriptive rather than closed; another filesystem-compatible method may be composed under the same rules.
 
 ## 2. Method overlays
 
 A **method overlay** is a methodology that influences organization, knowledge development, or human workflow without defining a CCA-native structural compatibility profile.
 
-CCA must not treat an overlay as equivalent to native ICM compatibility, ICM skeleton compatibility, native LLM Wiki compatibility, AGENTS.md conformance, or Agent Skills conformance unless that methodology publishes a concrete applicable machine-facing contract that CCA intentionally adopts in a future revision.
+CCA MUST NOT treat an overlay as equivalent to upstream-native ICM, LLM Wiki compatibility, AGENTS.md conformance, Agent Skills conformance, or a named CCA profile unless that methodology publishes a concrete applicable machine-facing contract that CCA intentionally adopts in a future revision.
 
 Examples:
 
 - **PARA** may organize material into Projects, Areas, Resources, and Archives.
 - **Zettelkasten** may organize knowledge as addressable linked notes.
 - **BASB/CODE** may guide the lifecycle Capture → Organize → Distill → Express.
-- **Eisenhower / GTD / custom shelves** may organize by urgency, next-action, or domain.
+- **GTD / custom shelves** may organize by next-action, domain, or another human concern.
 
 CCA may describe a workspace as PARA-organized, Zettelkasten-style, BASB-guided, or otherwise overlay-shaped, but those labels are not additional CCA compatibility states.
 
-### Overlay + ICM skeleton
+### Organization, epistemic role, and navigation
 
-Outer overlays answer *where things live*. The **ICM skeleton** (`spec.md` §2.1) answers *how a cold agent walks the workspace*. Architect must:
+These are separate axes:
 
-1. prefer the user's named overlay when they have one;
-2. under deferred trust, choose a small default overlay (often PARA) without claiming it is mandatory;
-3. always apply ICM skeleton roles (entry, map, folder contracts, factory vs product, stamps, status) to the shelves that actually exist;
-4. never require agents to know the overlay's brand name to operate — contracts and the L0 map carry the walk.
+- an organizational shelf answers **where material lives**;
+- an epistemic role answers **what kind of information it is** and often implies different authority/lifecycle expectations;
+- a navigation contract answers **how a consumer discovers the relevant boundary and context**.
+
+Therefore PARA `Resources` is not semantically equivalent to CCA `knowledge.reference`. A Resource may contain external evidence, a human note, maintained synthesis, a dataset, or a nested workspace. Crosswalks MUST describe partial/composed relationships where one-to-one equivalence is false.
+
+CCA core does not mandate an ICM-shaped navigation skeleton for every overlay or CCA-compatible workspace. Use:
+
+- exact current ICM routing when the boundary is upstream-native ICM;
+- selected ICM-derived patterns when the target explicitly adopts them;
+- a named CCA profile's own bootstrap/routing contract when that profile is selected;
+- the target's existing router/index/instruction convention when it already provides sufficient deterministic navigation;
+- ordinary filesystem inference when no stronger declaration is required.
 
 ## 3. Boundary composition
 
 **Nested boundaries must remain independently interpretable by the convention that owns them.**
 
-An outer organizational method may determine where a nested workspace lives, but must not silently rewrite the nested workspace's native semantics merely for uniformity.
+An outer organizational method may determine where a nested workspace lives, but MUST NOT silently rewrite the nested workspace's native semantics merely for uniformity.
 
 Therefore:
 
 1. A native ICM root nested under a PARA Project remains governed by the complete applicable current ICM profile.
-2. An LLM Wiki nested under a Resources tree remains governed by its own maintenance/schema instructions.
+2. An LLM Wiki-style maintained knowledge base nested under a Resources tree remains governed by its own maintenance/schema instructions.
 3. A coding repository nested under a broader second-brain hierarchy retains its application structure and scoped instructions.
-4. Zettelkasten notes are not assumed to be agent-writable; their authority/maintenance behavior comes from the local workspace instructions.
-5. CCA routing may connect these boundaries, but must not merge their schemas merely because they coexist.
+4. Zettelkasten notes are not assumed agent-writable; their authority/maintenance behavior comes from the local workspace instructions.
+5. CCA routing may connect these boundaries, but MUST NOT merge their schemas merely because they coexist.
 
-A CCA-aware agent should be able to understand the relationship between boundaries while an upstream-specific consumer can still enter the nested native root and operate without CCA-only semantics.
+A CCA-aware consumer should be able to understand the relationship between boundaries while an upstream-specific consumer can still enter the nested native root and operate without CCA-only semantics.
 
 ## 4. Metadata discipline
 
-CCA should infer ordinary filesystem semantics when doing so is safe. It must not require a universal manifest that merely restates obvious directory roles or duplicates native routing.
+CCA should infer ordinary filesystem semantics when doing so is safe. It MUST NOT require a universal manifest that merely restates obvious directory roles or duplicates native routing.
 
 Explicit metadata is appropriate when:
 
-- a workspace-specific fact cannot safely be inferred;
-- authority or write policy would otherwise be ambiguous;
+- a workspace-specific semantic/binding fact cannot safely be inferred;
+- authority or mutation policy would otherwise be ambiguous;
 - the active upstream/profile requires the metadata;
 - a user intentionally adopts an optional CCA hardening convention.
 
@@ -73,7 +82,7 @@ Package portability means:
 4. modes coordinate by semantic mode name, not filesystem package boundaries;
 5. architect and advisor remain separate reference domains even though they share one package.
 
-`architect` mode is the primary entry point for compound architecture/design requests and may lazy-load form/method references or consult the advisor domain for judgment. It is not a mandatory gateway for an operation whose intent already matches another mode directly.
+`architect` is the primary entry point for compound architecture/design requests. It is not a mandatory gateway for an operation whose intent already matches another mode directly.
 
 ## 6. Progressive disclosure
 
@@ -89,13 +98,15 @@ Creating dedicated PARA, Zettelkasten, BASB, Scrum, or similar CCA skills is not
 
 ## 7. Validation
 
-`lint` mode must not invent native PARA, Zettelkasten, or BASB profiles.
+`lint` MUST NOT invent native PARA, Zettelkasten, or BASB profiles.
 
-It may verify locally declared method-preservation constraints when a workspace explicitly defines them, but those findings must be distinguished from upstream/native compatibility claims.
+It may verify locally declared method-preservation constraints when a workspace explicitly defines them, but those findings MUST be distinguished from upstream-native compatibility claims.
 
 Method composition is healthy when:
 
 - nested native profiles remain valid;
 - file authority/write behavior is clear enough for the requested operation;
 - routing crosses boundaries without duplicating or flattening their rules;
-- the fresh-agent walk test can identify the relevant boundary and load the smallest sufficient context.
+- organizational shelves are not mistaken for epistemic roles;
+- navigation requirements come from the active upstream/profile/local contract rather than an undeclared universal skeleton;
+- large collections can introduce boundary-local routing/indexing without requiring a global manifest.

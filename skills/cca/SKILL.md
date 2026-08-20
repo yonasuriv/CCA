@@ -5,7 +5,13 @@ description: Use to design or restructure context systems, create or set up nati
 
 # CCA
 
-CCA (Convergent Context Architecture) is an evolving, agent-agnostic interoperability layer for filesystem-native AI context. It aims to bridge human knowledge work and agentic work by building on open standards, ecosystem conventions, and proven methodologies, protocols and frameworks, based on software engineering principles and fundamentals, to make any workspace, project, or body of human knowledge easier for both humans and AI agents to understand, navigate, and use, without forcing it into a new competing convention. It's goal is to make automation easier in service of augmenting human capabilities, while improving efficiency, reducing technical debt, unnecessary complexity, and lowering compute, usage, and operational costs.
+Convergent Context Architecture (CCA) is an evolving, agent-agnostic interoperability architecture for filesystem-native AI context. It helps humans and AI agents understand, navigate, and operate across workspaces, projects, and bodies of knowledge by defining stable semantic roles, scoped boundaries, and configurable bindings that preserve meaning even when their concrete paths or implementations change.
+
+CCA aims to bridge human knowledge work and agentic work without forcing existing systems into a new competing convention, by building on open standards, ecosystem conventions, established methodologies, protocols and frameworks, and based on software-engineering principles and fundamentals.
+
+Its goal is to make automation easier in service of augmenting human capabilities while improving efficiency, reducing technical debt and unnecessary complexity, and lowering compute, context, usage, and operational costs.
+
+> **Automation is the means; augmenting human capabilities is the goal.**
 
 This is one installable skill with seven lazily loaded modes. Select the smallest mode that directly matches the request, then load only that mode and the references it names.
 
@@ -25,14 +31,16 @@ If the task is ordinary implementation, coding, editing, testing, or project wor
 
 Do not load every mode or reference. Progressive disclosure is part of the architecture.
 
-For workspace creation or material rebuild, Architect lazily loads `references/architect/workspace-builder.md`. For native ICM (Interpretable Context Methodology), that builder performs the inherited discovery, mapping, scaffolding, questionnaire, validation/repair, `setup`, and `status` behaviors while current upstream ICM remains the acceptance authority.
+For workspace creation or material rebuild, Architect lazily loads `references/architect/workspace-builder.md`. For the optional CCA Hybrid Workspace Profile, Architect additionally loads `references/architect/hybrid-workspace.md`; its complete reviewed reference implementation is bundled under `assets/hybrid-workspace/`. This profile is not an eighth mode.
+
+For native ICM (Interpretable Context Methodology), the builder performs the inherited discovery, mapping, scaffolding, questionnaire, validation/repair, `setup`, and `status` behaviors while current upstream ICM remains the acceptance authority.
 
 ## Shared authority
 
 Before making a claim about CCA semantics, compatibility, or composition, use only the skill-local canonical material needed for that claim under `references/core/`:
 
 - `spec.md` — normative CCA semantics and operation model;
-- `compatibility.md` — upstream profiles and preservation rules;
+- `compatibility.md` — upstream/CCA/profile compatibility vocabulary and preservation rules;
 - `method-composition.md` — how methods coexist without being absorbed;
 - `adapters.md` — harness-specific interoperability guidance;
 - `icm-inheritance.md` — provenance map for preserving the current applicable ICM capability floor without redefining ICM.
@@ -43,30 +51,45 @@ For native ICM work, `icm-inheritance.md` is a compatibility map only. The curre
 
 These files are inside the installable skill so runtime behavior never depends on repository-global specification files that may not exist after installation.
 
+## Portable distribution boundary
+
+`skills/cca/` is CCA's self-contained installable distribution boundary.
+
+Any CCA-owned reference, schema, template, executable, fixture, or validation resource required to understand, resolve, generate, operate, validate, or maintain behavior advertised by this skill MUST be available inside this package. Repository-global documentation may elaborate, illustrate, research, or publish CCA but MUST NOT be the sole authority for runtime-required or normative semantics.
+
+Bundled tooling MUST operate on an explicitly resolved target workspace. The skill/package directory is capability implementation, never an implicit workspace target.
+
 ## Domain boundaries
 
 Keep these domains separate:
 
 - `references/core/` owns normative CCA semantics shared by all modes plus compatibility/provenance maps for inherited upstream behavior.
 - `references/advisor/` owns engineering judgment and methodology priors. Its seven references remain independent and are never folded into architect references.
-- `references/architect/` owns workspace forms, builder/onboarding behavior, boundaries, structural composition, and migration design.
+- `references/architect/` owns workspace forms, builder/onboarding behavior, boundaries, structural composition, optional profile definitions, and migration design.
 - `references/operations/` owns focused operational procedures.
+- `assets/` owns skill-local templates, executable/reference tooling, and other portable implementation resources already used by the current package topology.
 
 Architect mode may consult advisor references when a structural decision requires engineering/process judgment. That is lazy consultation, not ownership transfer or duplication.
 
 ## Routing rules
 
-1. Detect the existing workspace/profile before proposing structure.
-2. Preserve native authorities and declared method boundaries.
-3. Prefer the smallest intervention that solves the routing/context problem.
-4. Existing code repositories keep their application structure unless restructuring is explicitly requested.
-5. PARA, Zettelkasten, BASB/CODE, Scrum, Kanban, XP, DevOps, SAFe, LeSS, DA, and similar methods remain their own authorities; CCA maps relationships and routing rather than reimplementing them.
-6. Native ICM and native LLM Wiki claims are validated against their own applicable semantics before optional CCA hardening. For native ICM, inherited ICM behavior is the compatibility floor: CCA may extend it but must not weaken or replace it.
-7. Native ICM create/setup/status requests use Architect's `workspace-builder.md`; they do not require the upstream workspace-builder checkout at runtime, although upstream remains the semantic/acceptance authority.
-8. Do not create structure merely because a template exists.
-9. For destructive restructuring, surface the migration map before moves, merges, renames, or deletions unless the user has explicitly authorized direct remediation.
-10. Use harness-native adapter files only where needed; portable guidance should remain canonical in the workspace's chosen portable authority.
-11. When uncertainty crosses a hard-stop boundary, use `references/advisor/escalation-triggers.md`.
+1. Detect the existing boundary/workspace/profile before proposing structure.
+2. Resolve CCA operations through `boundary + semantic role → binding`; semantic identity MUST NOT depend on a default path where the governing contract allows bindings to move.
+3. Preserve upstream-native authorities and declared method boundaries.
+4. Prefer the smallest intervention that solves the routing/context problem.
+5. Existing code repositories keep their application structure unless restructuring is explicitly requested.
+6. PARA, Zettelkasten, BASB/CODE, Scrum, Kanban, XP, DevOps, SAFe, LeSS, DA, and similar methods remain their own authorities; CCA maps relationships and routing rather than reimplementing them.
+7. A valid native ICM workspace is CCA-compatible without structural migration; native ICM remains governed and validated by current upstream ICM. CCA may extend/harden it but must not weaken or replace it.
+8. Native ICM create/setup/status requests use Architect's `workspace-builder.md`; they do not require the upstream workspace-builder checkout at runtime, although upstream remains the semantic/acceptance authority.
+9. The optional Hybrid Workspace Profile is CCA-owned and profile-conformant only when its bundled contract passes. Its default bindings are not semantic identities.
+10. Do not create structure merely because a template exists.
+11. For destructive restructuring, surface the migration map before moves, merges, renames, or deletions unless the user has explicitly authorized direct remediation.
+12. Use harness-native adapter files only where needed; portable guidance should remain canonical in the workspace's chosen portable authority.
+13. When uncertainty crosses a hard-stop boundary, use `references/advisor/escalation-triggers.md`.
+
+## Upstream-change rule
+
+CCA MUST update or explicitly version/pin a compatibility mapping when a supported upstream changes in a way that affects a compatibility claim. CCA SHOULD converge toward an upstream approach that demonstrates a materially better solution to the same problem, provided it does not violate CCA's core principles. CCA MUST NOT preserve an inferior CCA-specific convention merely because CCA introduced it first.
 
 ## Core rule
 
@@ -74,6 +97,4 @@ Preserve existing standards, frameworks, methodologies, protocols, and knowledge
 
 Always advise; never enforce or assume. When a decision is left to you, first determine the user's intent, then choose the path most likely to produce the best possible outcome.
 
-Automation is the means; augmenting human capability is the goal.
-
-For for information, see [CITATION](CITATION.cff).
+For reference metadata and upstream attribution, see [CITATION](CITATION.cff).

@@ -17,5 +17,15 @@ jobs:
           python-version: "3.12"
       - name: Run evaluation harness tests
         run: python -m unittest discover -s evals/tests -v
+      - name: Run personal-hybrid intent scorer tests
+        run: python evals/personal-hybrid-intent/tests/test_score_intent.py
+      - name: Install bundled hybrid workspace test dependency
+        run: python -m pip install -r skills/cca/assets/hybrid-workspace/requirements.txt
+      - name: Run bundled hybrid workspace regression tests
+        run: python -m unittest discover -s skills/cca/assets/hybrid-workspace/tests -v
+      - name: Validate bundled hybrid workspace frozen contract
+        run: python skills/cca/assets/hybrid-workspace/audit.py --self-test
       - name: Validate repository invariants
         run: python .github/scripts/validate_repo.py
+      - name: Validate portable distribution boundary
+        run: python .github/scripts/validate_distribution.py

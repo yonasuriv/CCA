@@ -1,138 +1,131 @@
 # Design principles behind CCA
 
-Explanatory, not normative. CCA inherits ideas from ICM, the LLM Wiki pattern, Agent Skills, and broader context-engineering practice. This document explains the reasoning behind CCA without turning optional implementation choices into upstream requirements.
+Explanatory, not normative. Normative semantics live inside the installable skill at [`../skills/cca/references/core/spec.md`](../skills/cca/references/core/spec.md). Compatibility claims live in [`../skills/cca/references/core/compatibility.md`](../skills/cca/references/core/compatibility.md). If this document conflicts with those references or a supported upstream's current primary authority, the normative/upstream authority wins.
 
-When this document conflicts with `spec/SPEC.md`, `spec/method-composition.md`, or a current upstream primary source, the normative spec/upstream wins.
+## 1. Augmentation is the objective
 
-## Context principles
+> **Automation is the means; augmenting human capabilities is the goal.**
 
-### 1. Route the right context, not bigger prompts
+CCA should increase human agency, comprehension, portability, and effective capability while reducing unnecessary human toil and machine work. Human-centered does not mean forcing humans to perform work an agent can safely automate; it means preserving inspectability, authority, provenance, and the ability to steer/override durable outcomes.
 
-A better prompt does not compensate for a badly designed context system. Agent execution depends on instructions, memory, knowledge, tools, and state. The engineering problem is constructing the right context for this task, at this moment, within budget rather than loading everything available.
+## 2. Converge instead of inventing
 
-*Encoded as:* layered routing where appropriate; catalogs that point instead of store; progressive loading; Inputs tables that scope what a stage reads; profile-aware routing instead of one universal router.
+CCA should use existing standards, methodologies, protocols, and proven conventions where they already solve the problem well.
 
-### 2. Available context ≠ useful context
+When an upstream changes in a way that affects CCA compatibility, CCA adapts or versions/pins the mapping. When a better upstream solution emerges, CCA should converge toward it rather than preserving a weaker CCA-specific convention for historical pride.
 
-Large context windows do not make irrelevant material useful. Selective routing should reduce unnecessary context before compression or larger prompts are considered.
+## 3. Stable semantics, replaceable bindings
 
-*Encoded as:* stage-scoped references and tools; selective section routing; compact routing files; lint checks for bloated or duplicative navigation.
+CCA separates meaning from implementation:
 
-### 3. The environment carries the system, not the prompt
+```text
+boundary + semantic role -> binding
+```
 
-When durable context lives in the workspace, short user intent can be enough because the agent navigates explicit files instead of reconstructing the operating model from chat history.
+Semantic roles remain stable while concrete paths or implementations may change where the governing contract permits it. This is the same engineering principle as stable interfaces over replaceable implementations.
 
-*Encoded as:* root/native instruction files, task routers, scoped references, durable state, and explicit compatibility/authority boundaries.
+A default path is not identity merely because it is convenient.
 
-## Knowledge principles
+## 4. Route the right context, not bigger prompts
 
-### 4. Persistent synthesis when knowledge should compound
+Large context windows do not make irrelevant material useful. Resolve the applicable boundary, authority, semantic role, and binding before searching broadly.
 
-Some knowledge tasks benefit from maintaining synthesis across sessions rather than rebuilding the same understanding from source material for every query. This complements retrieval; it does not imply that every RAG system discards reasoning or that persistent synthesis should replace retrieval everywhere.
+CCA therefore prefers:
 
-*Encoded as:* a source/synthesis distinction when the workspace adopts maintained knowledge; ingest as integration rather than isolated per-source summaries; verification against evidence when needed.
+```text
+boundary
+  -> authority/instructions
+  -> semantic role
+  -> binding/router
+  -> local catalog/contract/index
+  -> targeted search
+  -> optional derived index
+  -> broad search fallback
+```
 
-### 5. Build navigable knowledge, not a document dump
+## 5. The environment carries durable context
 
-Storage creates capacity; navigation makes knowledge usable. A maintained knowledge workspace should make it possible to find what exists, understand relationships, and trace important claims without forcing a specific database or graph implementation.
+When instructions, knowledge, state, contracts, and provenance live in durable filesystem-native form, short human intent can be enough. Agents navigate the environment instead of requiring the user to repeatedly reconstruct the operating model in prompts.
 
-*CCA hardening may encode this as:* an index/router, entity or concept pages, cross-links, provenance metadata, lifecycle fields, or structured frontmatter. These are optional CCA implementation choices unless the active workspace explicitly adopts them. Native LLM Wiki compatibility does not require this exact schema.
+## 6. Persistent synthesis where knowledge should compound
 
-### 6. Provenance, contradiction, and lifecycle are valuable hardening layers
+Some knowledge work benefits from maintained synthesis that survives sessions. CCA adopts the useful core of LLM Wiki without assuming every knowledge problem needs a wiki or that retrieval becomes obsolete.
 
-Where evidence traceability matters, derived claims should keep a path back to supporting material. Conflicting evidence should be preserved with enough context to understand the disagreement, and stale knowledge should remain distinguishable from current knowledge when history matters.
+Preserved evidence, human notes, and maintained synthesis are different epistemic roles and should not be silently collapsed.
 
-*CCA hardening may encode this as:* provenance fields, contradiction sections, lifecycle states, or a maintenance chronicle. None of those concrete mechanisms are universal LLM Wiki requirements, and the CCA spec only makes them normative for a workspace that intentionally adopts the corresponding profile/convention.
+## 7. Start with the workflow, not the agent
 
-## Workflow principles
+When work is sequential, decompose the real process and handoffs first. ICM provides a strong proven methodology for explicit routing, local contracts, selective context loading, one-way dependencies, and durable output handoffs.
 
-### 7. Start with the workflow, not the agent
+CCA should use native ICM directly when native ICM is the right solution. Borrowed ICM patterns remain ICM-derived unless the full upstream-native profile passes.
 
-Decompose the real process first; let the structure follow. A stage that fetches does not also filter. One stage, one job.
+## 8. Durable artifacts are human edit surfaces
 
-*Encoded as:* ICM's numbered stage folders, explicit `Inputs` / `Process` / `Outputs` contracts, one-way dependencies, and durable output handoffs when the workflow is pipeline-shaped.
+Human review should be able to occur on inspectable durable artifacts rather than only in chat history. A later agent should consume the artifact the human actually left behind.
 
-Borrowing these constructs does not automatically make a repository a full native ICM workspace. Native ICM compatibility requires the complete applicable current ICM profile.
+## 9. Configure the factory, not every product
 
-### 8. Every output can be an edit surface
+Stable preferences, constraints, schemas, templates, and rules belong in durable canonical homes. Repeated manual correction is evidence that the durable system may need improvement.
 
-For staged workflows, human review should happen on durable artifacts between stages rather than only in chat history. The next stage consumes what the human actually left on disk.
+## 10. Context packages before platforms
 
-*Encoded as:* ICM `output/` handoff folders and, where the profile calls for them, checkpoints and stage audits.
+Plain files are often enough for durable context. Add databases, indexes, MCP, orchestration, messaging, transactions, or services when they solve a real capability/scaling problem rather than because infrastructure looks more sophisticated.
 
-### 9. Configure the factory, not the product
+## 11. Build outcomes, not AI features
 
-Stable preferences and system rules belong in durable configuration/reference material rather than being re-entered for every run. Repeated manual corrections are signals that the durable system may need improvement.
+Use deterministic scripts/tools for deterministic work. Use models where reasoning/generation adds value. Evaluate the result in human outcomes such as quality, speed, cost, reliability, understanding, and decision leverage.
 
-*Encoded as:* setup/onboarding for profiles that use it, canonical references, and shared constants for code-producing ICM workspaces where applicable.
+## 12. Stable context plane, replaceable execution plane
 
-## Product principles
+Durable context should survive changes in model vendor, harness, runtime, or orchestration system. Host-specific adapters are replaceable implementations, not the canonical home of CCA semantics.
 
-### 10. Context packages before platforms
+## 13. One portable skill, multiple lazy modes
 
-A large class of agent workflows can remain portable when their durable context is ordinary files. Software should be introduced for capabilities the filesystem cannot provide efficiently, not merely to make the architecture look more sophisticated.
+CCA is distributed as **one self-contained `cca` Agent Skill with seven modes**: `architect`, `scaffold`, `sync`, `ingest`, `query`, `lint`, and `advise`.
 
-*Encoded as:* the workspace-is-a-folder baseline; Git-friendly state; optional databases, indexes, MCP connections, and orchestration.
+Progressive disclosure comes from mode-specific skill-local references/assets/scripts, not from splitting one semantic authority across separately installable CCA packages.
 
-### 11. Build outcomes, not AI features
+`skills/cca/` is therefore the portable distribution boundary: repository docs may explain CCA, but installed meaning cannot depend on repository-global files.
 
-Evaluate the system by what changes for the user: quality, speed, cost, reliability, understanding, or decision leverage. Deterministic work should stay deterministic when a script or ordinary tool is more appropriate than a model.
+## 14. Modes and profiles are different dimensions
 
-*Encoded as:* CCA specifies context structure and operations rather than requiring a model or runtime for every step.
+A mode describes what the agent is doing. A profile describes an optional workspace contract.
 
-### 12. Automation as infrastructure, augmentation as the objective
+The CCA Hybrid Workspace Profile is not an eighth mode. Existing modes architect it, scaffold it, sync it, query/ingest through its semantic bindings, and lint it.
 
-Automation removes repetitive work; augmentation increases what a person can understand, decide, and create. The human remains able to inspect and steer durable artifacts while agents handle repeatable context/navigation work.
+## 15. Compose boundaries; do not flatten methods
 
-*Encoded as:* human-editable files, visible handoffs, profile-specific checkpoints where applicable, and filesystem observability.
+PARA, Zettelkasten, BASB/CODE, ICM, LLM Wiki, coding repositories, delivery methods, and other systems solve different concerns.
 
-## Architecture principles
+An outer method may organize where a nested boundary lives without becoming authoritative for the nested boundary's internal semantics.
 
-### 13. Stable context plane, replaceable execution plane
+## 16. Infer ordinary structure before declaring metadata
 
-Durable instructions, knowledge, workflows, constraints, and capabilities should survive changes in model vendor, agent harness, orchestration framework, or deployment environment.
+Do not create a manifest merely to restate obvious filesystem paths. Explicit metadata should capture semantic/authority/binding facts that cannot safely be inferred or that an adopted profile/upstream explicitly requires.
 
-*Encoded as:* filesystem-native context packages, thin adapters, portable Agent Skills, and a refusal to make runtime-specific infrastructure the canonical home of durable semantics.
+The optional Hybrid Workspace Profile intentionally uses `WORKSPACE.yaml` as its machine-readable bootstrap because that profile needs configurable semantic bindings and deterministic validation. That choice is profile-specific, not universal CCA.
 
-### 14. One runtime, many context-defined specializations
+## 17. Derived state should remain derived
 
-A general agent runtime should become specialized by loading the relevant skill and context rather than requiring a permanent named agent for every task. Focused capabilities are cheaper to route and easier to replace than a proliferation of static agent identities.
+Indexes, dashboards, routers, caches, reports, and generated specifications should be reproducible from canonical sources where practical. A derived artifact should not silently become the authoritative source of truth.
 
-*Encoded as:* the CCA skill suite, precise skill descriptions, compact `SKILL.md` files, lazy-loaded references, and semantic delegation between focused capabilities when compound work requires it.
+## 18. Collaboration/runtime infrastructure is a separate layer
 
-This does **not** mean one monolithic skill. `cca-architect` coordinates compound architecture requests, while direct lint/ingest/query/sync/scaffold requests can activate the focused skill immediately.
+Filesystem-native durable context supports asynchronous handoffs, shared history, and inspectability. It does not replace message buses, schedulers, authorization systems, transactions, or high-concurrency runtime infrastructure.
 
-### 15. Collaboration and deployment are separate layers
+CCA can sit beneath those systems as a durable context/interoperability layer.
 
-Durable workspace context, real-time collaboration infrastructure, and execution runtime are different concerns. Files can support asynchronous handoffs and shared history, but they are not a substitute for message buses, authorization systems, transactions, scheduling, or high-concurrency services.
+## 19. Validate what can be deterministic
 
-*Encoded as:* CCA keeps collaboration/runtime infrastructure optional and out of the core filesystem contract while remaining usable beneath those layers.
+Checkable invariants should be mechanically validated rather than deferred entirely to model judgment. The Hybrid Workspace Profile carries its schema, generator, audit logic, and adversarial tests inside the installed skill for this reason.
 
-### 16. Compose boundaries; do not flatten methods
+## 20. Preserve upstream authority
 
-PARA, Zettelkasten, BASB/CODE, LLM Wiki, ICM, coding repositories, and other valid structures may coexist because they solve different concerns. Interoperability is strongest when each nested boundary remains understandable to the convention that owns it.
+- Native ICM remains governed by current ICM.
+- LLM Wiki remains implementation-flexible unless a specific implementation/profile chooses stronger structure.
+- AGENTS.md retains its own scoped-instruction convention.
+- Agent Skills retains its own package/progressive-disclosure contract.
+- Human methodologies remain independent methods.
+- CCA-owned hardening/profile choices must be labeled as CCA choices.
 
-*Encoded as:* method overlays, nested native boundaries, no fake PARA/Zettelkasten/BASB lint profiles, and the rule that an outer organizational method may place a nested workspace without rewriting its native internals.
-
-### 17. Infer structure before declaring metadata
-
-Filesystem-native context loses much of its value if every obvious path must be mirrored in a central manifest. Explicit metadata should represent facts that cannot safely be inferred, not restate the directory tree.
-
-*Encoded as:* optional metadata, native/profile discovery first, and rejection of giant manifests that duplicate Projects/Areas/Resources/Archives, stages, wiki folders, skill collections, or other obvious filesystem roles.
-
-## Convergence rule
-
-CCA's own preferred forms are never allowed to erase upstream distinctions or human methodology boundaries:
-
-- Native ICM remains governed by current ICM conventions and acceptance.
-- LLM Wiki remains implementation-flexible unless a specific implementation chooses stronger structure.
-- `AGENTS.md` follows its own standard and nested-scope behavior.
-- Agent Skills remain focused packages governed by the current Agent Skills specification; CCA suite coordination uses semantic capability names rather than sibling filesystem paths.
-- PARA, Zettelkasten, and BASB/CODE remain method overlays unless a future concrete contract is deliberately adopted.
-- CCA-specific hardening must be labeled as CCA-specific hardening.
-
-Prefer Mermaid for CCA's own explanatory architecture/routing diagrams, but preserve an upstream-required representation when compatibility depends on it.
-
----
-
-Primary influences: the ICM repository and paper, Karpathy's LLM Wiki idea file, AGENTS.md, Agent Skills, the method-composition sources documented in `docs/method-composition.md`, and the context-engineering design notes that informed CCA. Normative claims belong in the specification or in the upstream standard itself, not in this explanatory document.
+CCA succeeds when interoperability increases without making upstream systems less themselves.

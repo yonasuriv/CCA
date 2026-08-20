@@ -1,193 +1,228 @@
 # Lint mode
 
-Validate the workspace it actually is. Do not fail upstream projects for omitting CCA-specific conventions they never adopted, and do not invent native PARA/Zettelkasten/BASB profiles.
+Validate the target it actually is. Do not fail upstream systems for omitting CCA conventions they never adopted, and do not invent native profiles for human methods that do not define one.
 
-## 1. Detect the profile
+## 1. Detect claims and boundaries
 
-Determine one or more applicable profiles from the workspace files and instructions:
+Determine applicable claims from durable files/instructions:
 
-- **ICM native compatibility**
-- **ICM skeleton compatibility**
-- **ICM-derived patterns only**
-- **LLM Wiki native compatibility**
-- **CCA conformance**
-- **ordinary project with portable agent guidance**
+- **upstream-native ICM**;
+- **ICM-derived patterns**;
+- **LLM Wiki-style maintained-knowledge compatibility**;
+- **CCA-compatible**;
+- **CCA-conformant**;
+- **CCA Hybrid Workspace Profile-conformant**;
+- **CCA-hardened**;
+- ordinary project/workspace with portable agent guidance.
 
-Also detect **method overlays** when locally declared or structurally clear, such as PARA, Zettelkasten, or BASB/CODE. Treat them as preservation/context boundaries, not native compatibility profiles.
+Also detect method overlays where declared or structurally clear, such as PARA, Zettelkasten, or BASB/CODE. Treat them as preservation/context boundaries rather than inventing structural certification.
 
-If detection is ambiguous, report the ambiguity. Do not silently choose the strictest profile. A project that only borrows ICM stage contracts is not automatically a native ICM workspace.
+If detection is ambiguous, report the ambiguity. Do not silently choose the strictest claim.
 
 ## 2. Universal structural checks
 
-These checks apply where relevant regardless of profile:
+Where relevant:
 
-- referenced paths resolve;
-- canonical rules are not duplicated as divergent authoritative copies;
-- routing files contain routing rather than large bodies of unrelated content;
-- nested instruction scopes are preserved rather than flattened;
-- nested native/method boundaries remain identifiable;
-- adapters do not contradict the canonical guidance they route to;
-- files required by an explicitly adopted contract actually exist;
-- contract filenames are not assumed: resolve L1/L2 paths from the Layer-0 skeleton map when present, else default to `CONTEXT.md` (`spec.md` §5.1).
+- resolve the current boundary before applying rules;
+- referenced bindings/paths resolve;
+- CCA operations resolve `boundary + semantic role -> binding` rather than treating defaults as identity;
+- canonical rules are not duplicated into divergent authoritative copies;
+- routing files route rather than accumulate unrelated payload;
+- nested instruction scopes remain scoped;
+- native/method boundaries remain identifiable;
+- adapters do not contradict canonical guidance;
+- files required by an explicitly adopted contract exist;
+- installed CCA skill resources do not depend on repository-global runtime files.
 
-## 3. ICM native compatibility checks
+Do not add an ICM-shaped structural requirement to this universal set. Navigation requirements come from the active upstream, named profile, or local contract.
 
-For a workspace that claims native ICM/MWP compatibility, validate the **complete applicable current upstream profile**, not only stage-folder syntax. Treat current upstream ICM `_core/CONVENTIONS.md` as canonical and its workspace-builder validation stage as the practical acceptance checklist for generated workspaces.
+## 3. Upstream-native ICM checks
 
-At minimum verify:
+When a boundary claims native ICM/MWP, validate the complete applicable **current upstream profile**, not only stage-folder syntax. Treat upstream ICM `_core/CONVENTIONS.md` and the applicable workspace-builder validation behavior as the authority.
 
-1. **Five layers.** Native Layer 0 `CLAUDE.md`, root `CONTEXT.md`, stage `CONTEXT.md`, selectively loaded reference material, and working artifacts preserve ICM semantics.
-2. **Root routing.** One root `CONTEXT.md` routes task types to the appropriate stages rather than storing reference content.
-3. **Stage contracts.** Every stage has `Inputs`, `Process`, and `Outputs`; the Inputs table uses exactly `Source | File/Location | Section/Scope | Why`.
-4. **CONTEXT purity.** `CONTEXT.md` files contain routing/process/checkpoint/audit/output contract material, not extended reference content.
-5. **Naming.** Files/folders follow current ICM naming rules; stages use zero-padded `01-name` prefixes; output artifacts follow the workspace convention; no spaces; intentionally empty persistent folders contain `.gitkeep`.
-6. **Handoff chain.** Each stage writes to its own `output/`; Stage N+1 references Stage N's actual output location; the chain is unbroken.
-7. **Reference integrity.** Every path named by an Inputs table exists.
-8. **One-way graph.** Cross-stage/reference dependencies are acyclic and do not point backward in a way that creates circular dependencies.
-9. **Selective routing.** Inputs identify exact sections where only part of a reference is needed; use `Full file` only when justified.
-10. **Canonical sources.** Substantive rules have one authoritative home; downstream routers point rather than duplicate.
-11. **Setup trigger.** `setup` starts the one-time onboarding flow defined by the workspace and resolves configured placeholders.
-12. **Status trigger.** `status` reports pipeline completion according to the current ICM convention. Do not substitute a different presentation format when native ICM specifies one.
-13. **Questionnaire.** Onboarding is flat, all-at-once, system-level, derives instead of re-asking inferable fields, supplies sensible defaults/examples, and is not repeated after setup.
-14. **Placeholder coverage.** Every placeholder has a corresponding setup answer/question, every questionnaire field maps somewhere useful, no unresolved/orphaned placeholders remain, and conditional placeholder blocks are structurally valid when used.
-15. **Tool prerequisites.** Required system tools have setup/verification guidance in the correct reference scope; optional tools remain conditional.
-16. **Bundled skills.** If present, skill references and discovery/bundling behavior do not break current ICM expectations; CCA package-locality checks may be reported separately.
-17. **Specs as contracts.** Specification stages define WHAT/WHEN and leave implementation HOW to the build stage where applicable.
-18. **Checkpoints.** Creative stages include at least one valid checkpoint; checkpoint step references resolve.
-19. **Audits.** Creative/build stages include specific pass/fail audit checks after process execution and before writing output where applicable.
-20. **Value validation.** Content-producing stages define and lock relevant value criteria where the current ICM pattern applies.
-21. **Docs over outputs.** Reference docs remain authoritative for quality/build rules; old outputs are not treated as pattern libraries.
-22. **Shared constants.** Code-producing workspaces centralize configurable shared values when applicable.
-23. **Quality guardrails.** Enforce current ICM size/readability/formatting guardrails, including CONTEXT/reference size limits and ICM-specific text style rules.
-24. **End-to-end validation.** A generated workspace should pass the equivalent of the current workspace-builder validation stage and complete at least one representative run before being called ready when that claim is being made.
+At minimum verify, where applicable:
 
-If only ICM-derived stage patterns are present, report whether those borrowed patterns are internally valid, but mark **ICM native compatibility: N/A** unless the full profile is actually claimed and present.
+1. five-layer routing and current native Layer-0 semantics;
+2. root and per-stage `CONTEXT.md` routing using exact upstream-native filenames;
+3. exact `Inputs` / `Process` / `Outputs` contracts and current Inputs columns;
+4. contract purity;
+5. current file/folder/stage naming and intentionally empty persistent-folder rules;
+6. per-stage `output/` handoffs and an unbroken handoff chain;
+7. referenced-input integrity;
+8. an acyclic one-way dependency graph;
+9. selective section routing;
+10. canonical-source discipline;
+11. current `setup` trigger behavior;
+12. current `status` trigger behavior/presentation;
+13. current onboarding/questionnaire behavior;
+14. complete placeholder/conditional-placeholder coverage where used;
+15. required-tool setup/verification guidance;
+16. bundled-skill behavior where applicable;
+17. specification-stage WHAT/WHEN discipline where applicable;
+18. checkpoints in applicable creative stages;
+19. audits in applicable creative/build stages;
+20. value validation where applicable;
+21. docs-over-outputs discipline;
+22. shared constants where applicable;
+23. current size/readability/formatting quality guardrails;
+24. workspace-builder-equivalent end-to-end validation before a generated workspace is described as ready.
 
-CCA-only wiki metadata and outer method organization are irrelevant to the native ICM profile unless they break the nested ICM boundary.
+A valid upstream-native ICM boundary is **CCA-compatible** without requiring structural migration or CCA metadata. If only ICM-derived patterns are present, report those patterns separately and mark upstream-native ICM `N/A` unless the full native claim is actually present.
 
-## 3b. ICM skeleton compatibility checks
+## 4. ICM-derived checks
 
-When the workspace claims ICM skeleton compatibility (or CCA generates a hybrid and asserts skeleton portability), validate **cold-agent isomorphism** (`spec.md` §2.1):
+A non-native boundary may borrow ICM stages, local contracts, selective routing, one-way dependencies, progressive disclosure, or handoffs. Validate only the constructs actually adopted.
 
-1. Layer 0 contains an explicit role→path map covering L1 workspace router and L2 folder-contract names.
-2. Every working folder has a local contract at the mapped name with Purpose / Inputs / Process / Outputs / Human check (not README-only).
-3. Nested `AGENTS.md` counts as L2 only if the map says so **and** those sections are present.
-4. Do **not** fail merely because the mapped name is not the string `CONTEXT.md`.
-5. Fail if alternate names are used without a map (agents would have to assume).
-6. Fail **native ICM** if any of those names diverge from upstream `CONTEXT.md` / `CLAUDE.md`.
-7. Factory vs product separation is declared; live `_templates/` (or mapped L3) exists in the workspace.
-8. Status-without-memory surface is declared for non-pipelines.
-9. Fail the claim if a cold agent must know CCA or ICM by name to find the next file.
+Do not require every CCA-compatible workspace to look like an ICM pipeline. If a named CCA-owned profile explicitly adopts ICM-style cold-agent navigation, validate that profile's own declared mapping/acceptance rather than promoting it to native ICM.
 
-Mark **ICM skeleton compatibility: N/A** when neither claimed nor asserted by generation.
+## 5. LLM Wiki-style maintained knowledge
 
-## 4. LLM Wiki native compatibility checks
+Do not require one directory schema. When a boundary intentionally uses this pattern, read the implementation's own instructions first, then verify the behavior it actually claims, such as:
 
-Do not require one directory schema. Verify the implementation's own instructions first, then check the core behavior:
-
-1. durable source material/evidence exists or has a defined home;
+1. durable source/evidence exists or has a defined home;
 2. maintained synthesis persists across sessions;
-3. there is an explicit maintenance procedure for integrating/querying knowledge;
-4. the knowledge base is directly inspectable/editable as files;
-5. the implementation's own links/index/schema resolve and are internally coherent.
+3. maintenance behavior for integrating/querying knowledge exists;
+4. humans can inspect/edit the knowledge base directly as files;
+5. the implementation's own navigation/schema resolves coherently.
 
-Missing CCA frontmatter, `raw/`, `wiki/`, `wiki/index.md`, `log.md`, entity/concept subdirectories, or CCA log syntax are **not** native LLM Wiki failures.
+Missing CCA-preferred paths/metadata are not failures unless the implementation explicitly adopted them.
 
-## 5. Method-overlay preservation
+## 6. Method-overlay preservation
 
-PARA, Zettelkasten, BASB/CODE, and similar methods are not native CCA lint profiles.
+PARA, Zettelkasten, BASB/CODE, and similar methods are not automatically CCA lint profiles.
 
-When a workspace explicitly declares such a method, lint may report whether CCA changes preserve its locally observable/declared boundaries. Examples:
+When declared, lint MAY report whether CCA changes preserve their locally observable semantics and boundaries. Examples:
 
-- an outer PARA tree still distinguishes Projects, Areas, Resources, and Archives where the workspace relies on those categories;
-- a nested native ICM root has not been flattened or rewritten by outer organization;
-- Zettelkasten notes have not been silently reclassified as agent-writable maintained synthesis without authority;
-- BASB/CODE terminology is not misrepresented as a structural filesystem requirement.
+- an organizational PARA boundary still preserves the categories the workspace actually relies on;
+- nested upstream-native systems have not been flattened by outer organization;
+- Zettelkasten/human notes have not been silently reclassified as agent-writable synthesis;
+- BASB/CODE terminology is not misrepresented as a mandatory filesystem taxonomy;
+- PARA `Resources` has not been treated as synonymous with preserved raw/reference evidence.
 
-Report these as **method-preservation findings**, not upstream/native compatibility certification.
+Report these as method-preservation findings, not invented native certification.
 
-## 6. CCA conformance checks
+## 7. CCA conformance
 
-Only apply requirements the workspace intentionally adopted. Examples include:
+Apply only intentionally adopted CCA requirements. Validate:
 
-- portable `AGENTS.md` routing;
-- CCA file-role classifications;
-- a CCA-hardened knowledge bundle;
-- provenance/lifecycle metadata;
-- CCA maintenance history conventions;
-- the fresh-agent walk test.
+- explicit boundary/authority semantics where the adopted contract needs them;
+- stable semantic role/key resolution;
+- configurable bindings where the governing contract permits them;
+- no semantic identity hidden in a default path;
+- one-fact-one-home / adapter locality;
+- installed-skill portability where CCA-owned runtime behavior is used;
+- applicable provenance/lifecycle/maintenance contracts;
+- supplemental fresh-agent walkability where claimed.
 
-Report optional hardening recommendations separately from errors.
+Report optional hardening separately from conformance errors.
 
-## 7. Agent Skills checks
+## 8. CCA Hybrid Workspace Profile
 
-When a `skills/` directory exists, validate each bundled skill package:
+Load `../architect/hybrid-workspace.md` when the target matches the bundled frozen-v1 profile.
 
-- `SKILL.md` exists;
-- frontmatter contains valid `name` and `description`;
-- directory name and skill name agree;
-- name uses lowercase letters, digits, and hyphens and remains within the current Agent Skills limits;
-- description states purpose and trigger conditions and remains within the current limits;
-- implementation resources referenced by file path are relative and remain inside the skill package;
-- no skill reaches into a sibling skill directory or repository-global implementation file by relative path;
-- semantic delegation to another installed capability by skill name is allowed;
-- detailed resources are progressively disclosed rather than copied wholesale into `SKILL.md`.
+Use the skill-local reference implementation on an **explicit target**:
 
-Do not fail a CCA skill merely because another suite capability is named as the correct next operation. Package locality and semantic capability composition are separate concerns.
+```bash
+python <cca-skill>/assets/hybrid-workspace/audit.py --target <workspace>
+python <cca-skill>/assets/hybrid-workspace/generate.py --target <workspace> --check
+```
 
-## 8. History and append-only claims
+For release-grade/self-test verification:
 
-A filesystem snapshot alone cannot prove that a file has never been rewritten.
+```bash
+python <cca-skill>/assets/hybrid-workspace/audit.py --target <workspace> --self-test
+```
 
-- Validate current log syntax only if the active profile defines one.
-- Claim append-only history only when version-control/history evidence is actually available and inspected.
-- Otherwise report history immutability as **not verified**, not passed.
+Profile checks include:
 
-## 9. Repairs
+1. frozen semantic-key/policy/authority contract passes;
+2. unsafe/escaping bindings and generated destinations are rejected after symlink resolution;
+3. effective permissions remain intersections rather than a single-axis grant;
+4. archive identity/trust/promotion invariants pass;
+5. required generated **semantic outputs** agree with current bindings and profile semantics;
+6. `AGENTS.md` satisfies the human-authored profile control contract;
+7. non-breaking binding moves propagate to generated consumers;
+8. `context.router` generation follows its current binding rather than treating literal `CONTEXT.md` as identity;
+9. moving `_state/`, `_runtime/`, or another default does not leak obsolete default paths into generated artifacts;
+10. the tooling leaves the installed package untouched and writes/checks only the explicit target;
+11. local routing/indexing remains boundary-scoped as large collections grow rather than requiring one root manifest.
 
-Default lint behavior is report-only unless the user asked for remediation.
+When the bundled Python reference implementation owns an artifact, `generate.py --check` additionally performs its canonical byte-for-byte drift check. Do not treat Python rendering details as the only possible implementation of the profile; an independent implementation must satisfy the normative semantic/artifact contract in `../architect/hybrid-workspace.md`.
 
-When remediation is authorized, automatically repair only changes whose intent is unambiguous, such as a catalog path that clearly points to a uniquely renamed file. Do not automatically:
+Do not "repair" a failed frozen semantic/policy field by treating it as a binding customization. Semantic changes follow the profile's evolution/version contract.
+
+## 9. Agent Skills checks
+
+When validating Agent Skills packages:
+
+- `SKILL.md` exists with valid current-standard frontmatter;
+- directory and skill name agree;
+- detailed resources are progressively disclosed;
+- implementation resources remain inside the package;
+- no runtime dependency escapes into sibling skills or repository-global implementation files;
+- semantic delegation to another capability/mode is distinct from a filesystem dependency.
+
+For CCA itself, verify that everything required to understand/operate advertised installed behavior exists under `skills/cca/`.
+
+## 10. History and append-only claims
+
+A filesystem snapshot alone cannot prove historical immutability.
+
+- Validate current syntax only where the active contract defines it.
+- Claim append-only history only when relevant history/version evidence is available and inspected.
+- Otherwise report immutability history as **not verified**.
+
+## 11. Repairs
+
+Default lint behavior is report-only unless remediation is requested.
+
+When remediation is authorized, automatically repair only unambiguous issues. Do not automatically:
 
 - delete files;
-- resolve semantic contradictions;
+- resolve semantic contradictions by guessing;
 - rename an upstream-native structure into a CCA preference;
 - flatten a method overlay or nested native boundary;
-- merge competing instruction files without reviewing unique content;
-- fabricate missing provenance or metadata.
+- merge competing instruction authorities without reviewing unique content;
+- fabricate provenance/metadata;
+- reset a Hybrid Workspace Profile target from bundled templates over human-authored control files.
 
 ## Report format
 
 ```text
-# Lint report — [workspace]
+# Lint report — [target]
 
-Profiles detected:
-- ICM native compatibility: PASS | FAIL | N/A
-- ICM skeleton compatibility: PASS | FAIL | N/A
+Claims/boundaries detected:
+- Upstream-native ICM: PASS | FAIL | N/A
 - ICM-derived patterns: PASS | FAIL | N/A
-- LLM Wiki native compatibility: PASS | FAIL | N/A
-- CCA conformance: PASS | PARTIAL | N/A
-Method overlays detected: [list or none]
+- LLM Wiki-style maintained knowledge: PASS | FAIL | N/A
+- CCA-compatible: PASS | FAIL | N/A
+- CCA-conformant: PASS | PARTIAL | FAIL | N/A
+- Profile-conformant (name): PASS | FAIL | N/A
+- CCA-hardened: [present capabilities | none]
+- Method overlays: [list | none]
 
-## Compatibility errors
-[Issues that break a claimed upstream/native profile]
+## Upstream compatibility errors
+[Only failures against a claimed upstream authority]
 
 ## CCA conformance errors
-[Only requirements intentionally adopted by this workspace]
+[Only intentionally adopted CCA requirements]
+
+## Profile conformance errors
+[Only named CCA profile requirements]
 
 ## Method-preservation findings
-[Only locally declared/observable overlay constraints; not native certification]
+[Declared/observable overlay findings; not native certification]
 
 ## Hardening opportunities
-[Optional improvements, never presented as upstream failures]
+[Optional improvements]
 
 ## Verification limits
-[Checks that could not be proven from available evidence]
+[What available evidence cannot prove]
 
 ## Repairs applied
-[Only if explicitly authorized]
+[Only if authorized]
 ```
 
 ## Production rule
 
-A clean lint report means the workspace satisfies the profile it claims within the evidence inspected. The CCA walk test supplements profile-specific validation; it does not replace ICM acceptance or another upstream's stricter rules.
+A clean lint report means the target satisfies the claims checked within the evidence inspected. CCA compatibility/conformance and the fresh-agent walk test never waive a failed upstream-native acceptance check.
