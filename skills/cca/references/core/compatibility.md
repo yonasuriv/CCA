@@ -64,7 +64,7 @@ Roles overlap; concrete filenames and paths may differ where the applicable cont
 | maintained synthesis | no direct ICM equivalent | core LLM Wiki behavior |
 | chronicle/history | Git/history or workspace artifact | optional implementation detail |
 
-Semantic overlap is not permission to force identical directory trees.
+Semantic overlap is not permission to force identical directory trees or ownership rules.
 
 ## 4. ICM compatibility
 
@@ -96,7 +96,7 @@ A non-ICM boundary may intentionally borrow ICM constructs such as numbered stag
 
 That is **ICM-derived**, not upstream-native ICM, unless the complete applicable upstream profile passes.
 
-### 4.3 ICM-skeleton behavior in optional profiles
+### 4.3 ICM-derived navigation in optional profiles
 
 A CCA-owned profile may intentionally adopt ICM's cold-agent navigation behaviors without claiming to be native ICM. When such a profile declares this behavior, validate the profile's declared mapping and local contracts rather than pretending the profile is an upstream ICM pipeline.
 
@@ -115,14 +115,17 @@ Where both exist:
 
 ## 5. LLM Wiki compatibility
 
-LLM Wiki is an idea pattern whose concrete filesystem details are intentionally implementation-defined. CCA compatibility therefore focuses on behavior:
+Karpathy's LLM Wiki is explicitly an **idea pattern**, not a fixed conformance standard. Its published core distinguishes immutable raw sources, an LLM-owned maintained wiki, and a schema/instruction document that humans and the LLM co-evolve. It also says implementation details are intentionally domain- and preference-dependent.
 
-- durable source material/evidence exists;
-- maintained synthesis compounds across sessions rather than being rebuilt from scratch for each query;
-- maintenance behavior for incorporating new material is explicit enough for the agent to operate;
-- the human can inspect and edit the filesystem-native knowledge base directly.
+CCA compatibility therefore preserves that pattern instead of inventing a universal filesystem certification:
 
-CCA may recommend hardening such as a raw/wiki split, indexes, provenance metadata, lifecycle state, logs, or integrity checks, but must not attribute those implementation choices to LLM Wiki as mandatory upstream requirements.
+- durable raw/source material remains the evidence layer and is not silently rewritten by the maintainer;
+- maintained synthesis persists and compounds across sessions rather than being reconstructed from scratch for every question;
+- a local schema/instruction contract tells the maintainer how to ingest, query, and maintain the wiki;
+- the filesystem-native result remains directly inspectable by the human;
+- write ownership follows the local LLM Wiki implementation/schema rather than a CCA default. The published idea gives the LLM ownership of the wiki layer; a human-editable shared variant is therefore an adaptation unless its local schema explicitly defines that behavior.
+
+CCA may recommend hardening such as stronger indexes, provenance metadata, lifecycle state, trust controls, logs, or integrity checks, but must not attribute those choices to LLM Wiki as mandatory requirements.
 
 ## 6. AGENTS.md compatibility
 
@@ -151,7 +154,7 @@ Repository documentation may elaborate, illustrate, research, or publish CCA, bu
 
 The optional Hybrid Workspace Profile is CCA-owned, CCA-compatible by construction, and intended to be CCA-conformant/profile-conformant when its declared contracts pass.
 
-It is **not** a new CCA mode and **not** native ICM. Its complete portable reference implementation is bundled inside the `cca` skill and is governed by [`../architect/hybrid-workspace.md`](../architect/hybrid-workspace.md).
+It is **not** a new CCA mode and **not** native ICM. Its portable reference implementation is bundled inside the `cca` skill and is governed by [`../architect/hybrid-workspace.md`](../architect/hybrid-workspace.md).
 
 Profile tooling operates on an explicit target workspace. The installed skill/package directory is implementation machinery, never the workspace target.
 
@@ -177,7 +180,7 @@ CCA tooling must resolve and operate on native ICM without structural migration.
 
 ### LLM Wiki → CCA tooling
 
-CCA tooling must discover the wiki's own schema/instructions before imposing implementation preferences. Optional hardening remains optional.
+CCA tooling must discover the wiki's own schema/instructions before imposing implementation preferences. Optional hardening remains optional. CCA must not silently convert the published LLM-owned wiki layer into shared or human-owned synthesis.
 
 ### CCA-conformant → ICM consumer
 
@@ -185,9 +188,9 @@ If a CCA-conformant boundary claims **upstream-native ICM**, it must preserve th
 
 If it only borrows ICM patterns, it must describe them as ICM-derived or as behavior adopted by a named CCA profile rather than promise native ICM interchangeability.
 
-### CCA knowledge bundle → LLM Wiki practice
+### CCA maintained-knowledge profile → LLM Wiki pattern
 
-A CCA-owned knowledge profile that claims LLM Wiki compatibility must preserve persistent synthesis over durable source material. CCA-specific metadata and maintenance structure remain implementation choices.
+A CCA-owned knowledge profile may be inspired by LLM Wiki without claiming exact LLM Wiki ownership semantics. If it claims LLM Wiki compatibility, document any ownership/authority adaptations explicitly rather than hiding them behind a one-to-one mapping.
 
 ## 11. Validation precedence
 
