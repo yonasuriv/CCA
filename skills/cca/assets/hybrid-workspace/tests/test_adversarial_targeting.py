@@ -8,9 +8,8 @@ import sys
 import tempfile
 import unittest
 
-import yaml
-
 PACKAGE = Path(__file__).resolve().parents[1]
+PROFILE = PACKAGE.parents[1] / "references" / "architect" / "hybrid-workspace.md"
 
 
 def run(*args: str, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
@@ -31,11 +30,11 @@ def make_target() -> Path:
 
 
 class AdversarialTargetingTests(unittest.TestCase):
-    def test_generation_contract_names_router_semantically(self) -> None:
-        data = yaml.safe_load((PACKAGE / "WORKSPACE.yaml").read_text(encoding="utf-8"))
-        derived = data["generation_contract"]["derived"]
-        self.assertIn("context.router", derived)
-        self.assertNotIn("CONTEXT.md", derived)
+    def test_profile_contract_names_router_semantically(self) -> None:
+        text = PROFILE.read_text(encoding="utf-8")
+        self.assertIn("**`context.router`** — semantic output role", text)
+        self.assertIn("consumers MUST interpret that entry as the `context.router` role", text)
+        self.assertIn("not as a fixed filename requirement", text)
 
     def test_parent_traversal_binding_is_rejected(self) -> None:
         target = make_target()
