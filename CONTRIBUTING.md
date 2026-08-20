@@ -73,16 +73,31 @@ Profiles are a separate dimension. A new workspace profile is not automatically 
 
 The optional CCA Hybrid Workspace Profile lives completely inside the installed skill.
 
-Its frozen-v1 semantic/policy contract should not be casually changed. Before changing it:
+The **current bundled schema is v2**. It preserves the complete frozen-v1 semantic/policy/authority baseline and adds only `reference.curated` and `reference.collected` admission classifications beneath `knowledge.reference`. The v2 bump is deliberate: frozen v1 already declared that key additions require a schema-version bump.
 
-1. determine whether the issue is actually a movable `binding` rather than a semantic-key problem;
-2. preserve the existing key/policy/authority meanings for non-breaking binding changes;
-3. require a schema-version treatment for changes the profile marks breaking;
-4. add a failing regression/adversarial test before implementation changes;
-5. verify generation/audit operate on an explicit target workspace, never the installed tool/package directory;
-6. verify `context.router` follows its declared binding;
-7. verify moved `_state/`, `_runtime/`, and other defaults do not leak into generated artifacts;
-8. keep the reviewed scripts/templates/tests within `skills/cca/`.
+Do not casually change either the v1 baseline or the v2 admission extension. Before changing the profile:
+
+1. determine whether the issue is actually a movable `binding` rather than a semantic-key/classification problem;
+2. preserve existing key/policy/authority meanings for non-breaking binding changes;
+3. require the declared schema-version treatment for changes the profile marks breaking;
+4. keep `reference.curated`/`reference.collected` as admission classifications composing with `knowledge.reference`, not competing knowledge roles;
+5. preserve the distinction `source admission/provenance != content authorship != semantic role`;
+6. add a failing regression/adversarial test before implementation changes;
+7. verify generation/audit operate on an explicit target workspace, never the installed tool/package directory;
+8. verify `context.router` follows its declared binding;
+9. verify moved `_state/`, `_runtime/`, `20-sources/`, and other defaults do not leak into generated artifacts;
+10. verify most-specific nested binding policy prevents parent permissions from widening child source policy;
+11. verify collected-source acquisition provenance/content identity and no-loose-parent-source invariants;
+12. keep the reviewed scripts/templates/tests within `skills/cca/`.
+
+For source admission specifically:
+
+- `reference.curated` is human-admitted/read-only to agents;
+- `reference.collected` uses existing append/add-child semantics for agent/tool deposits, not unrestricted mutation;
+- existing collected objects remain immutable to normal agent operation;
+- human review changes review metadata, not original admission classification;
+- evidence presence never implies truth/endorsement;
+- synthesis remains `knowledge.durable`, deliverables remain `output.artifact`, finite research work remains `work.project`.
 
 The profile is not native ICM. Nested upstream-native ICM boundaries remain governed by current ICM.
 
