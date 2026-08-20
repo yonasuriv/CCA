@@ -4,7 +4,7 @@
 
 ## What this repository is
 
-CCA is an agent-agnostic interoperability and evolution layer for filesystem-native context. It builds on ICM / Model Workspace Protocol and LLM Wiki, adopts portable ecosystem conventions such as AGENTS.md and Agent Skills, and composes with human knowledge-work and delivery methodologies without replacing their authorities.
+CCA is an agent-agnostic interoperability architecture for filesystem-native context. It builds on ICM / Model Workspace Protocol and LLM Wiki, adopts portable ecosystem conventions such as AGENTS.md and Agent Skills, and composes with human knowledge-work and delivery methodologies without replacing their authorities. It is deliberately evolvable as those upstream systems and ecosystem conventions change.
 
 ## Directory map
 
