@@ -1,17 +1,42 @@
 # CCA behavioral evaluations
 
-This directory defines evaluation contracts and mechanics. It does **not** treat static documentation, fixture existence, or simulated agent plans as behavioral evidence.
+This directory defines evaluation contracts, benchmark mechanics, and repository-level regression checks. It does **not** treat static documentation, fixture existence, or simulated agent plans as behavioral evidence.
+
+CCA 1.0 keeps two evidence classes separate:
+
+1. **release/regression verification** — deterministic tests and validators executed by CI on the exact repository candidate;
+2. **behavioral benchmarking** — matched external-agent runs used to support parity, improvement, efficiency, or broader capability claims.
+
+A green release suite proves the checked repository/profile invariants. It does not by itself prove model-agnostic behavioral superiority over an upstream or no-skill control.
 
 ## Evaluation layers
 
-CCA makes two claims that must remain separately visible:
+CCA makes two behavioral claims that must remain separately visible:
 
 1. **ICM inheritance:** for every applicable native ICM behavior CCA claims to inherit, CCA must be at least parity with pinned/current ICM. A regression cannot be offset by unrelated CCA wins.
 2. **CCA extension value:** broader interoperability must demonstrate useful behavior in cases that actually require cross-authority composition, maintained knowledge, profile-aware validation, or method reasoning.
 
 The benchmark also uses a **no-skill control** so easy cases do not mistake generic model competence for repository capability.
 
-## Three-arm protocol
+## Release verification surface
+
+The repository CI runs the release/regression surface documented in `CONTRIBUTING.md`:
+
+```bash
+python -m unittest discover -s evals/tests -v
+python evals/personal-hybrid-intent/tests/test_score_intent.py
+python -m pip install -r skills/cca/assets/hybrid-workspace/requirements.txt
+python -m unittest discover -s skills/cca/assets/hybrid-workspace/tests -v
+python skills/cca/assets/hybrid-workspace/audit.py --self-test
+python .github/scripts/validate_repo.py
+python .github/scripts/validate_distribution.py
+```
+
+`evals/tests/` contains runner, architecture-convergence, ICM-inheritance, routing/positioning, workspace-builder, capability-catalog, and release-readiness regression tests. The personal-hybrid scorer has its own focused smoke tests. The optional Hybrid Workspace Profile is additionally protected by its bundled regression/adversarial suite and exhaustive frozen-contract audit.
+
+These checks are required release evidence for CCA itself. Full matched behavioral benchmark runs remain a separate evidence class.
+
+## Three-arm behavioral protocol
 
 Use fresh isolated contexts for every case/arm.
 
@@ -56,6 +81,10 @@ A real behavioral run requires an actual agent to inspect/act on the isolated wo
 
 ## Suites
 
+### `tests/` — repository regression and release-readiness tests
+
+Mechanically protects the evaluation harness and selected release-critical architecture/documentation invariants. These tests are part of CI and are not substitutes for matched external-agent behavioral runs.
+
 ### `cases/` — 14 core interoperability cases
 
 The stable broad regression suite: native/derived ICM, ordinary code repositories, PARA/Zettelkasten, LLM Wiki, forms, hybrid boundaries, approved restructure, and no-op behavior. Historical results remain tied to their exact freezes.
@@ -66,7 +95,7 @@ Tests sense-making, enterprise scaling, sequential constraints, team-delivery me
 
 ### `icm-parity/` — granular ICM inheritance catalog
 
-`capabilities.json` contains **40** atomic/integration/compound contracts. The final audit must instantiate neutral executable cases from this catalog and run pinned ICM, CCA, and the no-skill control where applicable.
+`capabilities.json` contains **40** atomic/integration/compound contracts. A full behavioral benchmark can instantiate neutral executable cases from this catalog and run pinned ICM, CCA, and the no-skill control where applicable.
 
 Coverage includes Layer 0-4 routing, exact stage contracts, output handoffs, one-way dependencies, selective loading, canonical sources, CONTEXT purity, prerequisites, setup/status, questionnaire behavior, placeholders/conditionals, skill discovery/bundling, specs/checkpoints/audits/value validation, docs-over-outputs, shared constants, naming/quality rules, cold-agent walking, build/restructure, factory/product distinction, end-to-end workspace building, adversarial repairs, and progressive-disclosure efficiency.
 
@@ -74,13 +103,15 @@ For an inherited capability classify CCA as **PARITY**, **IMPROVEMENT**, or **RE
 
 ### `cca-extensions/` — discriminative CCA extension catalog
 
-`capabilities.json` contains **20** extension contracts. These are deliberately not simple coexistence tests. They must require cross-authority reasoning or CCA operations such as PARA+Zettelkasten routing, LLM Wiki ingest/query, ICM+Wiki composition, human-vs-agent knowledge authority, profile-aware linting, nested profiles, method composition/conflict, non-trigger behavior, hybrid lifecycle routing, portable guidance, generic workspace building, forms, contradiction handling, escalation, and progressive-disclosure efficiency.
+`capabilities.json` contains **20** extension contracts. These are deliberately not simple coexistence tests. They require cross-authority reasoning or CCA operations such as PARA+Zettelkasten routing, LLM Wiki ingest/query, ICM+Wiki composition, human-vs-agent knowledge authority, profile-aware linting, nested profiles, method composition/conflict, non-trigger behavior, hybrid lifecycle routing, portable guidance, generic workspace building, forms, contradiction handling, escalation, and progressive-disclosure efficiency.
 
 ICM is not marked as failing for an extension outside its claims. Observe its behavior, classify out-of-scope where appropriate, and compare whether CCA adds value beyond both ICM and the no-skill control.
 
 ### `personal-hybrid-intent/` — personal hybrid builder from user intent
 
-Checks that architect/workspace-builder produces a useful projects + notes + immutable-sources + growing-wiki workspace from the same human dialogue prompts **without** hardcoding those prompts into the skill. See [`personal-hybrid-intent/README.md`](personal-hybrid-intent/README.md).
+Checks that architect/workspace-builder produces a useful projects + notes + preserved-sources + maintained-knowledge workspace from the same human dialogue prompts **without** hardcoding those prompts into the skill. See [`personal-hybrid-intent/README.md`](personal-hybrid-intent/README.md).
+
+This scorer is path-flexible. If Architect chooses the optional Hybrid Workspace Profile, profile conformance is validated separately by the bundled Hybrid tests rather than inferred from the intent score.
 
 ## Workspace-builder parity
 
@@ -99,7 +130,7 @@ Discovery
 
 Current upstream ICM remains the semantic and acceptance authority. The point of the CCA implementation is runtime parity without requiring a neighboring upstream checkout.
 
-The final audit must test the builder atomically and end-to-end. Documentation presence is not enough.
+Full behavioral benchmarking should test the builder atomically and end-to-end. Documentation presence is not enough.
 
 ## Context-efficiency requirement
 
@@ -128,7 +159,7 @@ icm-parity
 cca-extensions
 ```
 
-The granular suites currently expose capability catalogs for the final neutral audit; the orchestrator may materialize frozen executable cases from them before behavioral execution. Once frozen, prompts/fixtures/assertions must not change after results are observed.
+The granular suites expose capability catalogs from which a behavioral benchmark may materialize frozen executable cases. Once frozen for a run, prompts, fixtures, and assertions must not change after results are observed.
 
 Supported arms:
 
@@ -153,13 +184,13 @@ python evals/runner.py --suite core --case 01 --arm C \
 
 Arm C receives an empty `CCA_EVAL_MATERIAL` and no `baseline/` or `cca/` directory.
 
-## Final success bar
+## Behavioral success bar
 
-Do not conclude that CCA is an ICM evolution/superset from broad ties alone. The evidence bar is:
+Do not conclude that CCA is an ICM evolution/superset from broad ties alone. Supporting that stronger behavioral claim requires evidence that:
 
 1. every applicable `icm-parity` capability is PARITY or IMPROVEMENT for CCA;
 2. compound ICM workflows, especially workspace-builder and edited handoffs, are parity or better;
 3. CCA extensions outperform or materially add capability beyond controls in scenarios that require them;
 4. CCA's breadth does not impose a correctness, context, structural, or intervention tax on native ICM or ordinary tasks.
 
-Report exactly what was behaviorally executed and retain repository/model/runtime/freeze pins with raw artifacts.
+Report exactly what was behaviorally executed and retain repository/model/runtime/freeze pins with raw artifacts. Do not convert release-regression success into a broader behavioral-superiority claim.
