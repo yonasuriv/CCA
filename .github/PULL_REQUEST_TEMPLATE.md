@@ -1,4 +1,4 @@
-# Summary
+## Summary
 
 What problem does this pull request solve, what changed, and what is the resulting behavior?
 
@@ -36,7 +36,7 @@ Affected authority/boundary:
 
 ## Compatibility / version impact
 
-Check only claims this PR actually makes:
+Compatibility / conformance claims — check only claims this PR actually makes:
 
 - [ ] Upstream-native
 - [ ] CCA-compatible
