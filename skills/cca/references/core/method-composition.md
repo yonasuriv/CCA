@@ -23,15 +23,29 @@ Examples:
 
 CCA may describe a workspace as PARA-organized, Zettelkasten-style, BASB-guided, or otherwise overlay-shaped, but those labels are not additional CCA compatibility states.
 
-### Organization, epistemic role, and navigation
+### Organization, epistemic role, admission provenance, and navigation
 
-These are separate axes:
+These are separate concerns:
 
 - an organizational shelf answers **where material lives**;
-- an epistemic role answers **what kind of information it is** and often implies different authority/lifecycle expectations;
+- an epistemic/semantic role answers **what kind of information it is** and often implies different authority/lifecycle expectations;
+- an admission/provenance classification may answer **how a source entered a particular corpus** without replacing the source's semantic role;
 - a navigation contract answers **how a consumer discovers the relevant boundary and context**.
 
 Therefore PARA `Resources` is not semantically equivalent to CCA `knowledge.reference`. A Resource may contain external evidence, a human note, maintained synthesis, a dataset, or a nested workspace. Crosswalks MUST describe partial/composed relationships where one-to-one equivalence is false.
+
+The current CCA Hybrid Workspace Profile demonstrates admission classification without ontology replacement:
+
+```text
+reference.curated   -> knowledge.reference
+reference.collected -> knowledge.reference
+```
+
+`knowledge.reference` remains the semantic role: preserved source/evidence. `reference.curated` and `reference.collected` classify how evidence entered that profile's reference corpus. They MUST NOT be interpreted as separate knowledge roles, content authorship, review state, truth, or endorsement.
+
+Similarly, finite research work remains project/workflow activity rather than a new knowledge category: capture, preserved references, maintained synthesis, and outputs retain their own semantic roles as research traverses them.
+
+CCA core does not mandate those Hybrid classifications for every `knowledge.reference` implementation. They are profile-owned semantics. CCA core only requires consumers to preserve declared classification/role composition rather than collapsing the two dimensions.
 
 CCA core does not mandate an ICM-shaped navigation skeleton for every overlay or CCA-compatible workspace. Use:
 
@@ -54,6 +68,7 @@ Therefore:
 3. A coding repository nested under a broader second-brain hierarchy retains its application structure and scoped instructions.
 4. Zettelkasten notes are not assumed agent-writable; their authority/maintenance behavior comes from the local workspace instructions.
 5. CCA routing may connect these boundaries, but MUST NOT merge their schemas merely because they coexist.
+6. When a selected profile declares nested classification bindings, semantic classification may compose while filesystem mutation policy remains governed by the most-specific applicable binding according to that profile's contract.
 
 A CCA-aware consumer should be able to understand the relationship between boundaries while an upstream-specific consumer can still enter the nested native root and operate without CCA-only semantics.
 
@@ -65,10 +80,13 @@ Explicit metadata is appropriate when:
 
 - a workspace-specific semantic/binding fact cannot safely be inferred;
 - authority or mutation policy would otherwise be ambiguous;
+- provenance/admission/review facts cannot be safely reconstructed from the path or content;
 - the active upstream/profile requires the metadata;
 - a user intentionally adopts an optional CCA hardening convention.
 
 PARA directories, Zettelkasten folders, ICM stages, wiki folders, projects, areas, resources, archives, and skill collections do not require CCA metadata solely to announce their path names.
+
+A profile MAY require provenance metadata for evidence when the distinction is security/authority relevant. The Hybrid v2 collected-source contract is such a case: acquisition actor/method/origin/time and content identity are not safely inferable merely because a file lives under `collected/`.
 
 ## 5. CCA skill package and modes
 
@@ -108,5 +126,6 @@ Method composition is healthy when:
 - file authority/write behavior is clear enough for the requested operation;
 - routing crosses boundaries without duplicating or flattening their rules;
 - organizational shelves are not mistaken for epistemic roles;
+- declared admission/provenance classifications are not mistaken for semantic roles or content authorship;
 - navigation requirements come from the active upstream/profile/local contract rather than an undeclared universal skeleton;
 - large collections can introduce boundary-local routing/indexing without requiring a global manifest.
