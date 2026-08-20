@@ -8,7 +8,7 @@ Determine applicable claims from durable files/instructions:
 
 - **upstream-native ICM**;
 - **ICM-derived patterns**;
-- **LLM Wiki compatibility**;
+- **LLM Wiki-style maintained-knowledge compatibility**;
 - **CCA-compatible**;
 - **CCA-conformant**;
 - **CCA Hybrid Workspace Profile-conformant**;
@@ -33,6 +33,8 @@ Where relevant:
 - adapters do not contradict canonical guidance;
 - files required by an explicitly adopted contract exist;
 - installed CCA skill resources do not depend on repository-global runtime files.
+
+Do not add an ICM-shaped structural requirement to this universal set. Navigation requirements come from the active upstream, named profile, or local contract.
 
 ## 3. Upstream-native ICM checks
 
@@ -67,15 +69,15 @@ At minimum verify, where applicable:
 
 A valid upstream-native ICM boundary is **CCA-compatible** without requiring structural migration or CCA metadata. If only ICM-derived patterns are present, report those patterns separately and mark upstream-native ICM `N/A` unless the full native claim is actually present.
 
-## 4. ICM-derived / ICM-navigation checks
+## 4. ICM-derived checks
 
 A non-native boundary may borrow ICM stages, local contracts, selective routing, one-way dependencies, progressive disclosure, or handoffs. Validate only the constructs actually adopted.
 
 Do not require every CCA-compatible workspace to look like an ICM pipeline. If a named CCA-owned profile explicitly adopts ICM-style cold-agent navigation, validate that profile's own declared mapping/acceptance rather than promoting it to native ICM.
 
-## 5. LLM Wiki compatibility
+## 5. LLM Wiki-style maintained knowledge
 
-Do not require one directory schema. Read the implementation's own instructions first, then verify core behavior:
+Do not require one directory schema. When a boundary intentionally uses this pattern, read the implementation's own instructions first, then verify the behavior it actually claims, such as:
 
 1. durable source/evidence exists or has a defined home;
 2. maintained synthesis persists across sessions;
@@ -83,7 +85,7 @@ Do not require one directory schema. Read the implementation's own instructions 
 4. humans can inspect/edit the knowledge base directly as files;
 5. the implementation's own navigation/schema resolves coherently.
 
-Missing CCA-preferred paths/metadata are not LLM Wiki compatibility failures unless the implementation explicitly adopted them.
+Missing CCA-preferred paths/metadata are not failures unless the implementation explicitly adopted them.
 
 ## 6. Method-overlay preservation
 
@@ -94,7 +96,8 @@ When declared, lint MAY report whether CCA changes preserve their locally observ
 - an organizational PARA boundary still preserves the categories the workspace actually relies on;
 - nested upstream-native systems have not been flattened by outer organization;
 - Zettelkasten/human notes have not been silently reclassified as agent-writable synthesis;
-- BASB/CODE terminology is not misrepresented as a mandatory filesystem taxonomy.
+- BASB/CODE terminology is not misrepresented as a mandatory filesystem taxonomy;
+- PARA `Resources` has not been treated as synonymous with preserved raw/reference evidence.
 
 Report these as method-preservation findings, not invented native certification.
 
@@ -102,7 +105,7 @@ Report these as method-preservation findings, not invented native certification.
 
 Apply only intentionally adopted CCA requirements. Validate:
 
-- explicit boundary/authority semantics;
+- explicit boundary/authority semantics where the adopted contract needs them;
 - stable semantic role/key resolution;
 - configurable bindings where the governing contract permits them;
 - no semantic identity hidden in a default path;
@@ -117,7 +120,7 @@ Report optional hardening separately from conformance errors.
 
 Load `../architect/hybrid-workspace.md` when the target matches the bundled frozen-v1 profile.
 
-Use the skill-local implementation on an **explicit target**:
+Use the skill-local reference implementation on an **explicit target**:
 
 ```bash
 python <cca-skill>/assets/hybrid-workspace/audit.py --target <workspace>
@@ -133,15 +136,18 @@ python <cca-skill>/assets/hybrid-workspace/audit.py --target <workspace> --self-
 Profile checks include:
 
 1. frozen semantic-key/policy/authority contract passes;
-2. unsafe/escaping bindings are rejected;
+2. unsafe/escaping bindings and generated destinations are rejected after symlink resolution;
 3. effective permissions remain intersections rather than a single-axis grant;
 4. archive identity/trust/promotion invariants pass;
-5. generated artifacts match canonical render;
+5. required generated **semantic outputs** agree with current bindings and profile semantics;
 6. `AGENTS.md` satisfies the human-authored profile control contract;
 7. non-breaking binding moves propagate to generated consumers;
-8. `context.router` generation follows its current binding rather than literal `CONTEXT.md`;
+8. `context.router` generation follows its current binding rather than treating literal `CONTEXT.md` as identity;
 9. moving `_state/`, `_runtime/`, or another default does not leak obsolete default paths into generated artifacts;
-10. the tooling leaves the installed package untouched and writes/checks only the explicit target.
+10. the tooling leaves the installed package untouched and writes/checks only the explicit target;
+11. local routing/indexing remains boundary-scoped as large collections grow rather than requiring one root manifest.
+
+When the bundled Python reference implementation owns an artifact, `generate.py --check` additionally performs its canonical byte-for-byte drift check. Do not treat Python rendering details as the only possible implementation of the profile; an independent implementation must satisfy the normative semantic/artifact contract in `../architect/hybrid-workspace.md`.
 
 Do not "repair" a failed frozen semantic/policy field by treating it as a binding customization. Semantic changes follow the profile's evolution/version contract.
 
@@ -188,7 +194,7 @@ When remediation is authorized, automatically repair only unambiguous issues. Do
 Claims/boundaries detected:
 - Upstream-native ICM: PASS | FAIL | N/A
 - ICM-derived patterns: PASS | FAIL | N/A
-- LLM Wiki compatibility: PASS | FAIL | N/A
+- LLM Wiki-style maintained knowledge: PASS | FAIL | N/A
 - CCA-compatible: PASS | FAIL | N/A
 - CCA-conformant: PASS | PARTIAL | FAIL | N/A
 - Profile-conformant (name): PASS | FAIL | N/A
