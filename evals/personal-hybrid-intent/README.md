@@ -1,6 +1,8 @@
 # Personal-hybrid intent eval
 
-Behavioral check that `cca` architect builds a useful personal hybrid (projects + notes/research + immutable sources vs growing wiki) from **user intent**, without baking any specific user prompt into the skill.
+Behavioral check that `cca` architect builds a useful personal hybrid from **user intent** without baking one preferred folder tree or an undeclared ICM navigation profile into the score.
+
+The prompts ask for projects, notes/research/second-brain use, durable source material versus maintained knowledge, human + agent navigation, and continued use from later sessions. The eval scores those outcomes and the architectural consequences needed to keep them usable as the workspace grows.
 
 ## Protocol
 
@@ -14,7 +16,7 @@ python3 evals/personal-hybrid-intent/tests/score_intent.py /path/to/workspace \
   --skill skills/cca
 ```
 
-5. Unit smoke (prompt-not-in-skill + module load):
+5. Unit smoke (prompt-not-in-skill + scorer contract):
 
 ```bash
 python3 -m unittest evals/personal-hybrid-intent.tests.test_score_intent -v
@@ -22,8 +24,23 @@ python3 -m unittest evals/personal-hybrid-intent.tests.test_score_intent -v
 
 ## What is scored
 
-Path-flexible intent properties derived from the human prompts (projects, notes, immutable sources, growing wiki, agent navigation, README day-to-day), plus consequences of those claims (supersession or checkable integrity, seeded source→wiki chain, capture affordance, self-describing operation).
+Path-flexible properties derived from the human prompts and CCA's current architecture:
 
-Also scores **ICM skeleton / cold-agent isomorphism** (path-flexible): L0 skeleton map, folder contracts with Inputs / Process / Outputs / Human check, live factory stamps, declared status-without-memory scan. This does **not** require a native ICM pipeline or PARA shelf names — outer organization may be any overlay.
+- a home for outcome/coding projects;
+- a distinct home for human notes/thinking;
+- durable source/reference material with preservation/supersession behavior;
+- maintained knowledge/synthesis distinct from raw evidence;
+- capture affordance;
+- durable agent/human navigation;
+- README/day-to-day continuation guidance;
+- at least one worked source → maintained-knowledge citation chain where an empty scaffold would otherwise be ambiguous;
+- contradiction/provenance-aware maintenance language;
+- self-describing daily operation without requiring an installed skill mode;
+- bounded **route-before-search** behavior so a growing workspace can narrow from an entry/router to a relevant collection/local index before broad search;
+- no requirement that one root manifest enumerate the whole corpus.
 
-The skill must **not** contain the human prompt text. Resolution must come from architect/methods personal-hybrid guidance.
+The eval does **not** award points merely for ICM-shaped Layer 0/1/2 files, `CONTEXT.md`, four per-folder contracts, factory stamps, or native ICM `status` behavior. Those belong only when the target is upstream-native ICM, explicitly ICM-derived, or a named profile that adopts them.
+
+If Architect selects the optional CCA Hybrid Workspace Profile, that profile is validated separately by its own frozen/adversarial suite. This intent eval asks whether the produced workspace solves the user's problem, not whether every personal workspace resembles that profile.
+
+The skill must **not** contain the human prompt text. Resolution must come from general architect/method-composition guidance.
