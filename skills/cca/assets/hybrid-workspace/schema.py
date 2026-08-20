@@ -49,16 +49,6 @@ StrictSafeLoader.add_constructor(
 )
 
 
-def load_schema(path: str | Path) -> dict[str, Any]:
-    """Load WORKSPACE.yaml safely and reject duplicate keys."""
-    p = Path(path)
-    with p.open("r", encoding="utf-8") as fh:
-        data = yaml.load(fh, Loader=StrictSafeLoader)
-    if not isinstance(data, dict):
-        raise ValueError("schema root must be a mapping")
-    return data
-
-
 def validate_key(key: str) -> bool:
     return bool(KEY_RE.fullmatch(key))
 
@@ -88,6 +78,49 @@ def resolves_within(root: str | Path, binding: str) -> bool:
     except ValueError:
         return False
     return True
+
+
+def _generated_destinations(data: Mapping[str, Any]) -> list[str]:
+    """Resolve declared generated outputs to concrete target-local destinations."""
+    slots = {
+        slot.get("key"): slot
+        for slot in data.get("slots", [])
+        if isinstance(slot, Mapping) and isinstance(slot.get("key"), str)
+    }
+    router = slots.get("context.router", {})
+    router_binding = router.get("binding") if isinstance(router, Mapping) else None
+
+    destinations: list[str] = []
+    for entry in data.get("generation_contract", {}).get("derived", []):
+        # `CONTEXT.md` is the frozen-v1 legacy/default declaration. Newer
+        # contracts may name the semantic role directly. In both cases the
+        # current context.router binding is the actual output destination.
+        if entry in {"CONTEXT.md", "context.router"} and isinstance(router_binding, str):
+            destinations.append(router_binding)
+        elif isinstance(entry, str):
+            destinations.append(entry)
+    return destinations
+
+
+def _validate_generated_destinations(data: Mapping[str, Any], root: Path) -> None:
+    """Reject generated outputs whose text or existing symlinks escape the target."""
+    for destination in _generated_destinations(data):
+        error = validate_binding_text(destination)
+        if error:
+            raise ValueError(f"generated artifact binding {destination!r}: {error}")
+        if not resolves_within(root, destination):
+            raise ValueError(f"generated artifact {destination!r} escapes workspace via symlink/path resolution")
+
+
+def load_schema(path: str | Path) -> dict[str, Any]:
+    """Load WORKSPACE.yaml safely and reject duplicate keys/path escapes."""
+    p = Path(path)
+    with p.open("r", encoding="utf-8") as fh:
+        data = yaml.load(fh, Loader=StrictSafeLoader)
+    if not isinstance(data, dict):
+        raise ValueError("schema root must be a mapping")
+    _validate_generated_destinations(data, p.parent.resolve())
+    return data
 
 
 def effective_agent_operations(slot: Mapping[str, Any], schema: Mapping[str, Any]) -> list[str]:
