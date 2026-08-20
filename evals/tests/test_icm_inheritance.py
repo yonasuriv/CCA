@@ -24,7 +24,9 @@ class ICMInheritanceContractTests(unittest.TestCase):
                 f"{name} redefines native ICM Layer 0",
             )
         combined = "\n".join(texts.values())
-        self.assertIn("native Layer-0 `CLAUDE.md`", combined)
+        self.assertIn("Layer 0 `CLAUDE.md`", combined)
+        self.assertIn("Preserve native `CLAUDE.md` Layer-0 entry semantics", combined)
+        self.assertIn("not universal CCA requirements", combined)
 
     def test_claimed_native_icm_surface_is_preserved(self):
         inheritance = CORE / "icm-inheritance.md"
