@@ -454,4 +454,4 @@ The measure of success is not how much CCA vocabulary a workspace contains. It i
 - [Andrej Karpathy, *LLM Wiki* idea](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
 - [AGENTS.md open convention](https://agents.md).
 - [Agent Skills specification](https://agentskills.io).
-- [Tiago Forte, PARA](https://fortelabs.com/para/) and [Building a Second Brain](https://fortelabs.com/basb/).
+- [Tiago Forte, PARA](https://fortelabs.com/blog/para/) and [Building a Second Brain](https://fortelabs.com/blog/basboverview/).
