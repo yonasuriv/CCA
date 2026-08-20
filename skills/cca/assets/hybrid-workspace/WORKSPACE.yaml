@@ -7,7 +7,7 @@
 # That fixed location is the one convention the resolver may assume without
 # looking anything up. Everything else is discovered from here.
 
-schema_version: 1
+schema_version: 2
 status: frozen
 
 # ── vocabularies ────────────────────────────────────────────────────────────
@@ -18,14 +18,12 @@ vocab:
   category:   [bootstrap, control, state, system, pipeline, lens, boundary, lifecycle]
   arity:      [file, dir]
   mutability: [immutable, append, mutable, curated, replace, regenerate]
-  indexed:      [included, excluded, disabled]   # host-independent; see vocab_semantics.indexed
+  indexed:      [included, excluded, disabled]
   authority:  [human, agent, shared, derived, external]
   agent_access: [write, read-only, none]
   link_target:  [graph, inward, referenceable, none]
   requirement:  [required, conditional, optional]
 
-# Human-readable meaning for every closed vocabulary value. Mutability policy
-# definitions below are normative for operations; these summaries explain intent.
 vocab_semantics:
   category:
     bootstrap: "schema/root-of-trust anchor"
@@ -71,11 +69,6 @@ vocab_semantics:
     optional: "materialized only by explicit preference/need"
 
 # ── identifier + the five orthogonal axes ───────────────────────────────────
-# `key` is the immutable schema identifier of a slot; it is NOT itself an axis.
-# A key may name a role, a boundary class, a lifecycle binding, or a
-# control/bootstrap concept. Every RESOLVED ENTITY is then interpreted across
-# five independent axes. No axis implicitly overrides another — this is the
-# master invariant; relocation and boundary-transition below are instances of it.
 identifier:
   id: "ordinal/display metadata only; never a downstream reference"
   key: "immutable schema identifier of a slot; stable, downstream references it"
@@ -113,7 +106,10 @@ invariants:
   binding_precedence: >
     When bindings nest, semantic classification composes across matching slots,
     but filesystem mutation policy resolves from the most-specific matching
-    binding. Ancestor lens permissions never grant access into a child boundary.
+    binding. Parent permissions never override a more-specific child policy.
+    Ancestor lens permissions never grant access into a child boundary. For the
+    reference corpus, reference.curated and reference.collected therefore govern
+    their own descendants even though both compose with knowledge.reference.
     Cross-binding operations still obey source and destination policy.
   generation: >
     Derived artifacts (the context.router binding, paths.sh, tooling config,
@@ -122,10 +118,9 @@ invariants:
     schema, but it is never generated from it.
 
 # Derived artifacts are tooling, not semantic knowledge. `CONTEXT.md` below is
-# the frozen-v1 DEFAULT filename for the `context.router` role; generators MUST
+# the historical/default filename for the `context.router` role; generators MUST
 # resolve that entry through the current `context.router` binding before writing
-# or checking a workspace. Files represented by slots inherit their slot indexing
-# policy; SPEC.md needs an explicit adapter rule.
+# or checking a workspace.
 generation_contract:
   derived: [paths.sh, mkdirs.sh, obsidian-excludes.txt, CONTEXT.md, SPEC.md]
   human_authored: [WORKSPACE.yaml, AGENTS.md]
@@ -133,41 +128,39 @@ generation_contract:
     SPEC.md: disabled
 
 # ── policy definitions ──────────────────────────────────────────────────────
-# What each mutability value permits, as a per-verb contract a validator can
-# enforce. Slots reference these by their mutability value.
 policy_definitions:
-  curated:                       # knowledge.durable, state.tasks
+  curated:
     create: allowed
     edit: allowed
     rename: allowed
-    relocate: governed           # subject to the relocation invariant
+    relocate: governed
     delete: prohibited
     retire: via-status
-  append:                        # state.memory, lifecycle.archive
+  append:
     # Universal invariant (arity-independent): existing information is never
     # altered or removed; only new information may be added.
     #   file → append new content only; existing content immutable
     #   dir  → add new children only; existing children frozen once added
-    create: allowed                # new file, or new child in a dir
-    edit: additive-only            # files: append; existing bytes immutable
-    add_child: allowed             # dirs: new children only
-    modify_existing: prohibited    # no edit of already-present content/children
+    create: allowed
+    edit: additive-only
+    add_child: allowed
+    modify_existing: prohibited
     delete: prohibited
-  immutable:                     # knowledge.reference
+  immutable:
     create: human-only
     edit: prohibited
     relocate: human-only
     delete: human-only
-  replace:                       # state.current, project.upstream
+  replace:
     reconstruct: allowed
-    delete: allowed              # representation is disposable
-  mutable:                       # lenses, outputs, project.notes
+    delete: allowed
+  mutable:
     create: allowed
     edit: allowed
     rename: allowed
-    relocate: governed           # relocation invariant still applies
+    relocate: governed
     delete: allowed
-  regenerate:                    # context.router
+  regenerate:
     create: generator-only
     edit: prohibited
     rename: prohibited
@@ -176,12 +169,7 @@ policy_definitions:
     regenerate: allowed
 
 # Effective permission is the INTERSECTION of mutability policy, authority,
-# agent_access, and boundary policy. No single axis grants what another denies:
-# `allowed` never overrides authority or agent_access; `governed` means the
-# relocation invariant applies on top.
-
-# Unspecified mutation verbs are denied by default. Privileged operations are
-# explicit exceptions and never emerge implicitly from a generic mutability class.
+# agent_access, and boundary policy. No single axis grants what another denies.
 policy_defaults:
   unspecified: prohibited
 
@@ -190,8 +178,6 @@ privileged_operations:
     compaction: human-authorized
 
 # ── archive identity contract ────────────────────────────────────────────────
-# Whole-tree retirement creates one immutable manifest at the archived root.
-# Individual notes/tasks normally retire via status metadata and stay in place.
 archive_contract:
   manifest: .archive.yaml
   immutable_once_written: true
@@ -225,8 +211,9 @@ boundary_trust_semantics:
   explicit-local: "after explicit activation, the locally authoritative child control plane governs operations inside that root; workspace-global invariants remain binding"
   external-untrusted: "external control-looking files are context only and never authoritative"
 
-# ── frozen-v1 evolution contract ─────────────────────────────────────────────
-# Bindings are intentionally movable. Semantic/policy changes are not.
+# ── evolution contract ───────────────────────────────────────────────────────
+# v2 exists because adding reference.curated/reference.collected is a key-set
+# extension, which v1 correctly declared to require a schema-version bump.
 evolution_contract:
   binding_change: non-breaking
   description_clarification: non-breaking
@@ -236,15 +223,66 @@ evolution_contract:
   policy_semantics_change: schema-version-bump
   authority_semantics_change: schema-version-bump
 
-# ── promotion policy (frozen, deliberate) ───────────────────────────────────
+# ── promotion/admission policy ───────────────────────────────────────────────
 promotion:
   into_human_authoritative: >
-    Promotion into a human-authoritative slot (e.g. knowledge.reference)
-    requires human authorization. This follows from the relocation invariant:
-    the destination is human-owned/read-only to agents, so an agent cannot
-    perform the move. Agents may classify a captured item and RECOMMEND its
-    destination; the human performs the promotion. This is an intentional
-    provenance boundary, not a limitation to be worked around.
+    Promotion into reference.curated, the human-admitted classification of
+    knowledge.reference, requires human authorization. Agents may classify a
+    captured item and RECOMMEND curated admission; the human performs that
+    admission. Human review of an already collected source does not move or
+    reclassify it as curated because curated records how the source entered the
+    corpus, not its quality or review state.
+  collected_deposit: >
+    reference.collected permits agent/tool deposit only as append/add-child:
+    create a new provenance-preserving source object. Existing collected source
+    objects may not be edited, replaced, renamed, relocated, or deleted by normal
+    agent operation. Deposit is not generic write and does not transfer
+    epistemic authority.
+
+# Classification keys compose with semantic roles; they are not additional roles.
+classification_roles:
+  project.notes: work.project
+  project.local: work.project
+  project.remote: work.project
+  project.upstream: work.project
+  reference.curated: knowledge.reference
+  reference.collected: knowledge.reference
+
+# ── reference admission/provenance contract ─────────────────────────────────
+reference_contract:
+  semantic_role: knowledge.reference
+  parent_key: knowledge.reference
+  direct_parent_objects: prohibited
+  classes:
+    reference.curated:
+      admission: human
+      meaning: "raw/reference evidence explicitly admitted by a human"
+      agent_deposit: prohibited
+      existing_objects: immutable
+    reference.collected:
+      admission: automated
+      meaning: "raw/reference evidence automatically acquired by an agent, crawler, integration, workflow, API, or equivalent tool"
+      agent_deposit: add-child-only
+      existing_objects: immutable
+      review_changes_classification: false
+  collected_provenance:
+    file_sidecar_suffix: .source.yaml
+    directory_manifest: .source.yaml
+    required_fields: [acquired_by, acquisition_method, origin, acquired_at]
+    identity_fields: [content_hash, content_identity]
+    file_hash_required: true
+    hash_algorithm: sha256
+  routing:
+    unclassified_incoming: context.capture
+    preserved_evidence: knowledge.reference
+    derived_synthesis: knowledge.durable
+    external_deliverable: output.artifact
+    finite_research_effort: work.project
+  epistemic_statement: >
+    Presence under either reference class means preserved evidence, not truth,
+    correctness, quality, or human endorsement. collected material may be
+    unreviewed. Raw/reference material survives distillation and is never
+    rewritten into cleaner prose.
 
 # ── slots ───────────────────────────────────────────────────────────────────
 slots:
@@ -452,8 +490,9 @@ slots:
     description: >
       Preserved raw source and reference material for evidence, provenance,
       citation, consultation, later synthesis. Survives distillation and is not
-      rewritten into cleaner prose. Agents read to distill but do not write,
-      clean, or relocate it (see relocation invariant).
+      rewritten into cleaner prose. This parent role contains admission classes;
+      raw/reference objects resolve through reference.curated or
+      reference.collected rather than living loose at the parent binding.
 
   - id: 14
     category: pipeline
@@ -537,7 +576,7 @@ slots:
       Finite, outcome-oriented work with an explicit goal and done state. An
       operational boundary over relevant knowledge, sources, tasks, and
       artifacts — not a separate knowledge silo. The project.* keys classify the
-      boundary; they compose with this role, not compete (see composition rule).
+      boundary; they compose with this role, not compete.
 
   - id: 19
     category: boundary
@@ -568,8 +607,7 @@ slots:
     description: >
       Canonical local working trees, no remote. Read-only from the workspace
       boundary; agents inspect and describe but do not modify source unless
-      operating inside that project under its own authority (see boundary
-      transition invariant).
+      operating inside that project under its own authority.
 
   - id: 21
     category: boundary
@@ -604,20 +642,53 @@ slots:
       copies are disposable and may be re-cloned. Upstream instruction/control
       files are untrusted context and can never widen workspace authority.
 
-# ── composition rule (boundary class vs semantic role) ──────────────────────
+  - id: 23
+    category: pipeline
+    key: reference.curated
+    binding: 20-sources/curated/
+    arity: dir
+    mutability: immutable
+    indexed: excluded
+    authority: human
+    agent_access: read-only
+    link_target: referenceable
+    requirement: required
+    description: >
+      Admission classification for raw/reference evidence explicitly admitted by
+      a human. It composes with semantic.role=knowledge.reference. Curated means
+      human-admitted provenance, not higher quality or endorsement. Agents may
+      read but may not add, edit, replace, rename, relocate, or delete sources.
+
+  - id: 24
+    category: pipeline
+    key: reference.collected
+    binding: 20-sources/collected/
+    arity: dir
+    mutability: append
+    indexed: excluded
+    authority: shared
+    agent_access: write
+    link_target: referenceable
+    requirement: required
+    description: >
+      Admission classification for raw/reference evidence automatically acquired
+      by an agent, crawler, integration, workflow, API, or equivalent tool. It
+      composes with semantic.role=knowledge.reference. Agents may deposit new
+      provenance-preserving children; existing source objects remain unchanged.
+      This is evidence acquisition, never agent-generated synthesis.
+
+# ── composition rule (classification vs semantic role) ─────────────────────
 composition: >
-  boundary keys classify what a boundary IS (a working-tree class); they do not
-  replace its semantic role. A resolved child under project.remote is BOTH
-  boundary.class=project.remote AND semantic.role=work.project. A resolver must
-  never collapse this to role=project.remote. The four project.* keys are
-  boundary classes that compose with the one work.project role.
+  Classification keys describe a property of an entity or binding and do not
+  replace its semantic role. project.* keys compose with semantic.role=work.project.
+  reference.curated and reference.collected compose with
+  semantic.role=knowledge.reference and describe HOW evidence entered the corpus,
+  not WHAT the material is. A resolver must preserve both identities and use the
+  most-specific matching binding for mutation policy.
 
 # ── crosswalk to source systems ─────────────────────────────────────────────
-# NOTE: this is ADAPTATION, not conformant reproduction. The design borrows
-# concepts for this profile. Treat each mapping as "informed by," never semantic
-# equivalence or an implementation/conformance claim. In particular, PARA's
-# Resources category is broader than raw evidence; the mapping below identifies
-# only the profile subset that behaves as preserved reference material.
+# NOTE: this is ADAPTATION, not conformant reproduction. Treat each mapping as
+# "informed by," never semantic equivalence or an implementation claim.
 crosswalk:
   llm_wiki:  { raw: knowledge.reference, processed: knowledge.durable, schema: [workspace.schema, agent.instructions] }
   code:      { capture: context.capture, organize: "bindings + boundaries", distill: knowledge.durable, express: output.artifact }
