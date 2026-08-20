@@ -33,21 +33,40 @@ skill_dirs = sorted(p.name for p in SKILLS.iterdir() if p.is_dir()) if SKILLS.is
 if skill_dirs != ["cca"]:
     fail(f"expected exactly one first-party skill directory ['cca'], got {skill_dirs}")
 
+# Required 1.0 package surface. This is a packaging inventory, not a second
+# semantic specification: behavior remains governed by the references/tests.
 required = [
     "SKILL.md",
+    "CITATION.cff",
     "references/core/spec.md",
     "references/core/compatibility.md",
     "references/core/method-composition.md",
+    "references/core/adapters.md",
     "references/core/icm-inheritance.md",
+    "references/core/diagram-models.md",
     "references/architect/mode.md",
     "references/architect/core.md",
+    "references/architect/forms.md",
     "references/architect/methods.md",
+    "references/architect/workspace-builder.md",
+    "references/architect/native-icm-setup.md",
     "references/architect/hybrid-workspace.md",
+    "references/architect/system-map.md",
+    "references/advisor/mode.md",
+    "references/advisor/engineering-principles.md",
+    "references/advisor/frameworks-and-methodologies.md",
+    "references/advisor/security-and-adversarial-thinking.md",
+    "references/advisor/agent-system-design.md",
+    "references/advisor/context-engineering.md",
+    "references/advisor/ai-ml-practice.md",
+    "references/advisor/escalation-triggers.md",
     "references/operations/scaffold.md",
     "references/operations/sync.md",
     "references/operations/ingest.md",
     "references/operations/query.md",
     "references/operations/lint.md",
+    "assets/scripts/capture-source.py",
+    "assets/scripts/verify-sources.py",
     "assets/hybrid-workspace/WORKSPACE.yaml",
     "assets/hybrid-workspace/AGENTS.md",
     "assets/hybrid-workspace/schema.py",
@@ -57,10 +76,16 @@ required = [
     "assets/hybrid-workspace/tests/test_freeze.py",
     "assets/hybrid-workspace/tests/test_targeting.py",
     "assets/hybrid-workspace/tests/test_adversarial_targeting.py",
+    "assets/hybrid-workspace/tests/test_reference_admission.py",
 ]
 for rel in required:
     if not (SKILL / rel).is_file():
         fail(f"portable CCA package missing required resource: skills/cca/{rel}")
+
+for rel in ("assets/templates", "assets/scripts", "assets/hybrid-workspace"):
+    path = SKILL / rel
+    if not path.is_dir():
+        fail(f"portable CCA package missing required directory: skills/cca/{rel}")
 
 # Markdown references in the installed package must not depend on repository
 # files that disappear when only skills/cca is installed.
