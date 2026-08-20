@@ -43,6 +43,9 @@ desktop.ini
 __pycache__/
 *.pyc
 
+# Other artifacts
+evals/archive/
+
 # Keep stage outputs out of history by default — they are per-run products.
 # Uncomment to version them (ICM practice: commit after each run for a versioned pipeline history):
 # stages/*/output/*
