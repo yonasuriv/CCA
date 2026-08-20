@@ -96,19 +96,87 @@ It is an optional CCA-owned profile for a recurring personal/team environment co
 
 It is not a new mode, not native ICM, and not a universal CCA tree.
 
+The current bundled schema is **v2**. V2 preserves the frozen-v1 semantic/policy baseline and adds only two admission classifications beneath `knowledge.reference` so human-admitted and automatically collected evidence are distinguishable without creating new knowledge roles.
+
 The complete profile specification/tooling/tests live inside `skills/cca/` so installation remains portable.
 
-## Are `_state/`, `_runtime/`, `00-wiki/`, `10-inbox/`, or `CONTEXT.md` mandatory CCA paths?
+## Why are there `curated/` and `collected/` source directories?
+
+To make **source admission provenance** obvious from the filesystem without changing what a reference is.
+
+Default Hybrid v2 bindings are:
+
+```text
+20-sources/
+├── curated/      # reference.curated
+└── collected/    # reference.collected
+```
+
+Both resolve to:
+
+```text
+semantic.role = knowledge.reference
+```
+
+The distinction is:
+
+```text
+source provenance/admission != content authorship != semantic role
+```
+
+- `reference.curated` means a human explicitly admitted the source. Agents may read but not add or mutate it.
+- `reference.collected` means an agent/tool automatically acquired the source. Agents may deposit **new** children under append/additive semantics, but may not edit, replace, rename, relocate, or delete existing collected source objects.
+- Automatically collected sources require acquisition provenance and content identity/hash according to the profile contract.
+- A collected source remains collected after human review because the class records **how it entered the corpus**. Review/approval is metadata.
+- Neither class implies truth, correctness, quality, or endorsement.
+
+An agent downloading an arXiv PDF therefore creates preserved evidence under `reference.collected`; the conclusions the agent writes from it belong to `knowledge.durable`.
+
+## Why not make `collected` a new knowledge role?
+
+Because it answers a different question.
+
+`knowledge.reference` answers **what the material is**: preserved source/evidence.
+
+`reference.curated` / `reference.collected` answers **how it entered the workspace**.
+
+`knowledge.durable` answers what the workspace learned/synthesized from evidence.
+
+`output.artifact` answers what the workspace deliberately produced for delivery/publication.
+
+Research itself is an activity/workflow, normally bounded by `work.project` and task state; it is not another top-level semantic knowledge category.
+
+## Can source files live directly under `20-sources/`?
+
+Not in Hybrid v2.
+
+The parent `knowledge.reference` binding is a semantic/source-corpus root. Raw/reference source objects must resolve through `reference.curated` or `reference.collected`. The profile audit rejects loose/unknown source objects directly under the parent binding.
+
+## Does a parent source permission override `curated` or `collected`?
 
 No.
 
-They are default bindings in the Hybrid Workspace Profile. The semantic keys are the stable identity. The profile explicitly treats binding changes as non-breaking where its frozen contract allows them.
+When profile bindings nest, semantic classification composes, but filesystem mutation policy resolves from the **most-specific matching binding**. Parent permissions cannot widen a child policy, and the parent human/read-only policy does not erase the deliberately narrower append/deposit operation allowed by `reference.collected`.
+
+## Are `_state/`, `_runtime/`, `00-wiki/`, `10-inbox/`, `20-sources/`, or `CONTEXT.md` mandatory CCA paths?
+
+No.
+
+They are default bindings in the Hybrid Workspace Profile. The semantic keys are the stable identity. The profile treats binding changes as non-breaking where its evolution contract allows them.
+
+For the source corpus, if `knowledge.reference` moves, its `reference.curated` and `reference.collected` bindings must remain declared nested children so classification/policy resolution stays deterministic.
 
 ## Why does the Hybrid Profile have `WORKSPACE.yaml` if CCA avoids manifests?
 
 Because that optional profile needs a machine-readable bootstrap for stable semantic keys, configurable bindings, policy/authority, generation, and deterministic validation.
 
 CCA core does not require every workspace to have `WORKSPACE.yaml`. The manifest is a profile-specific mechanism, not a universal CCA rule.
+
+## Why did the Hybrid schema become v2?
+
+Because frozen v1 explicitly declared that adding/removing/renaming keys requires a schema-version bump.
+
+Adding `reference.curated` and `reference.collected` while pretending the schema was still v1 would violate the profile's own evolution contract. V2 preserves all 22 original v1 slot semantics and existing policy vocabulary, then adds only the two admission classifications and their provenance/routing contract.
 
 ## How is the Hybrid Profile created?
 
@@ -213,7 +281,7 @@ Use `lint` against the claims the boundary actually makes:
 - ICM-derived → borrowed constructs only;
 - LLM Wiki → its maintained-knowledge behavior;
 - CCA-conformant → adopted CCA semantics;
-- Hybrid Profile → bundled frozen-v1 audit plus generated-artifact check;
+- Hybrid Profile → frozen-v1 baseline + current v2 admission/provenance audit plus generated-artifact check;
 - human methods → preservation findings, not invented certification.
 
 Then use the CCA fresh-agent walk test where applicable. The walk test supplements stricter upstream/profile validation; it never replaces it.
