@@ -6,12 +6,18 @@
 
 CCA is an agent-agnostic interoperability architecture for filesystem-native context. It builds on ICM / Model Workspace Protocol and LLM Wiki, adopts portable ecosystem conventions such as AGENTS.md and Agent Skills, and composes with human knowledge-work and delivery methodologies without replacing their authorities. It is deliberately evolvable as those upstream systems and ecosystem conventions change.
 
+## Before modifying repository content
+
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before making any repository change, including documentation, skills, schemas, tests, evals, examples, publications, CI, or tooling. It defines the contribution workflow, changelog behavior, pull-request expectations, and the complete validation suite. Use [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) as the pre-integration checklist.
+
+This file tells you **where to route**. `CONTRIBUTING.md` tells you **how to change the repository safely**.
+
 ## Directory map
 
 | Path | Purpose |
 |---|---|
 | `skills/cca/` | The single installable CCA Agent Skill: router, canonical runtime spec, architect/advisor domains, operation modes, templates, and validation material |
-| `docs/` | Getting started, FAQ, design principles, scenarios, method composition, migration, references, and tracked upstream standards |
+| `docs/` | Explanatory documentation indexed by `docs/README.md` |
 | `examples/workspaces/` | Worked filesystem-native workspace examples |
 | `examples/publications/` | Non-normative blog, article, and paper expressions of CCA |
 | `examples/conversations/` | Worked conversations used as explanatory material |
@@ -20,9 +26,10 @@ CCA is an agent-agnostic interoperability architecture for filesystem-native con
 | `.github/workflows/` | CI validation entry points |
 | `.github/scripts/` | Repository and portable-distribution validation tooling |
 | `.github/PULL_REQUEST_TEMPLATE.md` | Contribution review checklist for authority, compatibility, documentation, and validation |
-| `README.md` | Human-facing overview |
-| `CONTRIBUTING.md` | Contribution rules and complete validation suite |
-| `CHANGELOG.md` | Released CCA milestones |
+| `README.md` | Human-facing product overview |
+| `docs/README.md` | Exhaustive documentation/repository index |
+| `CONTRIBUTING.md` | Contribution workflow and complete validation suite |
+| `CHANGELOG.md` | Unreleased changes and released CCA milestones |
 | `CITATION.cff` | Citation metadata |
 
 ## Routing
@@ -34,9 +41,10 @@ CCA is an agent-agnostic interoperability architecture for filesystem-native con
 - Work on engineering/process judgment → `skills/cca/references/advisor/`. Keep this corpus separate from architect references.
 - Work on scaffold/sync/ingest/query/lint behavior → `skills/cca/references/operations/`.
 - Start using CCA → `docs/getting-started.md`.
+- Inspect all explanatory documentation → `docs/README.md`.
 - Inspect scenario behavior → `docs/scenarios.md`.
 - Answer common integration questions → `docs/faq.md`.
-- Contribute changes → `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md`.
+- Contribute any repository change → `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md`.
 - Run the complete validation suite → follow `CONTRIBUTING.md`; CI mirrors it in `.github/workflows/validate.yml`.
 
 ## Repository invariants
