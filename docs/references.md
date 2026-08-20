@@ -1,50 +1,55 @@
 # CCA References
 
-Agent Context Methodologies:
+This page collects upstreams, inspirations, standards, and methodologies referenced by CCA. It is explanatory; normative CCA semantics live under `skills/cca/references/core/`, while each external system remains authoritative for its own semantics.
 
-- [Andrej Karpathy](https://en.wikipedia.org/wiki/Andrej_Karpathy)[LLM Wiki idea](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f "Andrej Karpathy's idea pattern for LLM-maintained persistent knowledge bases")
-- [ICM](https://github.com/RinDig/Interpretable-Context-Methodology)
-  - [ICM Paper](https://arxiv.org/pdf/2603.16021 "Jake Van Clief & David McDermott (2026). *Interpretable Context Methodology: Folder Structure as Agent Architecture*. Arxiv.")
-- [CCA](https://github.com/yonasuriv/CCA)
+## Agent context methodologies and knowledge patterns
 
-Personal Knowledge Management Methodologies:
+- [LLM Wiki idea](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) — Andrej Karpathy's idea pattern for LLM-maintained persistent knowledge bases.
+- [Interpretable Context Methodology (ICM)](https://github.com/RinDig/Interpretable-Context-Methodology)
+  - [Interpretable Context Methodology: Folder Structure as Agent Architecture](https://arxiv.org/abs/2603.16021) — Jake Van Clief and David McDermott, 2026.
+- [Convergent Context Architecture (CCA)](https://github.com/yonasuriv/CCA)
 
-- [Zettelkasten](https://en.wikipedia.org/wiki/Zettelkasten")
-- [PARA](https://fortelabs.com/para/ "Thiago's Forte Blog: The PARA Method")
-- [BASB](https://fortelabs.com/basb/ "Thiago's Forte Blog: The BASB Customer Persona")
+## Personal knowledge management methodologies
 
-[Open Standards](https://en.wikipedia.org/wiki/Open_standard"):
+- [Zettelkasten](https://en.wikipedia.org/wiki/Zettelkasten)
+- [PARA](https://fortelabs.com/blog/para/) — Tiago Forte.
+- [Building a Second Brain (BASB)](https://fortelabs.com/blog/basboverview/) — Tiago Forte.
 
-- [AGENTS.md](https://agents.md "Open Standard — portable agent instructions and entry point")
-- [SKILL.md](https://agentskills.io "Open Standard — portable agents skill packages")
+## Open standards and ecosystem conventions
 
-[Time Management](https://en.wikipedia.org/wiki/Time_management) Methodologies:
+- [AGENTS.md](https://agents.md) — portable scoped agent instructions.
+- [Agent Skills / SKILL.md](https://agentskills.io) — portable agent skill packages.
+- [Model Context Protocol (MCP)](https://modelcontextprotocol.io) — optional tool/context transport adjacent to CCA.
+
+## Time-management methodologies
 
 - [Timeboxing](https://en.wikipedia.org/wiki/Timeboxing)
-- [GTD](https://en.wikipedia.org/wiki/Getting_Things_Done)
+- [Getting Things Done (GTD)](https://en.wikipedia.org/wiki/Getting_Things_Done)
 - [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique)
 - [Eisenhower Matrix](https://en.wikipedia.org/wiki/Priority_Matrix)
 
-Methodologies and Frameworks:
+## Software delivery, engineering, and process methodologies
 
-- [ASD](https://en.wikipedia.org/wiki/Adaptive_software_development "Adaptive software development")
-- [DAD](https://en.wikipedia.org/wiki/Disciplined_agile_delivery "Disciplined agile delivery")
-- [DevOps](https://en.wikipedia.org/wiki/DevOps "DevOps")
-- [DSDM](https://en.wikipedia.org/wiki/Dynamic_systems_development_method "Dynamic systems development method")
-- [FDD](https://en.wikipedia.org/wiki/Feature-driven_development "Feature-driven development")
-- [IID](https://en.wikipedia.org/wiki/Iterative_and_incremental_development "Iterative and incremental development")
-- [Kanban](https://en.wikipedia.org/wiki/Kanban_\(development\) "Kanban (development)")
-- [Lean SD](https://en.wikipedia.org/wiki/Lean_software_development "Lean software development")
-- [LeSS](https://en.wikipedia.org/wiki/Scrum_\(project_management\)#Large-scale_scrum "Scrum (project management)")
-- [MDE](https://en.wikipedia.org/wiki/Model-driven_engineering "Model-driven engineering")
-- [MSF](https://en.wikipedia.org/wiki/Microsoft_Solutions_Framework "Microsoft Solutions Framework")
-- [PSP](https://en.wikipedia.org/wiki/Personal_software_process "Personal software process")
-- [RAD](https://en.wikipedia.org/wiki/Rapid_application_development "Rapid application development")
-- [RUP](https://en.wikipedia.org/wiki/Rational_unified_process "Rational unified process")
-- [SAFe](https://en.wikipedia.org/wiki/Scaled_agile_framework "Scaled agile framework")
-- [Scrum](https://en.wikipedia.org/wiki/Scrum_\(project_management\) "Scrum (project management)")
-- [SEMAT](https://en.wikipedia.org/wiki/SEMAT "SEMAT")
-- [TDD](https://en.wikipedia.org/wiki/Test-driven_development "Test-driven development")
-- [TSP](https://en.wikipedia.org/wiki/Team_software_process "Team software process")
-- [UP](https://en.wikipedia.org/wiki/Unified_process "Unified process")
-- [XP](https://en.wikipedia.org/wiki/Extreme_programming "Extreme programming")
+- [Adaptive Software Development (ASD)](https://en.wikipedia.org/wiki/Adaptive_software_development)
+- [Disciplined Agile Delivery (DAD)](https://en.wikipedia.org/wiki/Disciplined_agile_delivery)
+- [DevOps](https://en.wikipedia.org/wiki/DevOps)
+- [Dynamic Systems Development Method (DSDM)](https://en.wikipedia.org/wiki/Dynamic_systems_development_method)
+- [Feature-Driven Development (FDD)](https://en.wikipedia.org/wiki/Feature-driven_development)
+- [Iterative and Incremental Development (IID)](https://en.wikipedia.org/wiki/Iterative_and_incremental_development)
+- [Kanban](https://en.wikipedia.org/wiki/Kanban_(development))
+- [Lean Software Development](https://en.wikipedia.org/wiki/Lean_software_development)
+- [Large-Scale Scrum (LeSS)](https://less.works/)
+- [Model-Driven Engineering (MDE)](https://en.wikipedia.org/wiki/Model-driven_engineering)
+- [Microsoft Solutions Framework (MSF)](https://en.wikipedia.org/wiki/Microsoft_Solutions_Framework)
+- [Personal Software Process (PSP)](https://en.wikipedia.org/wiki/Personal_software_process)
+- [Rapid Application Development (RAD)](https://en.wikipedia.org/wiki/Rapid_application_development)
+- [Rational Unified Process (RUP)](https://en.wikipedia.org/wiki/Rational_unified_process)
+- [Scaled Agile Framework (SAFe)](https://scaledagileframework.com/)
+- [Scrum](https://scrumguides.org/)
+- [SEMAT](https://en.wikipedia.org/wiki/SEMAT)
+- [Test-Driven Development (TDD)](https://en.wikipedia.org/wiki/Test-driven_development)
+- [Team Software Process (TSP)](https://en.wikipedia.org/wiki/Team_software_process)
+- [Unified Process (UP)](https://en.wikipedia.org/wiki/Unified_process)
+- [Extreme Programming (XP)](https://en.wikipedia.org/wiki/Extreme_programming)
+
+Where a compatibility or semantic claim depends on an external system, prefer its current primary authority over this index or any stale local description.

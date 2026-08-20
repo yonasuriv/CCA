@@ -1,6 +1,6 @@
 # CCA Specification
 
-**Version 0.1.0** — Status: Draft, tracking ICM, LLM Wiki, AGENTS.md, Agent Skills, and other directly supported upstreams.
+**Version 1.0.0** — Status: Stable, tracking ICM, LLM Wiki, AGENTS.md, Agent Skills, and other directly supported upstreams.
 
 Normative. CCA runtime behavior and CCA-conformant examples must conform to this document. Compatibility details are governed by [`compatibility.md`](compatibility.md); method composition by [`method-composition.md`](method-composition.md).
 
@@ -310,10 +310,12 @@ The profile:
 - uses stable semantic keys with configurable bindings;
 - uses ICM-proven navigation principles where useful without claiming native ICM;
 - may contain nested upstream-native boundaries;
-- keeps its frozen-v1 schema/policy contract and adversarial tests with the installable skill;
+- preserves the complete frozen-v1 semantic/policy/authority baseline and its adversarial tests, while the current v2 schema adds only the `reference.curated` and `reference.collected` admission classifications beneath `knowledge.reference` plus the provenance/routing contract required to enforce that distinction;
 - requires generation/audit operations to use an explicit **target workspace**;
 - MUST NOT materialize a workspace inside the installed skill/tool directory;
 - resolves the generated `context.router` artifact through its current binding rather than a hardcoded filename.
+
+The two reference classifications describe **how preserved evidence entered the corpus**, not new semantic knowledge roles. Their detailed current contract is normative for the profile and lives in [`../architect/hybrid-workspace.md`](../architect/hybrid-workspace.md).
 
 ## 14. Profile-aware linting
 

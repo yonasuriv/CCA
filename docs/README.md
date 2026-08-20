@@ -10,6 +10,7 @@ CCA keeps runtime authority inside the installable `skills/cca/` package. Reposi
 - [Method composition](method-composition.md) — how human, agent, delivery, and engineering methods coexist without being flattened.
 - [Design principles](design-principles.md) — reasoning behind the architecture.
 - [Standards](standards.md) — tracked upstream compatibility surfaces.
+- [References](references.md) — upstream, methodology, and citation links.
 - [Migration](migration.md) — preserving existing structures while adopting CCA guidance.
 
 ## Runtime authority
@@ -19,18 +20,23 @@ The canonical installable surface is:
 ```text
 skills/cca/
 ├── SKILL.md
+├── CITATION.cff
 ├── references/
 │   ├── core/
 │   │   ├── spec.md
 │   │   ├── compatibility.md
 │   │   ├── method-composition.md
-│   │   └── adapters.md
+│   │   ├── adapters.md
+│   │   ├── icm-inheritance.md
+│   │   └── diagram-models.md
 │   ├── architect/
 │   │   ├── mode.md
 │   │   ├── core.md
 │   │   ├── forms.md
 │   │   ├── methods.md
 │   │   ├── workspace-builder.md
+│   │   ├── native-icm-setup.md
+│   │   ├── hybrid-workspace.md
 │   │   └── system-map.md
 │   ├── advisor/
 │   │   ├── mode.md
@@ -48,11 +54,14 @@ skills/cca/
 │       ├── query.md
 │       └── lint.md
 └── assets/
-    ├── scripts/          # capture-source.py, verify-sources.py (copy into workspaces)
-    └── templates/
+    ├── hybrid-workspace/    # profile schema, templates, generator, audit, tests
+    ├── scripts/             # reusable source/knowledge helpers
+    └── templates/           # portable workspace/context templates
 ```
 
 Architect and advisor references are deliberately separate domains. Architect owns workspace structure and composition; advisor owns engineering/process judgment. Architect may consult advisor references lazily, but does not absorb or duplicate them.
+
+The Hybrid Workspace Profile is optional and CCA-owned. Its current bundled schema is v2; the complete reference implementation and adversarial tests travel inside `skills/cca/assets/hybrid-workspace/` so the installed skill remains self-contained.
 
 ## Repository layout
 
@@ -63,6 +72,7 @@ CCA/
 ├── README.md
 ├── CONTRIBUTING.md
 ├── CITATION.cff
+├── CHANGELOG.md
 ├── docs/
 ├── skills/
 │   └── cca/
@@ -74,7 +84,8 @@ CCA/
 └── .github/
     ├── workflows/
     └── scripts/
-        └── validate_repo.py
+        ├── validate_repo.py
+        └── validate_distribution.py
 ```
 
-`examples/` and `docs/` are explanatory/non-normative unless a file explicitly says otherwise. Normative CCA runtime semantics live under `skills/cca/references/core/` so they remain available after the skill is installed.
+`examples/` and `docs/` are explanatory/non-normative unless a file explicitly says otherwise. Normative CCA runtime semantics live under `skills/cca/references/core/` so they remain available after the skill is installed. `docs/_wip.md` is development material and must not be treated as normative or current release authority.

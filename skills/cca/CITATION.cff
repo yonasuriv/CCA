@@ -2,19 +2,21 @@ cff-version: 1.2.0
 title: 'CCA: Convergent Context Architecture'
 message: 'If you use CCA, please cite it using the metadata below.'
 type: software
+version: '1.0.0'
+date-released: '2026-08-21'
 authors:
   - given-names: Jonathan
     family-names: Di Rico
 repository-code: 'https://github.com/yonasuriv/CCA'
 url: 'https://github.com/yonasuriv/CCA'
 abstract: >-
-  CCA is an agent-agnostic interoperability layer for
-  filesystem-native AI context, designed to make ICM
-  workspaces, LLM Wikis, AGENTS.md, Agent Skills, and
-  existing projects work together without forcing a new
-  convention. It provides shared structure, routing, skills,
-  and compatibility rules so context remains portable across
-  agents, tools, and runtimes.
+  CCA is an agent-agnostic interoperability architecture for
+  filesystem-native AI context, designed to make ICM workspaces,
+  LLM Wikis, AGENTS.md, Agent Skills, existing projects, and human
+  knowledge-work systems interoperable without forcing a new competing
+  convention. It defines stable semantic roles, scoped boundaries,
+  configurable bindings, routing, and compatibility rules so durable
+  context remains portable across agents, tools, and runtimes.
 keywords:
   - agnostic
   - architecture
@@ -47,5 +49,3 @@ references:
         given-names: David
     year: 2026
     url: 'https://arxiv.org/abs/2603.16021'
-    # https://github.com/RinDig/Interpretable-Context-Methodology
-    # https://github.com/RinDig/icm-architect

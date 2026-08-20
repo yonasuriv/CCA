@@ -5,7 +5,7 @@ the hard part is increasingly not the model. It is context: where instructions
 live, what is authoritative, what an agent is allowed to change, and how several
 methods or tools coexist without duplicating the same truth.
 
-CCA (Convergent Context Architecture) is an agent-agnostic interoperability layer
+CCA (Convergent Context Architecture) is an agent-agnostic interoperability architecture
 for that problem. It does not replace ICM, LLM Wiki, AGENTS.md, Agent Skills,
 PARA, Zettelkasten, BASB, Scrum, Kanban, or other established methods. It keeps
 them distinct and makes their boundaries explicit enough for humans and agents

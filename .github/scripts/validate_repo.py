@@ -72,16 +72,20 @@ def validate_single_skill_package() -> None:
 def validate_unified_skill_surface() -> None:
     required = [
         CCA / "SKILL.md",
+        CCA / "CITATION.cff",
         CCA / "references/core/spec.md",
         CCA / "references/core/compatibility.md",
         CCA / "references/core/method-composition.md",
         CCA / "references/core/adapters.md",
+        CCA / "references/core/icm-inheritance.md",
+        CCA / "references/core/diagram-models.md",
         CCA / "references/architect/mode.md",
         CCA / "references/architect/core.md",
         CCA / "references/architect/forms.md",
         CCA / "references/architect/methods.md",
         CCA / "references/architect/system-map.md",
         CCA / "references/architect/native-icm-setup.md",
+        CCA / "references/architect/hybrid-workspace.md",
         CCA / "references/advisor/mode.md",
         CCA / "references/advisor/engineering-principles.md",
         CCA / "references/advisor/frameworks-and-methodologies.md",
@@ -95,6 +99,8 @@ def validate_unified_skill_surface() -> None:
         CCA / "references/operations/ingest.md",
         CCA / "references/operations/query.md",
         CCA / "references/operations/lint.md",
+        CCA / "assets/hybrid-workspace",
+        CCA / "assets/scripts",
         CCA / "assets/templates",
     ]
     for path in required:
@@ -145,7 +151,6 @@ def validate_skills() -> None:
 
         if re.search(r"(?:\.\./)+cca-[a-z0-9-]+/", text):
             error(f"Skill uses sibling filesystem dependency: {skill_dir.name}")
-
 
 
 def validate_skill_self_containment() -> None:
@@ -246,6 +251,7 @@ def validate_methodology_corpus() -> None:
         if anchor not in text:
             error(f"Methodology corpus lost coverage anchor: {anchor!r}")
 
+
 def validate_icm_derived_example() -> None:
     """Validate only the ICM-derived patterns the hybrid example adopts."""
     stages = EXAMPLE / "stages"
@@ -308,6 +314,7 @@ def validate_current_documentation_paths() -> None:
     current_docs = [
         ROOT / "README.md",
         ROOT / "AGENTS.md",
+        ROOT / "CHANGELOG.md",
         ROOT / "docs/README.md",
         ROOT / "docs/getting-started.md",
         ROOT / "docs/faq.md",
@@ -343,22 +350,32 @@ def validate_current_documentation_paths() -> None:
                 error(f"Stale documented path in {path.relative_to(ROOT)}: {pattern!r} ({reason})")
 
 
-def validate_markdown_links() -> None:
-    excluded = {
-        Path("docs/_wip.md"),
-    }
+def validate_markdown_link_syntax() -> None:
+    """Catch malformed Markdown link syntax without performing network requests."""
+    adjacent_links = re.compile(r"\]\([^\n]*?\)\[[^\]]+\]\(")
+    markdown_link = re.compile(r"\[[^\]]+\]\(([^)\n]+)\)")
 
     for path in sorted(ROOT.rglob("*.md")):
-        relative_path = path.relative_to(ROOT)
-
-        if relative_path in excluded:
-            continue
         if ".git" in path.parts:
             continue
         if "assets" in path.parts and "templates" in path.parts:
             continue
-        # Paper may use repository-root citations/identifiers that are not local links.
-        if path.name in {"paper.md", "paper-brief.md"}:
+
+        text = read(path)
+        for line_no, line in enumerate(text.splitlines(), start=1):
+            if adjacent_links.search(line):
+                error(f"Adjacent Markdown links missing separator: {path.relative_to(ROOT)}:{line_no}")
+            for target in markdown_link.findall(line):
+                first_token = target.strip().split(maxsplit=1)[0].strip("<>")
+                if first_token.endswith(('"', "'")):
+                    error(f"Malformed Markdown link target: {path.relative_to(ROOT)}:{line_no} -> {first_token}")
+
+
+def validate_markdown_links() -> None:
+    for path in sorted(ROOT.rglob("*.md")):
+        if ".git" in path.parts:
+            continue
+        if "assets" in path.parts and "templates" in path.parts:
             continue
 
         text = read(path)
@@ -378,6 +395,7 @@ def validate_required_docs() -> None:
     required = [
         ROOT / "README.md",
         ROOT / "AGENTS.md",
+        ROOT / "CHANGELOG.md",
         ROOT / "CITATION.cff",
         ROOT / "CONTRIBUTING.md",
         ROOT / "docs/README.md",
@@ -386,6 +404,7 @@ def validate_required_docs() -> None:
         ROOT / "docs/scenarios.md",
         ROOT / "docs/method-composition.md",
         ROOT / "docs/standards.md",
+        ROOT / "docs/references.md",
         ROOT / "examples/publications/blog.md",
         ROOT / "examples/publications/article.md",
         ROOT / "examples/publications/paper.md",
@@ -420,6 +439,7 @@ def main() -> int:
     validate_example_style()
     validate_current_documentation_paths()
     validate_publications()
+    validate_markdown_link_syntax()
     validate_markdown_links()
 
     if ERRORS:
