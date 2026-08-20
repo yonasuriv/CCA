@@ -4,6 +4,22 @@ CCA has one governing rule: **converge on proven upstream conventions instead of
 
 The human objective remains explicit: **automation is the means; augmenting human capabilities is the goal.**
 
+This workflow applies to **every repository change**, including documentation, skills, schemas, tests, evals, examples, publications, CI, and tooling.
+
+## Contribution workflow
+
+1. Read [`AGENTS.md`](AGENTS.md) and this file before editing.
+2. Identify the authority and boundary affected by the change. If an upstream claim is involved, verify the current primary source.
+3. Work on a branch. Keep the change scoped to the smallest semantically correct unit.
+4. For behavioral, normative, or regression-prone changes, add a failing deterministic/adversarial test before the implementation where practical.
+5. Change the canonical authority first. Then update every affected explanatory document, example, publication, index/map, citation surface, and regression check in the same change.
+6. Update [`CHANGELOG.md`](CHANGELOG.md) under `## Unreleased` for user-visible, compatibility, semantic, profile, packaging, or release-relevant changes. Pure internal maintenance may omit a changelog entry when it has no user-facing effect, but that should be obvious from the PR.
+7. Run the complete validation suite below on the **exact PR head**.
+8. Open a pull request and complete [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md). Do not merge while applicable CI or upstream acceptance checks are red.
+9. Release tags are created only from a merged `main` commit after the complete `main` validation run is green.
+
+The pull-request template is a review checklist, not a second specification. The changelog records release history and pending user-visible changes; normative semantics remain in the skill-local specification.
+
 ## Before changing behavior
 
 Identify which authority the change affects:
