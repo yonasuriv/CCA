@@ -128,73 +128,7 @@ CCA sits between existing authorities and the filesystem-native boundaries in wh
 
 It does not own those authorities or flatten them into a common schema. It provides the semantic contract required to identify boundaries, resolve roles, preserve authority, and route to the minimum relevant context while allowing each nested system to retain its native behavior.
 
-<!-- Composition + interoperability semantics -->
-```mermaid
----
-config:
-  flowchart:
-    wrappingWidth: 500
-    defaultRenderer: elk
----
-flowchart TB
-    subgraph UPSTREAM["Upstream"]
-        direction TB
-        STANDARDS["Standards"]
-        PRINCIPLES["Principles"]
-        FRAMEWORKS["Frameworks"]
-        CONVENTIONS["Conventions"]
-        METHODOLOGIES["Methodologies"]
-    end
-
-    subgraph CONSUMERS["Consumers"]
-        direction LR
-        AGENTS["Agents"]
-        HUMANS["Humans"]
-    end
-
-    subgraph CCA_CONTAINER["CCA"]
-        direction LR
-        SPEC["<b>STRUCTURE</b><br/>Specification <br>↓<br> Boundary + Semantic Role <br>↓<br> Binding<br/>↓<br>Authority · Capabilities · Concurrency<br/>↓<br>Durability · Recovery · Freshness · Requiredness"]
-        RESOLVER["<b>RESOLVE</b><br/>Route before search"]
-        LINT["<b>LINT</b><br/>Static + Runtime enforcement"]
-        SPEC --> LINT
-        SPEC --> RESOLVER
-    end
-
-    subgraph CONTAINER["Workspace Container"]
-        direction LR
-        subgraph WORKSPACE_LAYER[" "]
-            direction TB
-            GENERAL["<b>Portable Workspaces</b><br>PKM / Second brains<br/>Coding projects<br/>Research systems<br/>Hybrid workspaces"]
-            CONFIDENTIAL["<b>Restricted Workspaces</b><br>Client workspaces<br/>Confidential workspaces<br/><i>Gated · Not globally indexed</i>"]
-        end
-        subgraph SYSTEM_LAYER["System Layer"]
-            direction TB
-            SYS_ND["Index<br/>Cache<br/>Reports<br/><i>Generated · Rebuildable</i>"]
-            SYS_ST["Scripts<br/>Templates<br/>Internal conventions<br><i>Automation · Support</i>"]
-        end
-    end
-
-    UPSTREAM --> SPEC
-    PRINCIPLES --> SPEC
-    FRAMEWORKS --> SPEC
-    CONVENTIONS --> SPEC
-    METHODOLOGIES --> SPEC
-
-    CONSUMERS -- "Intent" --> RESOLVER
-    RESOLVER -- "Resolved context" --> CONSUMERS
-
-    LINT -. "Governs" .-> GENERAL
-    LINT -.-> CONFIDENTIAL
-    SPEC -. "Defines" .-> SYS_ST
-
-    RESOLVER -- "Default scope" --> GENERAL
-    RESOLVER -. "Explicit scope" .-> CONFIDENTIAL
-    RESOLVER -- "Reads index" --> SYS_ND
-
-    classDef restricted stroke-dasharray:4 3
-    class CONFIDENTIAL restricted
-```
+<img width="1043" height="1211" alt="image" src="https://github.com/user-attachments/assets/1f1e3b97-b4ff-4a16-b3dc-ef0d93cf5e91" />
 
 ## Supporting skill
 
