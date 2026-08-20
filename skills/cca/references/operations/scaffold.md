@@ -52,7 +52,7 @@ Preserve declared PARA/Zettelkasten/BASB or other organization. Scaffold routing
 
 ## CCA Hybrid Workspace Profile
 
-Use this path only after `architect` selected the optional profile or the target already matches its bundled frozen-v1 contract. Load `../architect/hybrid-workspace.md` before acting.
+Use this path only after `architect` selected the optional profile or the target already matches the current bundled **v2** contract. V2 preserves the frozen-v1 baseline and adds only `reference.curated` and `reference.collected` admission classifications beneath `knowledge.reference`. Load `../architect/hybrid-workspace.md` before acting.
 
 The implementation lives inside the installed skill at `../../assets/hybrid-workspace/` relative to this reference's skill package. Resolve the actual installed skill root; do not depend on a repository-global path.
 
@@ -71,10 +71,24 @@ Rules:
 3. Review/customize semantic bindings in the target contract rather than renaming generated defaults ad hoc.
 4. Run generation again after authorized binding edits so derived artifacts follow the new bindings.
 5. Do not copy the Python implementation into the target merely to execute it.
+6. Required reference materialization creates the parent `knowledge.reference` binding plus its `reference.curated` and `reference.collected` child bindings. Do not create loose source objects at the parent.
+
+### Source admission
+
+Scaffold does not reinterpret source admission as content authorship or a new knowledge role.
+
+- Human-admitted raw/reference evidence goes through `reference.curated` and remains agent-read-only.
+- Automatically acquired raw/reference evidence goes through `reference.collected`; agents/tools may add new child objects only under the existing append/additive policy.
+- Existing collected sources are not edited, replaced, renamed, relocated, or deleted by normal agent operation.
+- Collected sources require the provenance/content-identity metadata declared by `reference_contract`.
+- Human review does not move collected evidence to curated; review is metadata because the classification records original admission provenance.
+- Agent-authored synthesis routes to `knowledge.durable`; deliverables route to `output.artifact`; finite research work routes to `work.project`.
 
 ### Existing profile target
 
 Do not use `--init` as a reset mechanism. Read the target's existing `WORKSPACE.yaml`, preserve human-authored `AGENTS.md`, and use `sync`/`lint` for reconciliation or validation.
+
+A v1 target is not silently rewritten as though its frozen schema had always contained the new keys. The current bundled profile is v2 because v1's own evolution contract requires a schema-version bump for key additions. Treat an upgrade as an explicit profile-version migration.
 
 ## Change safety
 
@@ -86,6 +100,7 @@ Before writing:
 4. For changes that replace, merge, move, or substantially rewrite existing instructions/content, present the migration/diff and obtain approval unless direct remediation was already authorized.
 5. Never delete or rename application content merely to satisfy scaffold defaults.
 6. Never materialize profile output inside `skills/cca/` or its bundled tool directory.
+7. For nested bindings, resolve filesystem mutation policy from the most-specific applicable binding; parent permissions do not widen child policy.
 
 ## Production rules
 
@@ -108,6 +123,6 @@ After scaffolding, simulate a fresh human/agent consumer:
 3. If a pipeline was added, can it follow the applicable local contract?
 4. If maintained knowledge was added, can it find the implementation's own navigation/schema instructions?
 5. If upstream-native compatibility is claimed, did that upstream's complete applicable acceptance surface pass?
-6. If the Hybrid Workspace Profile is claimed, do the bundled profile audit and generated-artifact check pass on the explicit target?
+6. If the Hybrid Workspace Profile is claimed, do the bundled profile audit and generated-artifact check pass on the explicit target, including reference admission/provenance rules?
 
 Use `lint` mode for profile-aware validation. Report upstream-native validity, CCA compatibility/conformance, named-profile conformance, and optional hardening separately.
