@@ -12,8 +12,8 @@ This page collects upstreams, inspirations, standards, and methodologies referen
 ## Personal knowledge management methodologies
 
 - [Zettelkasten](https://en.wikipedia.org/wiki/Zettelkasten)
-- [PARA](https://fortelabs.com/para/) — Tiago Forte.
-- [Building a Second Brain (BASB)](https://fortelabs.com/basb/) — Tiago Forte.
+- [PARA](https://fortelabs.com/blog/para/) — Tiago Forte.
+- [Building a Second Brain (BASB)](https://fortelabs.com/blog/basboverview/) — Tiago Forte.
 
 ## Open standards and ecosystem conventions
 
