@@ -6,11 +6,7 @@ CCA aims to bridge human knowledge work and agentic work without forcing existin
 
 Its goal is to make automation easier in service of augmenting human capabilities while improving efficiency, reducing technical debt and unnecessary complexity, and lowering compute, context, usage, and operational costs.
 
-<!-- ADD THE "IN PLAIN ENGLISH EXPLAINATION" --
-_In plain English_
-
-<TEXT HERE>
--->
+_In plain English:_ CCA lets different file-based ways of working keep their own rules while giving humans and agents a common way to determine what something means, where it lives, which authority governs it, and how to reach the right context without forcing everything into one new structure.
 
 > **Automation is the means; augmenting human capabilities is the goal.**
 
@@ -28,7 +24,7 @@ _In plain English_
 - [Migration](docs/migration.md)
 - [FAQ](docs/faq.md)
 
-> _Braindump file that may or may not be aligned with the current goal of the repo is under [docs/_wip.md](docs/_wip.md) (must be processed first)_ \
+> _Development notes under [docs/_wip.md](docs/_wip.md) are explicitly non-normative._ \
 > _Non-normative publication forms are under [examples/publications/](examples/publications/)._
 
 ## Why CCA exists
@@ -128,7 +124,7 @@ CCA sits between existing authorities and the filesystem-native boundaries in wh
 
 It does not own those authorities or flatten them into a common schema. It provides the semantic contract required to identify boundaries, resolve roles, preserve authority, and route to the minimum relevant context while allowing each nested system to retain its native behavior.
 
-<img width="1043" height="1211" alt="image" src="https://github.com/user-attachments/assets/1f1e3b97-b4ff-4a16-b3dc-ef0d93cf5e91" />
+<img width="1043" height="1211" alt="CCA convergence model" src="https://github.com/user-attachments/assets/1f1e3b97-b4ff-4a16-b3dc-ef0d93cf5e91" />
 
 ## Supporting skill
 
@@ -137,19 +133,24 @@ CCA ships with one self-contained Agent Skill under [`skills/cca/`](skills/cca/)
 ```text
 skills/cca/
 ├── SKILL.md
+├── CITATION.cff
 ├── references/
-│   ├── core/          # normative CCA semantics and compatibility
-│   ├── architect/     # workspace forms, boundaries, builders
-│   ├── advisor/       # engineering and process judgment
-│   └── operations/    # scaffold, sync, ingest, query, lint
+│   ├── core/                 # normative CCA semantics and compatibility
+│   ├── architect/
+│   │   └── hybrid-workspace.md
+│   ├── advisor/              # engineering and process judgment
+│   └── operations/           # scaffold, sync, ingest, query, lint
 └── assets/
+    ├── hybrid-workspace/     # optional Hybrid Workspace Profile implementation/tests
+    ├── scripts/
     └── templates/
 ```
 
-The root [`SKILL.md`](skills/cca/SKILL.md) acts as a compact router. It selects the smallest applicable mode and loads only the references that operation requires. It should select the smallest applicable mode and progressively load only the references required for the current operation.
+The root [`SKILL.md`](skills/cca/SKILL.md) acts as a compact router. It selects the smallest applicable mode and progressively loads only the references required for the current operation.
 
 Implementation work that needs no context architecture, knowledge operation, validation, or advice should never reach deeper CCA material.
-> Progressive disclosure is architectural, not packaging: **This applies to both context and capability.**
+
+> Progressive disclosure is architectural, not packaging: **this applies to both context and capability.**
 
 | Mode        | Responsibility                                                                             |
 | ----------- | ------------------------------------------------------------------------------------------ |
@@ -162,10 +163,11 @@ Implementation work that needs no context architecture, knowledge operation, val
 | `advise`    | Apply engineering, process, security, agent-system, context, and AI/ML judgment.           |
 
 The skill is an implementation of CCA, not the definition of CCA itself:
+
 - A CCA workspace must remain understandable from its durable files and declared semantics without requiring a particular model, harness, or installed skill.
 - CCA documentation should never override the active upstream authority for a native profile.
 
-### Normative Authority
+### Normative authority
 
 Normative CCA semantics are maintained inside the portable skill package, not in this README:
 
