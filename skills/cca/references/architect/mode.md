@@ -31,7 +31,7 @@ Before changing structure, identify the current boundary, upstream-native claims
 - **CCA-compatible**: CCA can resolve the target without structural migration or semantic replacement.
 - **CCA-conformant**: preserve the normative CCA semantics the target intentionally adopted.
 - **Profile-conformant**: preserve the named CCA-owned profile contract independently from other claims.
-- **CCA Hybrid Workspace Profile**: optional CCA-owned profile; not a new mode and not native ICM. Stable semantic keys remain identity; bindings remain configurable where frozen-v1 permits them.
+- **CCA Hybrid Workspace Profile**: optional CCA-owned profile; not a new mode and not native ICM. The current bundled schema is v2, preserving the frozen-v1 baseline and adding only `reference.curated`/`reference.collected` admission classifications. Stable semantic roles remain identity; bindings remain configurable where the current profile permits them.
 - **Method overlays**: PARA, Zettelkasten, BASB/CODE, delivery methods, and similar systems remain their own authorities unless an explicit machine-facing contract says otherwise.
 
 Compatibility is interoperability, not ownership. Do not label an upstream workspace CCA-conformant merely because CCA can resolve it.
@@ -44,9 +44,19 @@ For CCA-owned/interoperable architecture decisions, reason through:
 boundary + semantic role -> binding
 ```
 
-Then separately determine authority, mutability, lifecycle/status, provenance, and indexing/visibility semantics where the selected contract requires them.
+Then separately determine authority, mutability, lifecycle/status, provenance, classification, and indexing/visibility semantics where the selected contract requires them.
 
 Do not use a concrete default path as the role identity. If a governing upstream makes a filename/path normative for native conformance, preserve that upstream requirement.
+
+For the Hybrid Workspace Profile specifically, source admission classification is orthogonal to semantic role:
+
+```text
+reference.curated   ─┐
+                     ├─> knowledge.reference
+reference.collected ─┘
+```
+
+`reference.*` records how preserved evidence entered the corpus; it does not create a second reference ontology.
 
 ## Build mode
 
@@ -95,7 +105,7 @@ The target MUST be explicitly resolved outside the installed package. The implem
 - Routing files point; they do not become knowledge dumps.
 - Load minimum sufficient context for the active operation.
 - Nest boundaries; do not merge schemas merely because several methods coexist.
-- Stable semantic roles are distinct from concrete bindings.
+- Stable semantic roles are distinct from concrete bindings and orthogonal classifications.
 - Bindings may move where their governing contract permits; consumers follow the semantic role.
 - Upstream-native systems retain their upstream authority.
 - Human methods remain independent rather than being absorbed into CCA.
