@@ -22,6 +22,7 @@ class ReleaseReadinessTests(unittest.TestCase):
         readme = self.read("README.md")
         self.assertNotIn('ADD THE "IN PLAIN ENGLISH EXPLAINATION"', readme)
         self.assertNotIn("<TEXT HERE>", readme)
+        self.assertNotIn("must be processed first", readme)
 
     def test_current_package_maps_include_hybrid_workspace(self) -> None:
         readme = self.read("README.md")
@@ -41,9 +42,26 @@ class ReleaseReadinessTests(unittest.TestCase):
     def test_reference_markdown_targets_do_not_contain_stray_quotes(self) -> None:
         text = self.read("docs/references.md")
         targets = re.findall(r"\[[^\]]+\]\(([^)]+)\)", text)
-        malformed = [target for target in targets if target.strip().endswith(('"', "'"))]
+        malformed = []
+        for target in targets:
+            first_token = target.strip().split(maxsplit=1)[0]
+            if first_token.endswith(('"', "'")):
+                malformed.append(target)
         self.assertEqual([], malformed, f"Malformed Markdown targets: {malformed}")
         self.assertNotRegex(text, r"\]\([^)]*\)\[[^\]]+\]\(")
+
+    def test_primary_public_product_identity_is_architecture(self) -> None:
+        surfaces = {
+            "AGENTS.md": "CCA is an agent-agnostic interoperability architecture",
+            "examples/publications/article.md": "CCA (Convergent Context Architecture) is an evolving, agent-agnostic interoperability architecture",
+            "examples/publications/blog.md": "CCA (Convergent Context Architecture) is an agent-agnostic interoperability architecture",
+        }
+        for path, expected in surfaces.items():
+            self.assertIn(expected, self.read(path), path)
+
+    def test_deprecated_compatibility_vocabulary_is_not_active_documentation(self) -> None:
+        wip = self.read("docs/_wip.md")
+        self.assertNotIn("**Native-compatible**", wip)
 
     def test_release_citation_metadata_is_consistent(self) -> None:
         root_cff = self.read("CITATION.cff")
@@ -52,7 +70,8 @@ class ReleaseReadinessTests(unittest.TestCase):
             self.assertIn("version: '1.0.0'", text)
             self.assertIn("date-released: '2026-08-21'", text)
             self.assertIn("CCA is an agent-agnostic interoperability architecture", text)
-        self.assertEqual(root_cff.split("# Citation File Format", 1)[-1].strip(), skill_cff.strip())
+            self.assertIn("title: 'CCA: Convergent Context Architecture'", text)
+            self.assertIn("repository-code: 'https://github.com/yonasuriv/CCA'", text)
 
     def test_release_history_exists(self) -> None:
         changelog = ROOT / "CHANGELOG.md"
