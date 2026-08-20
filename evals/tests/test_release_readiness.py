@@ -59,9 +59,10 @@ class ReleaseReadinessTests(unittest.TestCase):
         for path, expected in surfaces.items():
             self.assertIn(expected, self.read(path), path)
 
-    def test_deprecated_compatibility_vocabulary_is_not_active_documentation(self) -> None:
+    def test_pre_1_0_wip_is_explicitly_historical(self) -> None:
         wip = self.read("docs/_wip.md")
-        self.assertNotIn("**Native-compatible**", wip)
+        self.assertIn("Historical pre-1.0 design notebook", wip)
+        self.assertIn("not current release authority", wip)
 
     def test_release_citation_metadata_is_consistent(self) -> None:
         root_cff = self.read("CITATION.cff")
