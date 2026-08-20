@@ -1,6 +1,28 @@
 # Summary
 
-Describe the problem, the change, and why it belongs in CCA.
+What problem does this pull request solve, what changed, and what is the resulting behavior?
+
+## Why
+
+Why is this change needed now? Include the concrete failure mode, user need, audit finding, upstream change, or maintenance problem that justifies it.
+
+## Scope
+
+What is intentionally included in this change?
+
+- 
+
+## Non-goals
+
+What is intentionally **not** being changed? Call out adjacent architecture, compatibility, cleanup, migration, or follow-up work that this PR deliberately leaves alone.
+
+- 
+
+## What changed
+
+Summarize the actual implementation/documentation changes. Prefer concrete bullets over file-by-file narration.
+
+- 
 
 ## Authority and scope
 
@@ -12,7 +34,7 @@ Affected authority/boundary:
 
 <!-- e.g. CCA core, Hybrid Workspace Profile, upstream-native ICM, Agent Skills, repository-only docs/tooling -->
 
-## Compatibility / conformance claims
+## Compatibility / version impact
 
 Check only claims this PR actually makes:
 
@@ -24,7 +46,7 @@ Check only claims this PR actually makes:
 - [ ] ICM-derived only
 - [ ] Repository-only / no compatibility claim
 
-Explain any changed claim or acceptance surface:
+Explain any changed compatibility/conformance claim, migration requirement, schema/spec version impact, or why none is required:
 
 ## Semantic impact
 
@@ -33,9 +55,9 @@ Explain any changed claim or acceptance surface:
 - [ ] Binding-only changes remain binding-only where the governing contract permits relocation.
 - [ ] Authority, provenance/admission, lifecycle, mutability, and semantic role remain distinct axes where applicable.
 
-Breaking or versioned impact:
+Semantic axes affected, if any:
 
-<!-- State none, or explain the required version treatment. -->
+<!-- boundary / role / classification / binding / authority / policy / provenance / lifecycle / freshness / none -->
 
 ## Documentation and distribution
 
@@ -44,9 +66,9 @@ Breaking or versioned impact:
 - [ ] All affected skill references, repository docs, examples, publications, indexes/maps, citation metadata, and changelog entries were updated together where applicable.
 - [ ] No stale compatibility terminology, obsolete paths, placeholders, or contradictory current guidance were introduced.
 
-## Validation
+## Verification
 
-Run the complete suite documented in `CONTRIBUTING.md`:
+Run the complete suite documented in `CONTRIBUTING.md` when applicable:
 
 ```bash
 python -m unittest discover -s evals/tests -v
@@ -62,8 +84,22 @@ python .github/scripts/validate_distribution.py
 - [ ] Behavioral changes include failing regression/adversarial coverage before the implementation fix where practical.
 - [ ] Upstream-native claims also pass the upstream's own current acceptance requirements; CCA validation does not waive upstream failures.
 
+Exact tested head / merge candidate:
+
+```text
+<commit SHA>
+```
+
 Evidence / notable test results:
 
-## Review notes
+```text
+<tests, validators, audit counts, or intentionally not-applicable checks>
+```
 
-Call out ambiguity, debt, intentional exceptions, migration concerns, or follow-up work. Do not hide unresolved architectural or compatibility questions behind a passing test suite.
+## Follow-up / known debt
+
+List unresolved questions, intentional exceptions, deferred cleanup, migration concerns, or future work. Write `None` if there is no known follow-up.
+
+- 
+
+Do not hide unresolved architectural or compatibility questions behind a passing test suite.
