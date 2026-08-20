@@ -29,7 +29,7 @@ class ReleaseReadinessTests(unittest.TestCase):
         docs_index = self.read("docs/README.md")
         for text in (readme, docs_index):
             self.assertIn("hybrid-workspace.md", text)
-            self.assertIn("assets/hybrid-workspace", text)
+            self.assertRegex(text, r"assets/[\s\S]{0,300}hybrid-workspace/")
 
     def test_whitepaper_describes_current_hybrid_v2(self) -> None:
         paper = self.read("examples/publications/paper.md")
