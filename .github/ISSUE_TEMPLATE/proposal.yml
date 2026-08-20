@@ -1,0 +1,100 @@
+name: CCA proposal
+description: Propose a change to CCA architecture, semantics, profiles, interoperability, tooling, or repository behavior.
+title: "[Proposal]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when something should change. CCA prefers convergence over invention: proposals should identify the real interoperability problem, affected authority, and why an existing standard or convention is insufficient before introducing new CCA surface.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the concrete problem or limitation. Start with the failure mode or unmet need, not the proposed mechanism.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Affected authority / scope
+      description: Select the primary scope. Independent authorities must remain independent even when the proposal composes them.
+      options:
+        - CCA core / normative semantics
+        - CCA-owned profile
+        - Upstream compatibility / mapping
+        - Portable cca skill / operation mode
+        - Evaluation / validation / tooling
+        - Documentation / repository governance
+        - Other / unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: existing
+    attributes:
+      label: Existing standards or conventions considered
+      description: Identify upstream standards, ecosystem conventions, ordinary filesystem patterns, or existing CCA semantics considered before adding/changing CCA surface.
+      placeholder: What already exists, and why does it not fully solve the stated problem?
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: semantic-impact
+    attributes:
+      label: Semantic impact
+      description: Check every axis this proposal may affect. Leave all unchecked only if the proposal is repository-only.
+      options:
+        - label: Boundary
+        - label: Semantic role / classification
+        - label: Binding
+        - label: Authority / operation policy
+        - label: Provenance / admission
+        - label: Lifecycle / freshness / durability
+        - label: Compatibility / conformance claim
+        - label: Profile contract / schema version
+        - label: No semantic impact / repository-only
+
+  - type: textarea
+    id: proposed-change
+    attributes:
+      label: Why CCA should change
+      description: Explain the smallest change you think CCA should make and why the change belongs at this abstraction layer.
+    validations:
+      required: true
+
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility / migration impact
+      description: Explain what remains compatible, what could break, whether a profile/spec version change is required, and how existing workspaces remain interpretable.
+      placeholder: State "none" only if you have considered the impact and there is genuinely no compatibility or migration effect.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence / references
+      description: Link primary sources, examples, failure cases, prior discussions, benchmarks, or implementation evidence supporting the proposal.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What simpler mapping, binding, profile-local policy, or upstream-native mechanism could solve the problem without expanding CCA core?
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and pull requests for the same proposal.
+          required: true
+        - label: This proposal preserves existing frameworks, standards, methodologies, and knowledge systems as independent authorities rather than redefining them as CCA.
+          required: true
