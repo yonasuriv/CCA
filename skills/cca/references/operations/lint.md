@@ -118,7 +118,7 @@ Report optional hardening separately from conformance errors.
 
 ## 8. CCA Hybrid Workspace Profile
 
-Load `../architect/hybrid-workspace.md` when the target matches the bundled frozen-v1 profile.
+Load `../architect/hybrid-workspace.md` when the target matches the current bundled **v2** profile. V2 preserves all frozen-v1 semantics and adds only two admission classifications beneath `knowledge.reference`.
 
 Use the skill-local reference implementation on an **explicit target**:
 
@@ -135,21 +135,28 @@ python <cca-skill>/assets/hybrid-workspace/audit.py --target <workspace> --self-
 
 Profile checks include:
 
-1. frozen semantic-key/policy/authority contract passes;
+1. frozen-v1 semantic-key/policy/authority baseline plus the v2 extension contract passes;
 2. unsafe/escaping bindings and generated destinations are rejected after symlink resolution;
 3. effective permissions remain intersections rather than a single-axis grant;
 4. archive identity/trust/promotion invariants pass;
 5. required generated **semantic outputs** agree with current bindings and profile semantics;
-6. `AGENTS.md` satisfies the human-authored profile control contract;
+6. `AGENTS.md` satisfies the human-authored `workspace-contract:v2` control contract;
 7. non-breaking binding moves propagate to generated consumers;
 8. `context.router` generation follows its current binding rather than treating literal `CONTEXT.md` as identity;
-9. moving `_state/`, `_runtime/`, or another default does not leak obsolete default paths into generated artifacts;
+9. moving `_state/`, `_runtime/`, `20-sources/`, or another default does not leak obsolete default paths into generated artifacts;
 10. the tooling leaves the installed package untouched and writes/checks only the explicit target;
-11. local routing/indexing remains boundary-scoped as large collections grow rather than requiring one root manifest.
+11. local routing/indexing remains boundary-scoped as large collections grow rather than requiring one root manifest;
+12. `reference.curated` and `reference.collected` both compose with semantic role `knowledge.reference`;
+13. filesystem mutation policy resolves from the most-specific source-class binding so parent permissions cannot widen/narrow the wrong child;
+14. no loose source object exists directly under the parent `knowledge.reference` binding;
+15. collected source objects preserve required acquisition provenance and content identity/hash;
+16. collected sources remain collected after review; review metadata never rewrites admission provenance;
+17. existing curated and collected sources are immutable to normal agent operation;
+18. agent-generated synthesis routes to `knowledge.durable`, external deliverables remain `output.artifact`, and finite research work remains `work.project`.
 
 When the bundled Python reference implementation owns an artifact, `generate.py --check` additionally performs its canonical byte-for-byte drift check. Do not treat Python rendering details as the only possible implementation of the profile; an independent implementation must satisfy the normative semantic/artifact contract in `../architect/hybrid-workspace.md`.
 
-Do not "repair" a failed frozen semantic/policy field by treating it as a binding customization. Semantic changes follow the profile's evolution/version contract.
+Do not "repair" a failed frozen semantic/policy field by treating it as a binding customization. Semantic/key changes follow the profile's evolution/version contract.
 
 ## 9. Agent Skills checks
 
@@ -171,6 +178,7 @@ A filesystem snapshot alone cannot prove historical immutability.
 - Validate current syntax only where the active contract defines it.
 - Claim append-only history only when relevant history/version evidence is available and inspected.
 - Otherwise report immutability history as **not verified**.
+- For collected source files, a matching content hash verifies current content identity against recorded acquisition metadata; it does not by itself prove the entire historical custody chain.
 
 ## 11. Repairs
 
@@ -184,6 +192,7 @@ When remediation is authorized, automatically repair only unambiguous issues. Do
 - flatten a method overlay or nested native boundary;
 - merge competing instruction authorities without reviewing unique content;
 - fabricate provenance/metadata;
+- move collected evidence to curated because a human reviewed it;
 - reset a Hybrid Workspace Profile target from bundled templates over human-authored control files.
 
 ## Report format

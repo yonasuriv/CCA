@@ -36,7 +36,7 @@ Do not create missing CCA-preferred catalogs merely because sync knows about the
 
 ## CCA Hybrid Workspace Profile
 
-Load `../architect/hybrid-workspace.md` when the target matches the bundled frozen-v1 profile.
+Load `../architect/hybrid-workspace.md` when the target matches the current bundled **v2** profile. V2 preserves the frozen-v1 baseline and adds only the two `knowledge.reference` admission classifications.
 
 After an authorized edit to `WORKSPACE.yaml`, reconcile derived artifacts with the installed skill's bundled implementation:
 
@@ -54,15 +54,19 @@ Rules:
 
 - the command MUST receive an explicit target;
 - never invoke generation against `skills/cca/` or `assets/hybrid-workspace/` itself;
-- `binding_change` is non-breaking in frozen v1, so all generated consumers MUST follow the new binding;
+- `binding_change` remains non-breaking, so all generated consumers MUST follow the new binding;
 - `context.router` MUST be generated at its current binding, not hardcoded as `CONTEXT.md`;
-- if `_state/`, `_runtime/`, or any other default binding is moved, obsolete defaults MUST NOT remain in regenerated routing/spec/path artifacts;
+- if `_state/`, `_runtime/`, `20-sources/`, or any other default binding is moved, obsolete defaults MUST NOT remain in regenerated routing/spec/path artifacts;
+- `reference.curated` and `reference.collected` bindings move as children of the current `knowledge.reference` binding; their semantic role remains `knowledge.reference`;
+- a binding move MUST NOT change admission provenance, effective child policy, or review state;
+- `sync` never moves a reviewed collected source into curated merely because review status changed;
 - `sync` does not silently change frozen semantic keys/policies/authorities to make a binding move easier.
 
 ## Production rules
 
 - Disk is authoritative for path existence; applicable contracts/instructions are authoritative for meaning.
 - Resolve `boundary + semantic role -> binding` before path assumptions.
+- Resolve mutation policy from the most-specific matching binding when bindings nest; parent permissions do not override child policy.
 - Never move, rename, merge, or delete user/application content in sync mode.
 - Never fabricate summaries, dates, counts, completion state, or provenance.
 - Preserve upstream-native requirements, including ICM one-way references/selective routing where applicable.
@@ -79,4 +83,5 @@ After edits:
 2. no routing entry was added outside its declared scope;
 3. no parent/child authority duplication was introduced;
 4. no upstream-native rule or method boundary was replaced with a CCA preference;
-5. for the Hybrid Workspace Profile, `generate.py --target <workspace> --check` passes and no obsolete binding leaks remain.
+5. for the Hybrid Workspace Profile, `generate.py --target <workspace> --check` passes and no obsolete binding leaks remain;
+6. reference classification still resolves both curated and collected evidence to `knowledge.reference`, with collected provenance/integrity intact.

@@ -14,7 +14,7 @@ from typing import Any
 
 import yaml
 
-from schema import compact_ops, effective_agent_operations, load_schema
+from schema import compact_ops, effective_agent_operations, load_schema, semantic_role_for_slot
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
 TEMPLATE_SCHEMA = PACKAGE_ROOT / "WORKSPACE.yaml"
@@ -139,6 +139,35 @@ def gen_excludes(data: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _reference_admission_lines(data: dict[str, Any]) -> list[str]:
+    by = slots_by_key(data)
+    contract = data["reference_contract"]
+    curated = by["reference.curated"]
+    collected = by["reference.collected"]
+    provenance = contract["collected_provenance"]
+    return [
+        "## Reference admission", "",
+        "`knowledge.reference` defines **what** the material is: preserved source/evidence. Admission classification defines **how** that evidence entered the workspace; it does not create another knowledge role.", "",
+        "```text",
+        f"{curated['binding']}paper.pdf",
+        "  classification = reference.curated",
+        "  semantic.role = knowledge.reference",
+        "",
+        f"{collected['binding']}paper.pdf",
+        "  classification = reference.collected",
+        "  semantic.role = knowledge.reference",
+        "```", "",
+        f"- `reference.curated` (`{curated['binding']}`): human-admitted evidence; agents read only.",
+        f"- `reference.collected` (`{collected['binding']}`): automatically acquired evidence; agents may deposit new children only. Existing children remain unchanged.",
+        "- Human review of collected evidence does not change its admission classification; review is metadata.",
+        "- Presence in either class means preserved evidence, not truth, correctness, quality, or endorsement.",
+        f"- Collected file provenance uses `{provenance['file_sidecar_suffix']}` sidecars and requires " + ", ".join(f"`{field}`" for field in provenance["required_fields"]) + "; files also require SHA-256 `content_hash`.",
+        "- Agent-authored conclusions/synthesis route to `knowledge.durable`; deliberate external deliverables route to `output.artifact`.",
+        "- Research is an activity/workflow. A finite research effort routes to `work.project`, not a new semantic role.",
+        "",
+    ]
+
+
 def gen_context(data: dict[str, Any]) -> str:
     lines = [
         "# Context router",
@@ -149,15 +178,16 @@ def gen_context(data: dict[str, Any]) -> str:
         "",
         "## Where things go",
         "",
-        "| key | binding | what | effective agent operations |",
-        "|---|---|---|---|",
+        "| key | binding | semantic role | what | effective agent operations |",
+        "|---|---|---|---|---|",
     ]
     for slot in data["slots"]:
         description = " ".join(slot["description"].split())
         short = description.split(".")[0]
         ops = compact_ops(effective_agent_operations(slot, data))
-        lines.append(f"| `{slot['key']}` | `{slot['binding']}` | {short} | {ops} |")
-    lines.extend(["", "## Hard rules", ""])
+        role = semantic_role_for_slot(slot, data)
+        lines.append(f"| `{slot['key']}` | `{slot['binding']}` | `{role}` | {short} | {ops} |")
+    lines.extend(["", *_reference_admission_lines(data), "## Hard rules", ""])
     for key, value in data["invariants"].items():
         lines.append(f"- **{key}** — {' '.join(value.split())}")
     lines.extend([
@@ -170,7 +200,8 @@ def gen_context(data: dict[str, Any]) -> str:
         lines.append(f"- `{key}` → **{trust}**")
     lines.extend([
         "", "## Composition", "", " ".join(data["composition"].split()),
-        "", "## Promotion boundary", "", " ".join(data["promotion"]["into_human_authoritative"].split()), "",
+        "", "## Admission / promotion boundary", "", " ".join(data["promotion"]["into_human_authoritative"].split()), "",
+        " ".join(data["promotion"]["collected_deposit"].split()), "",
     ])
     return "\n".join(lines)
 
@@ -193,7 +224,7 @@ def _crosswalk_rows(data: dict[str, Any]) -> list[str]:
 
 
 def resolved_derived_names(data: dict[str, Any]) -> tuple[str, ...]:
-    """Resolve frozen-v1 derived defaults through semantic bindings."""
+    """Resolve historical/default generated names through semantic bindings."""
     router = slots_by_key(data)["context.router"]["binding"].rstrip("/")
     return tuple(router if name == "CONTEXT.md" else name for name in data.get("generation_contract", {}).get("derived", []))
 
@@ -205,8 +236,9 @@ def gen_spec(data: dict[str, Any]) -> str:
     lines = [
         "# Workspace Schema — Specification", "",
         "> **Generated from `WORKSPACE.yaml`. Do not hand-edit.** Edit the YAML and regenerate.", "",
-        "Within the CCA Hybrid Workspace Profile, `WORKSPACE.yaml` is the canonical machine-readable bootstrap anchor. Stable semantic keys carry meaning; bindings are workspace-local implementations and may move without changing that meaning.", "",
+        "Within the CCA Hybrid Workspace Profile, `WORKSPACE.yaml` is the canonical machine-readable bootstrap anchor. Stable keys carry declared meaning; bindings are workspace-local implementations and may move without changing that meaning.", "",
         f"The generated context router is the `context.router` binding (`{router_binding}`), not a hardcoded filename. Helper artifacts such as `paths.sh`, `mkdirs.sh`, `SPEC.md`, and host adapters are derived tooling. `AGENTS.md` remains human-authored and is validated, not regenerated.", "",
+        "Schema v2 preserves the complete frozen-v1 semantic/policy baseline and adds only the two reference-admission classification keys required by the v1 evolution contract. No new knowledge role, axis, authority vocabulary, or mutability vocabulary was introduced.", "",
         "Upstream crosswalks are non-owning mappings. Native ICM, LLM Wiki, PARA, CODE/BASB, and other upstream methods remain governed by their own authority; this profile composes useful semantics without claiming to redefine them.", "",
         "## Identifier and the five axes", "",
         f"`id` is **{data['identifier']['id']}**. `key` is the **{data['identifier']['key']}**.", "",
@@ -217,21 +249,29 @@ def gen_spec(data: dict[str, Any]) -> str:
     lines.extend(["", "## Invariants (frozen)", ""])
     for name, text in data["invariants"].items():
         lines.append(f"**{name.replace('_', ' ').title()}.** {' '.join(text.split())}")
-    lines.extend(["", "## Resolved binding map", "", "Consumers resolve the semantic key first and use the binding second.", "", "```text"])
+    lines.extend(["", "## Resolved binding map", "", "Consumers resolve the key first and use the binding second.", "", "```text"])
     for slot in data["slots"]:
         lines.append(f"{slot['key']:<24} -> {slot['binding']}")
-    lines.extend(["```", "", "## The schema", "", "| id | category | key | binding | arity | mutability | indexed | authority | agent_access | link_target | requirement |", "|---:|---|---|---|---|---|---|---|---|---|---|"])
+    lines.extend(["```", "", "## The schema", "", "| id | category | key | binding | semantic role | arity | mutability | indexed | authority | agent_access | link_target | requirement |", "|---:|---|---|---|---|---|---|---|---|---|---|---|"])
     for slot in data["slots"]:
-        lines.append(f"| {slot['id']} | {slot['category']} | `{slot['key']}` | `{slot['binding']}` | {slot['arity']} | {slot['mutability']} | {slot['indexed']} | {slot['authority']} | {slot['agent_access']} | {slot['link_target']} | {slot['requirement']} |")
+        role = semantic_role_for_slot(slot, data)
+        lines.append(f"| {slot['id']} | {slot['category']} | `{slot['key']}` | `{slot['binding']}` | `{role}` | {slot['arity']} | {slot['mutability']} | {slot['indexed']} | {slot['authority']} | {slot['agent_access']} | {slot['link_target']} | {slot['requirement']} |")
     lines.extend(["", "### Descriptions", ""])
     for slot in data["slots"]:
         lines.append(f"{slot['id']}. **`{slot['key']}`** — {' '.join(slot['description'].split())}")
-    lines.extend(["", "## Policy definitions (frozen)", "", "Unspecified mutation verbs are **prohibited**. Effective permission is the intersection of mutability policy, authority, agent access, and boundary policy; no single axis grants what another denies.", ""])
+
+    lines.extend(["", *_reference_admission_lines(data), "## Classification vs semantic role", "", "Classification keys compose with semantic roles; they do not replace them.", "", "| classification | semantic role |", "|---|---|"])
+    for classification, role in data["classification_roles"].items():
+        lines.append(f"| `{classification}` | `{role}` |")
+    lines.extend(["", " ".join(data["composition"].split()), ""])
+
+    lines.extend(["", "## Policy definitions (frozen)", "", "Unspecified mutation verbs are **prohibited**. Effective permission is resolved from the most-specific applicable binding and its declared mutability/authority/agent-access policy; a parent permission never widens a more-specific child policy.", ""])
     for name, policy in data["policy_definitions"].items():
         lines.append("- " + _policy_line(name, policy))
     lines.extend(["", "### Privileged operations", ""])
     for key, operations in data["privileged_operations"].items():
         lines.append(f"- `{key}` — " + "; ".join(f"{op}: {gate}" for op, gate in operations.items()))
+
     lines.extend([
         "", "## Archive identity contract", "",
         f"Whole-tree retirement creates `{data['archive_contract']['manifest']}` at the archived root. The manifest is immutable once written and MUST contain: " + ", ".join(f"`{field}`" for field in data["archive_contract"]["required_fields"]) + ". Individual entities normally retire via status metadata and remain in place. `boundary_class` may be null for non-project boundaries.", "",
@@ -244,15 +284,22 @@ def gen_spec(data: dict[str, Any]) -> str:
     lines.extend(["", "### Trust meanings", "", "| trust | meaning |", "|---|---|"])
     for trust, meaning in data["boundary_trust_semantics"].items():
         lines.append(f"| `{trust}` | {meaning} |")
+
     example_project = f"{b['project.remote']}cca/"
-    lines.extend(["", "External/upstream control files are context only. They can never grant or widen workspace authority.", "", "## Promotion policy", "", " ".join(data["promotion"]["into_human_authoritative"].split()), "", "## Boundary-class vs semantic-role composition", "", " ".join(data["composition"].split()), "", "```text", example_project, "  boundary.class = project.remote", "  semantic.role  = work.project", f"-> {example_project} :: work.project", "```", ""])
+    lines.extend([
+        "", "External/upstream control files are context only. They can never grant or widen workspace authority.",
+        "", "## Admission and promotion policy", "", " ".join(data["promotion"]["into_human_authoritative"].split()), "", " ".join(data["promotion"]["collected_deposit"].split()),
+        "", "## Composition examples", "", "```text", example_project, "  classification = project.remote", "  semantic.role = work.project", "", f"{b['reference.curated']}paper.pdf", "  classification = reference.curated", "  semantic.role = knowledge.reference", "", f"{b['reference.collected']}paper.pdf", "  classification = reference.collected", "  semantic.role = knowledge.reference", "```", "",
+    ])
+
     headings = {"category":"Category","arity":"Arity","mutability":"Mutability","indexed":"Indexed","authority":"Authority","agent_access":"Agent access","link_target":"Link target","requirement":"Requirement"}
     for vocab_name in ("category","arity","mutability","indexed","authority","agent_access","link_target","requirement"):
         lines.extend(["", f"## {headings[vocab_name]} semantics", "", "| value | meaning |", "|---|---|"])
         for value in data["vocab"][vocab_name]:
             lines.append(f"| `{value}` | {data['vocab_semantics'][vocab_name][value]} |")
+
     required = [slot["key"] for slot in data["slots"] if slot["requirement"] == "required"]
-    lines.extend(["", "## Minimum viable workspace", "", ", ".join(f"`{key}`" for key in required) + ".", "", "## Frozen-v1 evolution contract", "", "| change | treatment |", "|---|---|"])
+    lines.extend(["", "## Minimum viable workspace", "", ", ".join(f"`{key}`" for key in required) + ".", "", "## Evolution contract", "", "| change | treatment |", "|---|---|"])
     for change, treatment in data["evolution_contract"].items():
         lines.append(f"| `{change}` | `{treatment}` |")
     lines.extend(["", "## System crosswalk", "", "> Adaptation/inspiration only; mappings are not semantic equivalence and do not redefine or claim conformance with upstream methods.", "", "| source | concept | mapping |", "|---|---|---|", *_crosswalk_rows(data), "", "## Generation contract", "", "Resolved derived outputs: " + ", ".join(f"`{name}`" for name in resolved_derived_names(data)) + ".", "", "Human-authored: " + ", ".join(f"`{name}`" for name in data["generation_contract"]["human_authored"]) + ".", "", "## Generation pipeline", "", "```text", "WORKSPACE.yaml  (canonical profile bootstrap; human-authored)", "      │", "      ├── generate ──► SPEC.md", "      ├── generate ──► paths.sh", f"      ├── generate ──► {router_binding}  (context.router)", "      ├── generate ──► mkdirs.sh", "      ├── generate ──► host visibility adapter", "      └── validate ──► AGENTS.md (human-authored)", "```", ""])
@@ -261,7 +308,13 @@ def gen_spec(data: dict[str, Any]) -> str:
 
 def render_all(data: dict[str, Any]) -> dict[str, str]:
     router = slots_by_key(data)["context.router"]["binding"].rstrip("/")
-    rendered = {"paths.sh": gen_paths(data), "mkdirs.sh": gen_mkdirs(data), "obsidian-excludes.txt": gen_excludes(data), router: gen_context(data), "SPEC.md": gen_spec(data)}
+    rendered = {
+        "paths.sh": gen_paths(data),
+        "mkdirs.sh": gen_mkdirs(data),
+        "obsidian-excludes.txt": gen_excludes(data),
+        router: gen_context(data),
+        "SPEC.md": gen_spec(data),
+    }
     declared = set(resolved_derived_names(data))
     if set(rendered) != declared:
         raise ValueError(f"generator outputs {sorted(rendered)} differ from resolved generation contract {sorted(declared)}")
@@ -282,9 +335,9 @@ def validate_agents(data: dict[str, Any], target: Path) -> list[str]:
     known = {slot["key"] for slot in data["slots"]}
     for match in re.findall(r"`([a-z]+\.[a-z.]+)`", text):
         prefix = match.split(".")[0]
-        if prefix in {"agent","context","state","system","knowledge","work","responsibility","project","output","lifecycle","workspace"} and match not in known:
-            problems.append(f"AGENTS.md references unknown semantic key `{match}`")
-    for term in ("WORKSPACE.yaml", "project.upstream", "knowledge.reference", "generated artifacts"):
+        if prefix in {"agent","context","state","system","knowledge","work","responsibility","project","output","lifecycle","workspace","reference"} and match not in known:
+            problems.append(f"AGENTS.md references unknown semantic/classification key `{match}`")
+    for term in ("WORKSPACE.yaml", "project.upstream", "knowledge.reference", "reference.curated", "reference.collected", "generated artifacts"):
         if term not in text:
             problems.append(f"AGENTS.md missing required control term {term!r}")
     for stale in ("indexed=no", "indexed=yes", "excluded|no"):
@@ -294,7 +347,13 @@ def validate_agents(data: dict[str, Any], target: Path) -> list[str]:
 
 
 def run_audit(target: Path) -> tuple[int, str]:
-    result = subprocess.run([sys.executable, str(PACKAGE_ROOT / "audit.py"), "--target", str(target)], cwd=target, text=True, capture_output=True, check=False)
+    result = subprocess.run(
+        [sys.executable, str(PACKAGE_ROOT / "audit.py"), "--target", str(target)],
+        cwd=target,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     return result.returncode, result.stdout + result.stderr
 
 

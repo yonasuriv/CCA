@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# Shared schema primitives: strict YAML loading, path validation, and effective permissions.
+# Shared schema primitives: strict YAML loading, path validation, semantic composition,
+# most-specific binding resolution, and effective permissions.
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -92,9 +93,9 @@ def _generated_destinations(data: Mapping[str, Any]) -> list[str]:
 
     destinations: list[str] = []
     for entry in data.get("generation_contract", {}).get("derived", []):
-        # `CONTEXT.md` is the frozen-v1 legacy/default declaration. Newer
-        # contracts may name the semantic role directly. In both cases the
-        # current context.router binding is the actual output destination.
+        # `CONTEXT.md` is the historical/default declaration. Newer contracts
+        # may name the semantic role directly. In both cases the current
+        # context.router binding is the actual output destination.
         if entry in {"CONTEXT.md", "context.router"} and isinstance(router_binding, str):
             destinations.append(router_binding)
         elif isinstance(entry, str):
@@ -123,6 +124,51 @@ def load_schema(path: str | Path) -> dict[str, Any]:
     return data
 
 
+def semantic_role_for_slot(slot: Mapping[str, Any], schema: Mapping[str, Any]) -> str:
+    """Return the semantic role after composing any classification key."""
+    key = slot.get("key")
+    if not isinstance(key, str):
+        raise ValueError("slot key must be a string")
+    mapping = schema.get("classification_roles", {})
+    if isinstance(mapping, Mapping):
+        role = mapping.get(key)
+        if isinstance(role, str):
+            return role
+    return key
+
+
+def resolve_slot_for_path(path: str, schema: Mapping[str, Any]) -> Mapping[str, Any]:
+    """Resolve filesystem policy from the most-specific matching binding.
+
+    Semantic composition is separate: callers use semantic_role_for_slot() to
+    recover the role when the winning slot is a classification such as
+    reference.collected or project.remote.
+    """
+    error = validate_binding_text(path)
+    if error:
+        raise ValueError(f"invalid workspace-relative path {path!r}: {error}")
+    target = PurePosixPath(path.rstrip("/"))
+    matches: list[tuple[int, Mapping[str, Any]]] = []
+    for slot in schema.get("slots", []):
+        if not isinstance(slot, Mapping):
+            continue
+        binding = slot.get("binding")
+        arity = slot.get("arity")
+        if not isinstance(binding, str):
+            continue
+        bound = PurePosixPath(binding.rstrip("/"))
+        if arity == "file":
+            matched = target == bound
+        else:
+            matched = target == bound or bound in target.parents
+        if matched:
+            matches.append((len(bound.parts), slot))
+    if not matches:
+        raise KeyError(f"no declared binding matches {path!r}")
+    matches.sort(key=lambda item: item[0], reverse=True)
+    return matches[0][1]
+
+
 def effective_agent_operations(slot: Mapping[str, Any], schema: Mapping[str, Any]) -> list[str]:
     """Resolve user-facing agent operations from policy intersection.
 
@@ -138,8 +184,6 @@ def effective_agent_operations(slot: Mapping[str, Any], schema: Mapping[str, Any
     policy = schema["policy_definitions"][slot["mutability"]]
     ops: list[str] = ["read"]
 
-    # Derived artifacts are generator-controlled even though an agent/tool may
-    # perform regeneration. Never flatten them to generic write.
     if slot["authority"] == "derived":
         if policy.get("regenerate") == "allowed":
             ops.append("regenerate")

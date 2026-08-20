@@ -36,6 +36,36 @@ Likewise:
 - an LLM Wiki page is not automatically a PARA Resource merely because it is informative;
 - an ICM workflow can live inside a PARA Project without becoming PARA internally.
 
+## Source admission is another independent classification
+
+The current Hybrid Workspace Profile v2 makes an additional distinction inside preserved evidence:
+
+```text
+reference.curated   ─┐
+                     ├─> semantic.role = knowledge.reference
+reference.collected ─┘
+```
+
+This does **not** split `knowledge.reference` into two knowledge roles.
+
+- `knowledge.reference` answers **what the material is**: preserved source/evidence.
+- `reference.curated` vs `reference.collected` answers **how that source entered the workspace**.
+- content authorship is separate again: an agent may acquire a human-authored/arXiv/vendor source without becoming its author.
+- review/approval is metadata and does not retroactively change admission provenance.
+- presence in either source class means evidence, not truth or endorsement.
+
+The default Hybrid bindings make this visible as:
+
+```text
+20-sources/
+├── curated/
+└── collected/
+```
+
+The paths are profile defaults/bindings; the semantic distinction is carried by the classification/role contract. Automatically collected evidence remains raw evidence; agent-authored conclusions belong to `knowledge.durable`, deliberate external deliverables to `output.artifact`, and finite research work to `work.project`.
+
+This also means the PARA crosswalk remains deliberately partial. A PARA Resource is not automatically `knowledge.reference`, and a `reference.collected` object does not become a distinct PARA category.
+
 ## Nested boundaries
 
 The composition rule is:
@@ -70,6 +100,8 @@ A CCA-owned profile may adopt ICM-proven navigation behavior without claiming na
 
 CCA ships an optional Hybrid Workspace Profile for a recurring case: a filesystem-native environment containing projects, preserved sources, human notes/research, maintained knowledge, tasks/state, reusable capabilities, and human + agent operation.
 
+The current bundled schema is v2. V2 preserves the frozen-v1 semantic/policy baseline and adds only the two reference-admission classification keys required to distinguish human admission from automated acquisition without changing the meaning of `knowledge.reference`.
+
 It is:
 
 - CCA-owned;
@@ -78,7 +110,7 @@ It is:
 - not a universal CCA tree;
 - not native ICM;
 - implemented completely inside `skills/cca/`;
-- configurable through stable semantic keys and mutable bindings.
+- configurable through stable semantic keys and mutable bindings where its evolution contract permits them.
 
 See [`../skills/cca/references/architect/hybrid-workspace.md`](../skills/cca/references/architect/hybrid-workspace.md).
 
@@ -117,9 +149,9 @@ PARA-organized, Zettelkasten-style, BASB-guided, Scrum-managed, etc. remain desc
 
 ## Metadata discipline
 
-Do not serialize obvious filesystem facts merely because CCA can name them. Use explicit metadata when a semantic/authority/binding fact cannot safely be inferred or a selected profile/upstream requires it.
+Do not serialize obvious filesystem facts merely because CCA can name them. Use explicit metadata when a semantic/authority/binding/provenance fact cannot safely be inferred or a selected profile/upstream requires it.
 
-Filesystem-native context should not become YAML-native context.
+Filesystem-native context should not become YAML-native context. The Hybrid profile's collected-source provenance metadata exists because acquisition identity cannot be safely inferred from a filename or folder alone.
 
 ## Composition test
 

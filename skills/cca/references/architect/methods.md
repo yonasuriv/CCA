@@ -19,7 +19,7 @@ These methods are not interchangeable. Preserve the concern each one owns.
 
 An outer method may organize where a nested workspace lives, but it must not silently redefine the nested workspace's native semantics.
 
-## Organization and navigation are separate decisions
+## Organization, epistemic role, admission, and navigation are separate decisions
 
 Keep these questions independent:
 
@@ -27,9 +27,10 @@ Keep these questions independent:
 |---|---|---|
 | **Organization** | Where does this kind of thing live for the human/workflow? | PARA, Zettelkasten, GTD, BASB/CODE, custom domains |
 | **Epistemic role** | What kind of information is this? | capture, preserved evidence, human note, maintained synthesis, operational state |
+| **Admission/provenance classification** | How did preserved evidence enter this corpus? | human-admitted, automatically collected |
 | **Navigation** | How does a consumer discover the relevant boundary/context? | native upstream router, existing index, scoped AGENTS.md, ICM-derived contract, profile-defined router, ordinary filesystem structure |
 
-A human method does not determine epistemic authority. A navigation pattern does not determine the organizational shelf.
+A human method does not determine epistemic authority. A navigation pattern does not determine the organizational shelf. Source admission provenance does not determine content authorship or create a new knowledge role.
 
 For navigation:
 
@@ -133,6 +134,31 @@ Load this section when the user wants one filesystem-native environment containi
 
 Do not infer authority from the folder brand. Organizational shelves answer **where it lives**; epistemic roles answer **what it is**.
 
+### Hybrid v2 source admission
+
+When the optional CCA Hybrid Workspace Profile is selected, preserved evidence has two **admission classifications**:
+
+```text
+reference.curated   ─┐
+                     ├─> semantic.role = knowledge.reference
+reference.collected ─┘
+```
+
+- `reference.curated` = evidence explicitly admitted by a human; agents read only.
+- `reference.collected` = evidence automatically acquired by an agent/tool; new child objects may be deposited under append/additive semantics, while existing objects remain immutable to normal agent operation.
+- collected evidence requires acquisition provenance/content identity according to the profile contract.
+- human review does not reclassify collected evidence as curated; review is metadata.
+- neither class implies correctness/endorsement.
+- agent-authored conclusions/synthesis belong to `knowledge.durable`, not `reference.collected`.
+
+The distinction is exactly:
+
+```text
+source provenance/admission != content authorship != semantic role
+```
+
+Research remains an activity/workflow across capture, references, synthesis, and output; it does not become another top-level knowledge category.
+
 ### Architecture procedure
 
 1. Preserve the user's existing organization when it works. If the user defers, choose the smallest understandable organization; PARA is one possible default, never a CCA requirement.
@@ -142,18 +168,22 @@ Do not infer authority from the folder brand. Organizational shelves answer **wh
    - use upstream-native ICM for a workflow that should be ICM;
    - use specific ICM-derived patterns only when staged/local contracts improve the workflow;
    - do not apply ICM-shaped contracts to unrelated shelves by default.
-5. Consider the optional CCA Hybrid Workspace Profile when its reviewed frozen-v1 semantics match the requested personal/team hybrid. If it does not fit, compose a smaller custom CCA-compatible target rather than mutating the profile into a new hidden standard.
-6. Give large collections bounded local navigation when scale requires it. Prefer boundary-local routers/catalogs/indexes over one giant root manifest.
-7. Keep derived indexes rebuildable and non-authoritative.
-8. Preserve immutable/preserved material through explicit supersession or local provenance rules where needed; do not rely on folder names as enforcement.
-9. Seed examples only when they materially improve onboarding/pattern discovery.
-10. Add stronger retrieval infrastructure only after local routing/search becomes insufficient.
+5. Consider the optional CCA Hybrid Workspace Profile when its current v2 contract matches the requested personal/team hybrid. V2 preserves the frozen-v1 baseline and adds only reference-admission classifications. If the profile does not fit, compose a smaller custom CCA-compatible target rather than mutating it into a new hidden standard.
+6. If the Hybrid profile is selected, preserve `reference.curated`/`reference.collected` as classifications composing with `knowledge.reference`; do not turn them into separate semantic roles.
+7. Give large collections bounded local navigation when scale requires it. Prefer boundary-local routers/catalogs/indexes over one giant root manifest.
+8. Keep derived indexes rebuildable and non-authoritative.
+9. Preserve immutable/preserved material through explicit provenance/integrity rules; do not rely on folder names as enforcement.
+10. Seed examples only when they materially improve onboarding/pattern discovery.
+11. Add stronger retrieval infrastructure only after local routing/search becomes insufficient.
 
 ### Rejected collapses
 
 - Projects-only when durable cross-project knowledge is required.
 - Wiki-only when real project/application boundaries matter.
 - PARA `Resources` treated as synonymous with preserved raw evidence.
+- `reference.curated`/`reference.collected` treated as competing knowledge roles.
+- Automatically collected evidence treated as agent-authored synthesis.
+- Human-reviewed collected evidence silently moved to curated.
 - Human notes silently reclassified as agent-maintained synthesis.
 - Generic CCA compatibility made dependent on ICM Layer 0/1/2 files.
 - Per-folder contracts added where ordinary filesystem structure already provides sufficient navigation.
@@ -169,10 +199,11 @@ When methods appear together, determine:
 1. What is the outer organizational boundary, if any?
 2. Which nested directories claim upstream-native compatibility?
 3. Which material is capture, preserved evidence, human thinking, maintained synthesis, project work, and operational state?
-4. Which workflows actually benefit from native ICM or selected ICM-derived patterns?
-5. Which human methods are overlays rather than machine-facing profiles?
-6. What is the smallest routing surface a fresh consumer needs before targeted search?
-7. Where should local routing/indexing appear as the workspace grows?
+4. If preserved evidence uses the Hybrid profile, how was it admitted: `reference.curated` or `reference.collected`?
+5. Which workflows actually benefit from native ICM or selected ICM-derived patterns?
+6. Which human methods are overlays rather than machine-facing profiles?
+7. What is the smallest routing surface a fresh consumer needs before targeted search?
+8. Where should local routing/indexing appear as the workspace grows?
 
 ## Skill coordination
 

@@ -100,7 +100,10 @@ class FreezeToolchainTests(unittest.TestCase):
     def test_duplicate_yaml_keys_are_rejected(self) -> None:
         root = make_copy()
         text = (root / "WORKSPACE.yaml").read_text()
-        text = text.replace("schema_version: 1", "schema_version: 1\nschema_version: 999", 1)
+        version = yaml.safe_load(text)["schema_version"]
+        marker = f"schema_version: {version}"
+        self.assertIn(marker, text)
+        text = text.replace(marker, f"{marker}\nschema_version: 999", 1)
         (root / "WORKSPACE.yaml").write_text(text)
         result = run(sys.executable, "audit.py", cwd=root)
         self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
