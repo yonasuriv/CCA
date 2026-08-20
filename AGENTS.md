@@ -11,13 +11,18 @@ CCA is an agent-agnostic interoperability architecture for filesystem-native con
 | Path | Purpose |
 |---|---|
 | `skills/cca/` | The single installable CCA Agent Skill: router, canonical runtime spec, architect/advisor domains, operation modes, templates, and validation material |
-| `docs/` | Getting started, FAQ, design principles, scenarios, method composition, migration, and tracked upstream standards |
+| `docs/` | Getting started, FAQ, design principles, scenarios, method composition, migration, references, and tracked upstream standards |
 | `examples/workspaces/` | Worked filesystem-native workspace examples |
 | `examples/publications/` | Non-normative blog, article, and paper expressions of CCA |
 | `examples/conversations/` | Worked conversations used as explanatory material |
 | `examples/transcripts/` | Source/inspiration transcripts; not normative CCA authority |
-| `.github/scripts/` | Repository validation/regression tooling |
+| `evals/` | Repository evaluation suites, fixtures, scoring, and release-readiness regressions |
+| `.github/workflows/` | CI validation entry points |
+| `.github/scripts/` | Repository and portable-distribution validation tooling |
+| `.github/PULL_REQUEST_TEMPLATE.md` | Contribution review checklist for authority, compatibility, documentation, and validation |
 | `README.md` | Human-facing overview |
+| `CONTRIBUTING.md` | Contribution rules and complete validation suite |
+| `CHANGELOG.md` | Released CCA milestones |
 | `CITATION.cff` | Citation metadata |
 
 ## Routing
@@ -31,7 +36,8 @@ CCA is an agent-agnostic interoperability architecture for filesystem-native con
 - Start using CCA → `docs/getting-started.md`.
 - Inspect scenario behavior → `docs/scenarios.md`.
 - Answer common integration questions → `docs/faq.md`.
-- Validate changes → `python .github/scripts/validate_repo.py`.
+- Contribute changes → `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md`.
+- Run the complete validation suite → follow `CONTRIBUTING.md`; CI mirrors it in `.github/workflows/validate.yml`.
 
 ## Repository invariants
 

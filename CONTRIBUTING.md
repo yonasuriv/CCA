@@ -134,10 +134,11 @@ Follow the current Agent Skills standard. In particular:
 
 ## Validation
 
-Before proposing integration, run:
+Before proposing integration, run the same complete validation surface used by CI:
 
 ```bash
 python -m unittest discover -s evals/tests -v
+python evals/personal-hybrid-intent/tests/test_score_intent.py
 python -m pip install -r skills/cca/assets/hybrid-workspace/requirements.txt
 python -m unittest discover -s skills/cca/assets/hybrid-workspace/tests -v
 python skills/cca/assets/hybrid-workspace/audit.py --self-test

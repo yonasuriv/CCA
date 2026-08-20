@@ -31,6 +31,52 @@ class ReleaseReadinessTests(unittest.TestCase):
             self.assertIn("hybrid-workspace.md", text)
             self.assertRegex(text, r"assets/[\s\S]{0,300}hybrid-workspace/")
 
+    def test_documentation_index_includes_release_development_surfaces(self) -> None:
+        docs_index = self.read("docs/README.md")
+        for required in (
+            "CONTRIBUTING.md",
+            "CHANGELOG.md",
+            "evals/",
+            "PULL_REQUEST_TEMPLATE.md",
+            "validate.yml",
+            "validate_repo.py",
+            "validate_distribution.py",
+        ):
+            self.assertIn(required, docs_index, required)
+
+    def test_contributing_documents_complete_ci_suite(self) -> None:
+        contributing = self.read("CONTRIBUTING.md")
+        required_commands = (
+            "python -m unittest discover -s evals/tests -v",
+            "python evals/personal-hybrid-intent/tests/test_score_intent.py",
+            "python -m unittest discover -s skills/cca/assets/hybrid-workspace/tests -v",
+            "python skills/cca/assets/hybrid-workspace/audit.py --self-test",
+            "python .github/scripts/validate_repo.py",
+            "python .github/scripts/validate_distribution.py",
+        )
+        for command in required_commands:
+            self.assertIn(command, contributing, command)
+
+    def test_pull_request_template_covers_cca_release_contract(self) -> None:
+        path = ROOT / ".github/PULL_REQUEST_TEMPLATE.md"
+        self.assertTrue(path.is_file(), "CCA requires a pull request template")
+        text = path.read_text(encoding="utf-8")
+        for required in (
+            "Upstream authority",
+            "Compatibility / conformance claims",
+            "Documentation and distribution",
+            "Validation",
+            "boundary + semantic role -> binding",
+        ):
+            self.assertIn(required, text, required)
+
+    def test_agents_routes_complete_repository_validation(self) -> None:
+        agents = self.read("AGENTS.md")
+        self.assertIn("CONTRIBUTING.md", agents)
+        self.assertIn("evals/", agents)
+        self.assertIn("PULL_REQUEST_TEMPLATE.md", agents)
+        self.assertIn("complete validation suite", agents)
+
     def test_whitepaper_describes_current_hybrid_v2(self) -> None:
         paper = self.read("examples/publications/paper.md")
         self.assertIn("current bundled profile schema is v2", paper.lower())

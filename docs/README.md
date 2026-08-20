@@ -12,6 +12,10 @@ CCA keeps runtime authority inside the installable `skills/cca/` package. Reposi
 - [Standards](standards.md) — tracked upstream compatibility surfaces.
 - [References](references.md) — upstream, methodology, and citation links.
 - [Migration](migration.md) — preserving existing structures while adopting CCA guidance.
+- [Contributing](../CONTRIBUTING.md) — contribution rules and the complete validation suite.
+- [Pull request template](../.github/PULL_REQUEST_TEMPLATE.md) — review checklist for authority, compatibility, documentation, and validation.
+- [Evaluation protocol](../evals/README.md) — behavioral-evaluation contracts, release-test boundaries, and benchmark methodology.
+- [Changelog](../CHANGELOG.md) — released CCA milestones.
 
 ## Runtime authority
 
@@ -81,11 +85,20 @@ CCA/
 │   ├── publications/
 │   ├── conversations/
 │   └── transcripts/
+├── evals/
+│   ├── cases/
+│   ├── methodologies/
+│   ├── personal-hybrid-intent/
+│   └── tests/
 └── .github/
+    ├── PULL_REQUEST_TEMPLATE.md
     ├── workflows/
+    │   └── validate.yml
     └── scripts/
         ├── validate_repo.py
         └── validate_distribution.py
 ```
 
 `examples/` and `docs/` are explanatory/non-normative unless a file explicitly says otherwise. Normative CCA runtime semantics live under `skills/cca/references/core/` so they remain available after the skill is installed. `docs/_wip.md` is development material and must not be treated as normative or current release authority.
+
+`evals/` and `.github/` are repository-development surfaces rather than installed CCA runtime authority. They exist to exercise behavioral claims, release-readiness invariants, Hybrid profile behavior, and distribution integrity against the exact repository candidate.
