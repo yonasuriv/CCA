@@ -66,7 +66,7 @@ Semantic axes affected, if any:
 - [ ] All affected skill references, repository docs, examples, publications, indexes/maps, citation metadata, and changelog entries were updated together where applicable.
 - [ ] No stale compatibility terminology, obsolete paths, placeholders, or contradictory current guidance were introduced.
 
-## Verification
+## Verification / Validation
 
 Run the complete suite documented in `CONTRIBUTING.md` when applicable:
 
