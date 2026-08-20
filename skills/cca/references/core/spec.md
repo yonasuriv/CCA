@@ -1,425 +1,373 @@
 # CCA Specification
 
-**Version 0.1.0** — Status: Draft, tracking ICM, LLM Wiki, AGENTS.md, and Agent Skills upstream.
+**Version 0.1.0** — Status: Draft, tracking ICM, LLM Wiki, AGENTS.md, Agent Skills, and other directly supported upstreams.
 
-Normative. CCA runtime behavior and CCA-conformant examples must conform to this document. Method composition is additionally governed by [`method-composition.md`](method-composition.md).
+Normative. CCA runtime behavior and CCA-conformant examples must conform to this document. Compatibility details are governed by [`compatibility.md`](compatibility.md); method composition by [`method-composition.md`](method-composition.md).
 
-The key words **must**, **should**, and **may** are to be interpreted as in RFC 2119.
+The key words **MUST**, **SHOULD**, and **MAY** are interpreted as in RFC 2119.
 
 ## 1. What CCA is
 
-CCA (Convergent Context Architecture) is an interoperability and evolution layer for filesystem-native agent context. It defines shared semantics that let agents navigate plain-file workspaces without requiring a proprietary runtime, database, or model vendor.
+Convergent Context Architecture (CCA) is an evolving, agent-agnostic interoperability architecture for filesystem-native AI context. It helps humans and AI agents understand, navigate, and operate across workspaces, projects, and bodies of knowledge by defining stable semantic roles, scoped boundaries, and configurable bindings that preserve meaning even when their concrete paths or implementations change.
 
-CCA builds on:
+CCA bridges human knowledge work and agentic work without forcing existing systems into a new competing convention. It builds on open standards, ecosystem conventions, established methodologies, protocols and frameworks, and software-engineering principles and fundamentals.
 
-- **ICM / Model Workspace Protocol** for layered routing, stage contracts, selective context loading, canonical sources, one-way dependencies, and file-based human review.
-- **LLM Wiki** for persistent LLM-maintained synthesis that compounds across sessions instead of re-deriving knowledge from raw documents on every query.
-- **AGENTS.md** for portable agent guidance.
-- **Agent Skills (`SKILL.md`)** for portable, progressively disclosed capabilities.
+Its objective is augmentation:
 
-CCA can also compose with human knowledge-work methodologies such as PARA, Zettelkasten, and Building a Second Brain without promoting them to structural compatibility profiles.
+> **Automation is the means; augmenting human capabilities is the goal.**
 
-CCA does not replace those upstreams or methods. Where an upstream already defines a useful shape, CCA should preserve it rather than minting a competing convention.
+CCA SHOULD prefer designs that increase human agency, comprehension, portability, and effective capability while reducing unnecessary human effort and machine work.
 
-## 2. Core principle
+CCA currently builds strongly on:
 
-**Convergence over invention.**
+- **ICM / Model Workspace Protocol** for filesystem-native routing, layered context, progressive disclosure, local work contracts, canonical sources, one-way dependencies, handoffs, and human review;
+- **LLM Wiki** for persistent maintained synthesis that compounds across sessions;
+- **AGENTS.md** for portable agent guidance;
+- **Agent Skills (`SKILL.md`)** for portable progressively disclosed capabilities.
 
-CCA may add optional semantics where upstreams leave implementation open, but it must not:
+CCA may compose with human knowledge-work and delivery methods such as PARA, Zettelkasten, BASB/CODE, Scrum, Kanban, and others without absorbing or redefining them.
 
-1. redefine an upstream convention and still call the result identical;
-2. make a CCA-specific choice appear mandatory for ICM or LLM Wiki compatibility;
-3. require a proprietary runtime to understand the workspace;
-4. duplicate canonical rules across adapters or catalogs;
-5. force a pipeline, wiki, database, agent framework, or organizational taxonomy where the work does not need one.
+## 2. Core principle: convergence over invention
 
-### 2.1 Cold-agent structural isomorphism (ICM skeleton)
+CCA MUST preserve an upstream's native semantics and authority when claiming compatibility with it.
 
-A workspace created by CCA and a workspace created by an ICM-oriented builder should remain **walkable the same way** by a fresh agent that has **no skill, no prior chat, and no vendor docs** — only the files on disk.
+CCA MAY add semantics where upstreams leave implementation open, but MUST NOT:
 
-That means the **behavior** matches even when **names** differ (and even when the outer method overlay differs — PARA, Zettelkasten, Eisenhower, custom domains, …):
+1. redefine an upstream convention while claiming the result is the same upstream contract;
+2. make a CCA-specific choice appear mandatory for upstream compatibility;
+3. require a proprietary runtime, database, vendor, model, or harness to understand CCA's durable semantics;
+4. duplicate canonical rules across adapters, catalogs, or documentation authorities;
+5. force a pipeline, wiki, database, agent framework, organizational taxonomy, or universal directory tree where the work does not need one;
+6. preserve an inferior CCA-specific convention merely because CCA introduced it first.
 
-| Behavior a cold agent must find | Typical ICM default | Allowed variation |
-|---|---|---|
-| One small entry that says where things live | `CLAUDE.md` / `AGENTS.md` | Either; pointers OK |
-| Role→path map (or obvious defaults) so names are not guessed | often implicit as `CONTEXT.md` | Explicit map in L0 when names differ or CCA hardens |
-| One contract file **inside each working folder** | `CONTEXT.md` | Any mapped name; same job |
-| Contract logic | purpose + Inputs / Process / Outputs / Human check | Same sections (Inputs columns may be the ICM table when stages are used) |
-| Factory apart from product | `_shared/` / references vs `output/` / records | Any mapped L3 vs L4 paths |
-| New unit of work starts from a stamp | `_templates/` copy | Live stamps in the workspace, not only inside installed skills |
-| Status without memory | scan stage `output/` or declared status surface | Declare what to scan when not a pipeline |
+### 2.1 Upstream-change rule
 
-Outer organization is the user's method overlay; it is not part of the skeleton claim. ICM skeleton compatibility does not require PARA.
+CCA is deliberately evolvable.
 
-**Is this native ICM?** Only if the full upstream pipeline profile is claimed and passes.
-**Is this ICM-compatible?** Yes when the cold-agent behaviors above hold. CCA does not claim a better method — it keeps the same skeleton so agents do not invent structure.
+- CCA **MUST** update or explicitly version/pin a compatibility mapping when a supported upstream changes in a way that affects a compatibility claim.
+- CCA **SHOULD** converge toward an upstream approach that demonstrates a materially better solution to the same problem, provided the change does not violate CCA's core principles.
+- Upstream changes MUST be verified against the applicable primary authority before compatibility semantics are changed.
 
-If a cold agent must know “this was built by CCA,” “this is PARA,” or “look for CONTEXT.md by string” to succeed, the workspace is **not** skeleton-complete.
+CCA therefore treats current upstream methods as authorities to interoperate with, not dependencies to fork and freeze.
 
-## 3. Compatibility states
+## 3. Semantic resolution model
 
-CCA distinguishes:
+The primary CCA resolution primitive is:
 
-- **Native-compatible**: CCA tooling can consume the upstream workspace without structural migration.
-- **CCA-hardened**: optional CCA routing, portability, provenance, or maintenance conventions were added.
-- **CCA-conformant**: the workspace intentionally adopts the CCA specification.
+```text
+boundary + semantic role -> binding
+```
 
-Compatibility is an acceptance guarantee, not a claim that every upstream workspace is itself a CCA workspace.
+The parts are distinct:
 
-CCA also distinguishes a **native upstream profile** from **derived use of upstream patterns**. Borrowing an upstream construct does not by itself justify claiming full compatibility with that upstream.
+- **boundary** — the scope whose authority, context, and policies apply;
+- **semantic role/key** — the stable meaning being requested;
+- **binding** — the concrete workspace-local file, directory, adapter, or implementation that currently fulfills that role.
 
-PARA, Zettelkasten, BASB/CODE, and similar human methods are **method overlays**, not additional compatibility states.
+A path is an implementation detail unless the governing upstream/profile explicitly makes the path part of conformance.
 
-## 4. Workspace model
+For example:
 
-A workspace is a folder containing durable files that an agent and human can inspect and edit. Markdown is preferred for prose; JSON/YAML may be used for structured data.
+```text
+workspace::state.current -> _state/NOW.md
+```
 
-CCA requires no database, server, vector store, or binary state. Such infrastructure may be added when useful, but the durable operating context should remain understandable from files.
+and:
+
+```text
+workspace::state.current -> today.md
+```
+
+may carry the same CCA semantic identity under contracts that allow binding relocation.
+
+A nested boundary may independently resolve the same role:
+
+```text
+project/cca::context.router -> CONTEXT.md
+project/foo::context.router -> ROUTER.md
+```
+
+Consumers MUST resolve the applicable boundary and semantic role before assuming a binding. Native upstream requirements override CCA defaults when a native claim makes the concrete representation normative.
+
+### 3.1 Agnosticism
+
+CCA semantic identity MUST NOT depend on a particular:
+
+- vendor;
+- model;
+- agent runtime or harness;
+- application;
+- database/retrieval engine;
+- operating-system-specific absolute path;
+- CCA installation path;
+- default folder name.
+
+Adapters MAY translate CCA semantics for specific hosts without becoming the semantic authority.
+
+## 4. Compatibility vocabulary
+
+CCA distinguishes five composable claims:
+
+- **Upstream-native** — conforms to an upstream according to that upstream's own current authority.
+- **CCA-compatible** — CCA can resolve and operate on the boundary without structural migration or semantic replacement.
+- **CCA-conformant** — explicitly adopts this normative CCA interoperability contract.
+- **Profile-conformant** — satisfies a named optional CCA-owned profile.
+- **CCA-hardened** — optional CCA capabilities were added without invalidating native semantics.
+
+A valid native ICM workspace is CCA-compatible because CCA resolves its native semantics without structural migration through the CCA boundary/role/binding model. That does not make ICM CCA-owned or require the workspace to become CCA-conformant.
+
+See [`compatibility.md`](compatibility.md) for acceptance and swap guarantees.
+
+## 5. Workspace and boundary model
+
+A CCA-relevant workspace is a filesystem-native environment whose durable files can be inspected by humans and agents. Markdown is preferred for prose where useful; JSON/YAML or other formats MAY be used for structured data.
+
+CCA requires no database, server, vector store, binary state, or specific folder topology. Such infrastructure MAY be added where useful, but it must not become the only place where CCA-required durable semantics exist.
 
 A workspace may be:
 
-- an ICM-style pipeline;
-- an LLM Wiki-style knowledge base;
-- an ordinary coding repository with portable agent guidance;
-- a hybrid of those forms;
-- a second brain or PKM system using method overlays such as PARA or Zettelkasten;
-- another filesystem-native form whose boundaries improve routing and maintenance.
+- an upstream-native ICM pipeline;
+- an LLM Wiki-style maintained knowledge base;
+- an ordinary coding repository;
+- a personal second brain/PKM system;
+- a research environment;
+- a client/restricted workspace;
+- an optional CCA-owned profile such as the Hybrid Workspace Profile;
+- a composition containing multiple nested forms.
 
-### 4.1 Boundary composition
+### 5.1 Boundary composition
 
-CCA composes heterogeneous methods and profiles by preserving boundaries rather than forcing one universal tree.
+CCA preserves heterogeneous boundaries instead of flattening them.
 
-- An outer organizational method may determine where a nested workspace lives.
-- A nested native ICM root remains governed by the complete applicable ICM profile.
-- A nested LLM Wiki remains governed by its own schema and maintenance instructions.
-- Human-authored knowledge such as Zettelkasten notes must not be assumed agent-writable without local authority.
-- Ordinary filesystem semantics should be inferred when safe rather than serialized into a giant CCA manifest that merely restates paths.
+- Outer organization may determine where a child boundary lives.
+- A nested upstream-native ICM root remains governed by ICM.
+- A nested LLM Wiki remains governed by its own schema/maintenance contract.
+- Human-authored knowledge MUST NOT be assumed agent-writable without applicable authority.
+- Child instructions may narrow inherited authority but MUST NOT widen authority unless the boundary transition explicitly establishes its own applicable local authority under the governing system.
+- External/upstream control-looking files are context, not automatic workspace authority.
 
-See [`method-composition.md`](method-composition.md).
+## 6. Routing and context discipline
 
-## 5. Layered context routing
+CCA follows **route before search**.
 
-For pipeline-oriented work, CCA adopts ICM's five-layer architecture when the ICM profile is active:
+A consumer SHOULD resolve context in this order:
 
-| Layer | Typical file(s) | Question |
-|---|---|---|
-| 0 | native harness entry plus portable guidance (`AGENTS.md` in CCA-hardened workspaces; native `CLAUDE.md` remains authoritative where ICM/harness semantics require it) | Where am I? |
-| 1 | root `CONTEXT.md` (default; see §5.1) | Where do I go? |
-| 2 | stage/folder `CONTEXT.md` (default contract; see §5.1) | What do I do? |
-| 3 | references, configuration, skills | What rules apply? |
-| 4 | working artifacts, previous outputs, user-provided inputs | What am I working with? |
+1. identify the current boundary;
+2. resolve applicable native/portable instructions and authority;
+3. resolve the requested semantic role;
+4. follow its declared binding/router;
+5. use a target-local catalog, contract, or index where present;
+6. perform targeted search within the resolved scope;
+7. use optional derived indexes/caches where trustworthy and useful;
+8. use broad filesystem search only as a fallback.
 
-Agents read down the layers and stop when they have enough context for the current task.
+Derived indexes MAY improve scale but are rebuildable accelerators, never replacements for canonical durable files.
 
-### 5.1 Contract-file naming (roles, not assumptions)
+Available context is not automatically useful context. CCA SHOULD load the minimum sufficient context for the active task and fix under-specified routing before solving context bloat by loading more files.
 
-CCA distinguishes **roles** from **default filenames**. Agents MUST NOT assume a filename: resolve the path from the Layer-0 skeleton map first; if the map omits that role, use the default below.
+## 7. ICM relationship and profile
 
-| Role | ICM layer | Default filename | Required semantics |
-|---|---|---|---|
-| entry catalog | L0 | `AGENTS.md` (CCA) / `CLAUDE.md` (native ICM) | Where am I; where everything lives; where to go for task X |
-| workspace router | L1 | `CONTEXT.md` | Task → shelf/procedure routing; no payload |
-| folder contract | L2 | `CONTEXT.md` | One folder, one job; states purpose; for working folders: Inputs / Process / Outputs / Human check |
-| factory / stamps | L3 | `_templates/`, `_shared/`, `_config/`, … | Stable across runs; path is workspace-native |
-| product / working | L4 | `output/`, wiki pages, records, … | Per-run or maintained artifacts |
+ICM currently supplies CCA's strongest filesystem-native navigation foundation. CCA SHOULD use ICM directly where ICM already supplies the better abstraction rather than mint a competing CCA convention.
 
-Default filenames are recommendations outside **native ICM**. A CCA-created or CCA-hardened workspace may use different names for the workspace router and/or folder-contract files when the project's naming makes sense, **if and only if**:
+CCA recognizes:
 
-1. every override is declared once in the Layer-0 catalog (`AGENTS.md`, or native `CLAUDE.md` when that is the entry authority);
-2. the declaration is a compact role→path map (not scattered prose);
-3. the renamed file keeps the **same role semantics** (routing vs contract vs factory), including Inputs / Process / Outputs / Human check for working-folder contracts;
-4. agents resolve names only through that map — never by guessing.
+- **upstream-native ICM** — complete applicable upstream contract passes;
+- **ICM-derived patterns** — selected constructs are borrowed without claiming full ICM;
+- **CCA-owned profiles adopting ICM navigation behavior** — a CCA profile may use ICM-proven routing principles without becoming native ICM.
 
-CCA-created and CCA-hardened workspaces SHOULD include the skeleton map even when every path is still the default, so consumers (including ICM-oriented agents) never invent filenames.
+### 7.1 Native ICM preservation
 
-Example L0 map:
+When the current boundary is upstream-native ICM:
 
-```markdown
-## ICM / CCA skeleton map
-| Role | Path in this workspace |
-|---|---|
-| L0 entry | `AGENTS.md` |
-| L1 workspace router | `ROUTER.md` |
-| L2 folder contract | `PURPOSE.md` (one per working folder) |
-| L3 factory stamps | `Resources/knowledge/_templates/` |
-| Form | umbrella + knowledge bundle |
-| Native ICM pipeline | no |
-```
+- preserve native Layer-0 semantics and `CLAUDE.md` where required;
+- preserve root and stage `CONTEXT.md` filenames where upstream requires them;
+- preserve current stage-contract shape and Inputs columns;
+- preserve current naming, output handoffs, one-way dependencies, selective routing, canonical-source rules, setup/status triggers, builder validation, and other applicable upstream requirements;
+- do not rename or reinterpret native structure merely to make it resemble a CCA-owned profile;
+- portable `AGENTS.md` MAY coexist as interoperability hardening but MUST NOT falsely replace native authority.
 
-**Native ICM exception:** when the workspace claims **native ICM compatibility**, upstream filenames win (`CLAUDE.md`, root `CONTEXT.md`, per-stage `CONTEXT.md`). Do not rename those while claiming native ICM. Portable `AGENTS.md` may mirror the map for other harnesses but must not redefine native paths.
+The complete current acceptance surface is maintained in [`compatibility.md`](compatibility.md) and must track upstream changes.
 
-A workspace may use analogous routing for non-pipeline forms, but it must not force LLM Wiki, PARA, Zettelkasten, BASB, or ordinary repositories into ICM layers merely for cosmetic consistency.
+### 7.2 ICM-derived usage
 
-## 6. Portable root guidance
+A non-ICM boundary MAY borrow numbered stages, local contracts, one-way references, output handoffs, progressive disclosure, or selective input routing. These constructs remain ICM-derived unless the complete applicable upstream profile passes.
 
-CCA prefers `AGENTS.md` for portable cross-agent repository guidance because it is an existing ecosystem convention.
+### 7.3 Cold-agent walkability
 
-Rules:
+CCA values ICM's cold-agent property: a fresh agent should be able to orient from durable workspace files rather than prior chat memory.
 
-1. `AGENTS.md` should orient and route rather than become a knowledge dump.
-2. Nested `AGENTS.md` files are valid and should preserve subtree scope; the closest applicable file wins under the AGENTS.md convention.
-3. `AGENTS.md` has no required heading schema. CCA templates are recommendations only.
-4. Tool-specific instruction files may coexist when required by a harness.
-5. CCA must not claim it can override a harness's native instruction precedence.
-6. Contradictory copies of the same rule across root/adapter files are forbidden by the one-fact-one-home principle.
-7. In CCA-created or CCA-hardened workspaces that do not already have a stricter native profile, `AGENTS.md` is the preferred canonical portable guidance surface. A harness-native entry may bridge to that guidance using the harness's current supported mechanism. In a native upstream profile such as ICM, preserve the upstream's own entry semantics first; portable guidance is an interoperable counterpart, not a declaration that it overrides the native entry.
+This is a CCA portability objective, not a universal requirement that every CCA-compatible workspace mimic an ICM pipeline.
 
-When CCA operates on an existing **native ICM** workspace that already has a `CLAUDE.md`, it must not replace or break the native entry merely to make `AGENTS.md` look canonical; preserve it and, when portability is wanted, derive the `AGENTS.md` counterpart so both files interoperate under the open AGENTS.md convention.
-
-## 7. ICM pipeline profile
-
-CCA recognizes two different uses of ICM concepts:
-
-- **Native ICM compatibility**: the workspace claims to be an ICM/MWP workspace and must satisfy the complete applicable current upstream ICM profile.
-- **ICM-derived patterns**: another workspace borrows constructs such as numbered stages, stage contracts, selective routing, or output handoffs without claiming the complete ICM profile.
-
-CCA must not call a partial ICM-derived scaffold “native ICM-compatible.”
-
-### 7.1 Stage naming
-
-For native ICM and ICM-derived stages that intentionally preserve ICM syntax, use lowercase, hyphenated, zero-padded stage folders:
-
-```text
-stages/
-├── 01-collect/
-├── 02-synthesize/
-└── 03-publish/
-```
-
-Do not introduce underscore variants such as `01_collect` while claiming to preserve the current ICM naming convention.
-
-### 7.2 Stage contracts
-
-Every native ICM stage contract file (filename `CONTEXT.md` under native ICM; otherwise resolved via §5.1) uses the canonical sections:
-
-```markdown
-## Inputs
-
-| Source | File/Location | Section/Scope | Why |
-|---|---|---|---|
-| Previous stage | `../01-collect/output/notes.md` | Full file | Source material |
-| Voice guide | `../../_config/voice.md` | "Tone" | Style constraints |
-
-## Process
-
-1. Read only the listed inputs.
-2. Perform the stage's single job.
-3. Run any checkpoint or audit required by this stage.
-
-## Outputs
-
-| Artifact | Location | Format |
-|---|---|---|
-| Brief | `output/example-brief.md` | Markdown |
-```
-
-CCA must not add required columns to the ICM Inputs table while claiming the shape is exact. Additional semantics such as CCA file roles may be documented elsewhere or treated as optional metadata.
-
-Layer-3 folder names (for example `_config/`, `references/`, `shared/`, `brand-vault/`, or `design-system/`) are workspace-native; upstream ICM does not mandate one name. CCA examples and templates typically use `_config/` as a default, but an existing workspace's own Layer-3 homes are authoritative and must be preserved. CCA must not require renaming them to `_config/` for compatibility.
-
-### 7.3 Core pipeline invariants
-
-- One stage, one job (and more generally: one folder, one job — each working folder states its job in its folder-contract file; default name `CONTEXT.md`, else §5.1 map).
-- One-way cross-references; downstream stages may depend on upstream stages, not vice versa.
-- Inputs tables scope files and, when useful, exact sections.
-- Each stage writes to its own `output/` folder.
-- Human edits to output files are valid handoffs; the next stage consumes the edited file.
-- Stable rules live in references/configuration, not copied into stage routers.
-- Previous outputs are artifacts, not canonical templates for future quality rules.
-- Shared configurable code values should have one canonical source where applicable.
-
-These invariants are useful outside a native ICM workspace, but using them alone does not establish native ICM compatibility.
-
-### 7.4 Full native ICM acceptance
-
-When CCA creates, modifies, or validates a workspace that **claims native ICM compatibility**, it must validate the complete applicable current upstream ICM convention surface. The canonical semantic authority is upstream ICM `_core/CONVENTIONS.md`; the workspace-builder's validation stage is the practical acceptance checklist for generated workspaces. CCA's own walk test is supplemental and must not replace these upstream checks.
-
-At minimum, native ICM validation must cover the applicable current upstream requirements for:
-
-1. five-layer routing with the current native ICM Layer-0 entry semantics preserved; when portable `AGENTS.md` guidance is added, it interoperates with rather than replaces or overrides the native `CLAUDE.md` entry path;
-2. one root `CONTEXT.md` and one stage `CONTEXT.md` per stage (native ICM keeps these exact filenames; non-native CCA workspaces may use §5.1 equivalents only when not claiming native ICM);
-3. exact stage contract shape and canonical Inputs columns;
-4. lowercase-with-hyphens naming, zero-padded stages, output naming, and `.gitkeep` for intentionally empty persistent folders;
-5. unbroken stage handoffs through per-stage `output/` folders;
-6. cross-reference integrity and an acyclic, one-way dependency graph;
-7. selective section routing and canonical-source discipline;
-8. contract-file purity: routing/process contract, not embedded reference material (native ICM: the files named `CONTEXT.md`);
-9. `setup` and `status` trigger behavior as currently defined by ICM;
-10. a flat, all-at-once, system-level setup questionnaire that derives inferable fields and uses sensible defaults/examples;
-11. complete placeholder coverage and valid conditional placeholder blocks where those mechanisms are used;
-12. tool prerequisite/setup/verification guidance when external system tools are required;
-13. bundled skills behavior when the workspace uses that optional ICM pattern;
-14. specification stages that define WHAT/WHEN rather than implementation HOW when applicable;
-15. checkpoints in applicable creative stages;
-16. audits in applicable creative/build stages;
-17. value validation in applicable content-producing stages;
-18. docs-over-outputs discipline;
-19. shared constants in applicable code-producing workspaces;
-20. current ICM quality guardrails for routing/reference size, readable language, formatting, and persistent empty folders;
-21. an end-to-end workspace-builder-equivalent validation before a generated workspace is described as ready or fully native-compatible.
-
-Where current ICM requires a specific representation or trigger output, CCA presentation preferences such as Mermaid do not override that upstream requirement.
-
-If upstream ICM changes these requirements, CCA must converge toward the current upstream rather than freeze this list as a divergent fork.
+When a named CCA profile explicitly adopts ICM-style cold-agent behavior, that profile MUST define its own required router/contracts and acceptance surface. The Hybrid Workspace Profile does this through semantic-key bindings and its bundled validation tooling.
 
 ## 8. Knowledge profile
 
-CCA adopts the LLM Wiki core idea: durable source material plus LLM-maintained synthesis that compounds over time.
+CCA adopts the LLM Wiki core idea of persistent maintained synthesis over durable source material.
 
-Native LLM Wiki compatibility is behavioral, not tied to one directory tree. A compatible implementation should provide:
+A compatible implementation SHOULD provide:
 
-1. durable source material or evidence;
+1. durable source material/evidence;
 2. maintained synthesis that persists across sessions;
 3. explicit maintenance behavior for integrating new material and querying existing knowledge;
-4. a human-editable filesystem representation.
+4. a human-inspectable and human-editable filesystem representation.
 
-### 8.1 Optional CCA hardened knowledge bundle
+CCA hardening MAY add a capture inbox, raw/reference layer, human notes, wiki, index, maintenance log, provenance fields, contradiction tracking, lifecycle state, integrity manifests, or other useful structure. Those are CCA implementation/profile choices unless an upstream explicitly requires them.
 
-CCA may recommend the following implementation when a user wants stronger interoperability and maintenance:
-
-```text
-inbox/            optional staging before deposit
-raw/              durable source material (write-once)
-notes/            optional human-owned thinking (not raw, not wiki)
-wiki/             maintained synthesis
-wiki/index.md     navigation catalog
-log.md            maintenance chronicle
-```
-
-Optional hardening may also include YAML frontmatter, lifecycle states, provenance fields, contradiction sections, entity/concept taxonomies, machine-parseable log prefixes, a source index with supersession rows, and a checkable integrity mechanism (hash manifest and/or verify script).
-
-These are **CCA conventions**, not universal requirements of Karpathy's LLM Wiki idea.
-
-When scaffolding an empty hardened bundle, CCA should seed at least one real source and one citing wiki page so operators can pattern-match the maintenance loop.
-
-### 8.2 Knowledge invariants
+### 8.1 Knowledge invariants
 
 When adopted by a workspace:
 
-- source material should not be silently rewritten by synthesis operations;
-- corrections to evidence should **supersede** (add a new source and record the relationship) rather than mutate deposited raw files;
-- derived claims should retain provenance when the workspace promises evidence traceability;
-- contradictions should be represented rather than silently overwritten;
-- stale or superseded knowledge should remain inspectable when history matters;
-- indexes should route rather than duplicate full page content;
-- human-authored notes, when present as a separate layer, must not be treated as silently agent-rewritable wiki pages.
+- synthesis operations SHOULD NOT silently rewrite preserved evidence;
+- corrections SHOULD supersede preserved evidence rather than mutate it where provenance matters;
+- contradictions SHOULD be represented rather than silently overwritten;
+- stale/superseded knowledge SHOULD remain inspectable where history matters;
+- indexes SHOULD route rather than duplicate entire page contents;
+- human notes MUST NOT be silently reclassified as agent-maintained synthesis.
 
-## 9. File roles
+## 9. File/semantic roles
 
-CCA uses file roles as an internal reasoning model. They are classifications by function, not mandatory directories.
+CCA uses semantic roles as an internal interoperability model, not mandatory directories.
+
+Common roles include:
 
 | Role | Function |
 |---|---|
-| **catalog** | routes to other context; stores little substantive content |
-| **contract** | defines one unit of work: inputs, process, outputs (folder purpose / L2; default filename `CONTEXT.md`, else §5.1) |
-| **factory** | stable constraints, conventions, references, reusable skill material |
-| **source** | durable evidence/input that synthesis should not silently mutate |
+| **catalog/router** | routes to other context with little substantive payload |
+| **contract** | defines one unit/folder of work |
+| **factory** | stable constraints, references, templates, reusable capability material |
+| **source/reference** | preserved evidence/input |
 | **synthesis** | maintained derived knowledge |
-| **product** | per-run or per-stage working artifact |
-| **chronicle** | historical record |
-| **dead** | unowned/unreferenced material that requires review |
+| **product/output** | working or shipped artifact |
+| **chronicle** | historical/maintenance record |
+| **state** | current or durable operational state |
 
-A file has one primary role for maintenance purposes, but this classification must not force upstream workspaces to move files solely to match CCA labels. Folder-purpose files are the contract role at folder scope (ICM “one folder, one job”); the filename is not fixed outside native ICM.
+A role classification MUST NOT force an upstream workspace to move files solely to match CCA labels.
 
 ## 10. Canonical sources and adapters
 
-**One fact, one home.** If the same substantive rule appears in multiple files as authoritative text, CCA considers that drift risk.
+**One fact, one home.** If the same substantive rule is independently authoritative in multiple files, CCA treats that as drift risk.
 
-Adapters should point to canonical guidance rather than copy it. Prefer native include/import mechanisms when a tool supports them.
+Adapters SHOULD point to canonical guidance rather than copy it. A host-specific file MAY contain minimal bootstrap material required by that host, but MUST NOT become a divergent second specification of the workspace.
 
-A tool-specific file may contain minimal bootstrapping required by that tool, but must not become a divergent second specification of the workspace.
+## 11. Agent Skills distribution contract
 
-## 11. Agent Skills profile
+CCA is distributed as **one installable `cca` skill with seven lazily loaded modes**:
 
-Every bundled skill must satisfy the current Agent Skills specification.
+- `architect`
+- `scaffold`
+- `sync`
+- `ingest`
+- `query`
+- `lint`
+- `advise`
 
-Requirements:
+`skills/cca/` is the portable CCA distribution boundary.
 
-- one skill directory with a valid `SKILL.md`;
-- valid `name` and `description` frontmatter;
-- name uses lowercase letters, numbers, and hyphens and stays within the current standard limits;
-- description states what the skill does and when it should trigger;
-- `SKILL.md` remains compact enough for activation-time loading;
-- detailed material lives in skill-local `references/`, `assets/`, or `scripts/` and is loaded only when required;
-- implementation files referenced by path remain inside that skill package;
-- sibling filesystem paths and repository-global implementation paths are not part of a skill's execution contract.
+Every CCA-owned resource required to understand, resolve, generate, operate, validate, or maintain behavior advertised by the installed skill MUST be available inside that boundary.
 
-CCA is distributed as **one installable `cca` skill with seven lazily loaded modes**. Six modes are portable workspace operations (`architect`, `scaffold`, `sync`, `ingest`, `query`, `lint`); `advise` is a separate judgment capability inside the same package. Runtime references, templates, and scripts required by those modes must remain skill-local so installation is self-contained. Architect and advisor reference domains remain separate even though they share one package.
+Repository-level documentation MAY elaborate, illustrate, cite, research, or publish CCA, but MUST NOT be the sole authority for runtime-required or normative semantics.
+
+The skill package MUST:
+
+- contain a valid `SKILL.md`;
+- progressively disclose detailed material through skill-local references/assets/scripts according to the existing package topology;
+- keep implementation references inside the skill package;
+- avoid runtime dependencies on removed sibling skill packages, repository-global docs/examples, or a fixed installation path;
+- preserve architect and advisor reference-domain separation even though they share one package.
 
 ## 12. Operations
 
-CCA defines six portable workspace operations plus one advisory mode:
-
-| Operation | Purpose |
+| Mode | Purpose |
 |---|---|
-| `architect` | design a new filesystem-native workspace or restructure an existing one with an explicit migration gate; coordinate compound method/profile composition |
-| `scaffold` | add the smallest useful routing/context layer without restructuring existing content |
-| `sync` | reconcile routing/catalog files with disk without inventing content |
-| `ingest` | integrate new evidence into maintained synthesis |
-| `query` | navigate maintained synthesis, verify against evidence when needed, and preserve durable new knowledge when useful |
-| `lint` | validate the workspace using the correct compatibility/conformance profile |
-| `advise` | apply engineering/process/security/autonomy/context/model judgment without turning priors into enforcement |
+| `architect` | design/map a workspace, preserve existing authority, and coordinate compound composition |
+| `scaffold` | add the smallest approved routing/profile layer without unintended restructuring |
+| `sync` | reconcile declared routing/bindings/derived artifacts with disk without inventing content |
+| `ingest` | integrate new evidence into maintained knowledge under applicable authority |
+| `query` | resolve and navigate relevant knowledge/evidence with minimum sufficient context |
+| `lint` | validate the actual upstream/CCA/profile claims separately |
+| `advise` | apply engineering, process, security, autonomy, context, and model judgment without turning priors into enforcement |
 
-## 13. Profile-aware linting
+Modes describe **what the agent is doing**. Profiles describe **which optional workspace contract it is operating against**. Do not create a new mode merely because a profile has its own schemas/scripts.
 
-Linting must distinguish upstream validity from optional CCA hardening and method overlays.
+## 13. CCA Hybrid Workspace Profile
 
-At minimum, `lint` mode supports:
+The optional Hybrid Workspace Profile is defined by [`../architect/hybrid-workspace.md`](../architect/hybrid-workspace.md) and implemented completely inside `skills/cca/assets/hybrid-workspace/`.
 
-- **ICM native compatibility** — validate the complete applicable current ICM profile and workspace-builder-equivalent acceptance surface.
-- **ICM-derived patterns** — validate borrowed ICM constructs without falsely promoting the host repository to native ICM compatibility.
-- **LLM Wiki native compatibility** — validate the core maintained-wiki behavior without imposing one CCA filesystem schema.
-- **CCA conformance** — validate whichever additional CCA conventions the workspace explicitly adopted.
+The profile:
 
-PARA, Zettelkasten, BASB/CODE, and similar overlays must not be invented as native lint profiles. Locally declared preservation constraints may be checked as workspace rules.
+- is CCA-owned and optional;
+- is not a universal CCA directory tree;
+- uses stable semantic keys with configurable bindings;
+- uses ICM-proven navigation principles where useful without claiming native ICM;
+- may contain nested upstream-native boundaries;
+- keeps its frozen-v1 schema/policy contract and adversarial tests with the installable skill;
+- requires generation/audit operations to use an explicit **target workspace**;
+- MUST NOT materialize a workspace inside the installed skill/tool directory;
+- resolves the generated `context.router` artifact through its current binding rather than a hardcoded filename.
 
-A missing CCA optional convention may be reported as a hardening opportunity, but not as an upstream compatibility failure.
+## 14. Profile-aware linting
 
-## 14. CCA walk test
+Linting MUST distinguish upstream validity from CCA compatibility/conformance, named profile conformance, and optional hardening.
 
-For intentionally structured CCA workspaces, the CCA portability walk test is:
+At minimum `lint` supports:
 
-> A fresh agent with no prior chat memory can orient, perform a representative operation, and report status using the workspace files alone.
+- upstream-native ICM validation against current ICM;
+- ICM-derived pattern checks without falsely promoting the host to native ICM;
+- LLM Wiki compatibility behavior without imposing one CCA filesystem schema;
+- CCA conformance for explicitly adopted CCA semantics;
+- Hybrid Workspace Profile conformance using its bundled audit/generation checks.
 
-- **Orient**: identify what the workspace is, which profile/method boundary is active, and where relevant context lives.
-- **Act**: perform one representative operation using only routed files and available tools.
-- **Report**: state what changed, what was produced, what remains, and what is missing or ambiguous.
+A missing optional CCA convention MAY be reported as a hardening opportunity but MUST NOT be reported as an upstream compatibility failure.
+
+## 15. CCA walk test
+
+For intentionally structured CCA-conformant workspaces, the portability walk test is:
+
+> A fresh agent with no prior chat memory can orient, perform a representative operation, and report status using durable workspace files alone.
+
+- **Orient** — identify the boundary, applicable authority/profile, and routed context.
+- **Act** — perform one representative operation through resolved semantics/bindings.
+- **Report** — state what changed, what was produced, what remains, and what is ambiguous.
 
 If a required decision exists only in chat history or someone's memory, the durable workspace is incomplete.
 
-This walk test is **not** a substitute for profile-specific acceptance. A native ICM claim must also pass the full applicable ICM validation surface; another upstream profile remains governed by its own current rules.
+This test is supplemental; it never substitutes for upstream-native or named-profile acceptance.
 
-## 15. Size and context discipline
+## 16. Human + agent operating principle
 
-CCA inherits ICM's preference for small routing files and selective loading.
+CCA exists for humans and agents operating on shared knowledge and work.
 
-Guidelines, not universal laws outside a profile that makes them normative:
+A human should be able to understand and retain agency over the durable environment. An agent should be able to answer, without broad blind search:
 
-- root routing/instruction files should remain compact;
-- native ICM stage `CONTEXT.md` and reference files must respect current ICM guardrails;
-- large reference documents should be split or selectively routed when only sections are needed;
-- available context is not automatically useful context;
-- fix under-specified routing before solving context bloat by simply loading more files.
+1. Where am I?
+2. What governs this boundary?
+3. Which semantic role do I need?
+4. Where is that role bound here?
+5. What is authoritative?
+6. What may I read or mutate?
+7. What context is sufficient for this operation?
+8. Where should durable output/state go?
 
-## 16. Out of scope
+Human-centric does not mean requiring unnecessary manual toil. Safe automation that preserves provenance, inspectability, override, and authority may increase human agency more than manual repetition.
+
+## 17. Out of scope
 
 CCA is not:
 
 - an agent runtime;
-- a real-time multi-agent messaging layer;
+- a real-time multi-agent message bus;
 - a replacement for MCP;
 - a vector database or retrieval engine;
 - a workflow scheduler;
-- a replacement for PARA, Zettelkasten, BASB, ICM, LLM Wiki, AGENTS.md, or Agent Skills;
+- a replacement for ICM, LLM Wiki, AGENTS.md, Agent Skills, PARA, Zettelkasten, BASB, Scrum, or other upstream systems/methods;
 - a requirement to use Markdown for every artifact;
-- a claim that all filesystem layouts should look identical.
+- a universal directory tree;
+- a claim that every filesystem-native workspace should look identical.
 
-Real-time multi-agent collaboration, where agents need to communicate dynamically in tight loops, requires message-passing/orchestration infrastructure. CCA can provide durable shared context beneath such systems, but does not replace them.
+Real-time tight-loop multi-agent coordination requires appropriate orchestration/message-passing infrastructure. CCA may provide durable shared context beneath such systems but does not replace them.
 
-## 17. Upstream evolution
+## 18. Maintenance and evolution
 
-CCA tracks its upstreams. When ICM, LLM Wiki, AGENTS.md, Agent Skills, or a directly relevant adjacent standard changes, CCA should verify the primary source and adapt toward it.
+Repository maintainers MUST keep this skill-local specification, [`compatibility.md`](compatibility.md), affected mode references, portable implementation assets, examples, and regression checks consistent when CCA semantics change.
 
-Method-overlay guidance should likewise be updated when the methods it describes materially change, without silently promoting them to structural compatibility profiles.
-
-Repository maintainers should track the current primary upstream compatibility surfaces and update this skill-local specification, compatibility reference, affected modes, templates, examples, and regression checks together. The installed skill must not depend on repository-only documentation to execute correctly.
+The repository outside `skills/cca/` is a development, research, documentation, publication, and validation environment. It may explain CCA more broadly, but installed-skill meaning must not disappear when the repository is absent.

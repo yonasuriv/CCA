@@ -1,206 +1,204 @@
 # Workspace builder
 
-Read this reference only when the user asks to create, initialize, set up, materially rebuild, or report status for a workspace. It is a first-class `architect` capability, not a pointer that requires the upstream ICM repository to be installed beside CCA.
+Read this reference only when the user asks to create, initialize, set up, materially rebuild, migrate, or report status for a workspace. It is a first-class `architect` capability inside the single `cca` skill.
 
-For a **native ICM** target, current upstream ICM semantics and acceptance remain authoritative. This workflow preserves the upstream builder behavior inside CCA; if upstream changes, update this reference rather than freezing a competing ICM fork.
+For an **upstream-native ICM** target, current upstream ICM semantics and acceptance remain authoritative. Preserve the upstream builder behavior; if upstream changes, CCA adapts instead of freezing a competing ICM fork.
 
-For generic or hybrid targets, reuse only the orchestration mechanics that fit the problem. Do not label a workspace native ICM unless its complete applicable upstream profile passes.
+For generic targets, reuse only orchestration mechanics that fit the actual problem. For the optional **CCA Hybrid Workspace Profile**, additionally load [`hybrid-workspace.md`](hybrid-workspace.md) and use the bundled implementation under `../../assets/hybrid-workspace/`.
+
+Do not label a workspace upstream-native ICM unless its complete applicable upstream profile passes.
 
 ## Trigger routing
 
-- **create / build / initialize a workspace**: run the builder from Discovery through Validation and repair.
-- **setup** on a native ICM workspace: run the generated workspace onboarding contract, hydrate configuration, resolve conditionals, verify zero unresolved placeholders, and mark setup complete.
-- **status** on a native staged workspace: scan stage output folders and render the native COMPLETE/PENDING pipeline state.
-- **rebuild / migrate**: inspect first; preserve existing authorities; use Restructure mode when moves, merges, renames, or deletions are required.
-
-Do not run setup again after successful configuration unless the user explicitly requests reset/reconfiguration or the workspace's own native rules require it.
+- **create / build / initialize** — discover the actual target form, choose/preserve the appropriate upstream/profile, then scaffold and validate it.
+- **setup** on native ICM — run the workspace's native onboarding/setup contract.
+- **status** on native staged ICM — preserve upstream status semantics.
+- **hybrid profile init** — after profile selection, initialize the explicit target with bundled target-safe tooling.
+- **rebuild / migrate** — inspect first; preserve authorities; use an explicit migration map before destructive changes.
 
 ## Phase 1: Discovery
 
-Discover the actual workflow before designing files.
+Discover the work before designing files.
 
-1. Establish what the user starts with, what they need to end with, and who reviews or consumes intermediate artifacts.
-2. Identify natural stages and handoff points. Each stage needs one clear responsibility and one named primary output.
-3. For every stage identify inputs, outputs, stable references/constraints, tools, and human decisions.
-4. Separate shared context from stage-specific context.
-5. Separate system-level configuration from per-run input.
-6. Identify user-specific variables that must become explicit configurable fields/placeholders.
-7. Identify optional stages and the observable condition controlling each one.
-8. Identify tool prerequisites. Record which stage needs each tool, whether it is required/optional, install guidance needed, and a verification command.
-9. Perform skill discovery when domain skills could replace custom reference material or bundled tooling:
-   - inspect available local Agent Skills/skill directories exposed by the runtime;
-   - search an allowed upstream/package source when network access is available and the user permits it;
-   - present relevant candidates with scope and provenance;
-   - bundle only selected/allowed skills needed at runtime;
-   - do not duplicate reference material already authoritatively covered by the selected skill.
-10. Present the workflow map and dependency assumptions for human correction before irreversible structure is created when the workflow is materially ambiguous.
+1. Establish what the human starts with, what outcome they need, and who/what consumes intermediate artifacts.
+2. Detect existing upstream-native systems, portable instructions, method overlays, knowledge systems, projects, restricted boundaries, and local authorities.
+3. Identify natural work units/handoffs only where the workflow actually has them.
+4. Identify inputs, outputs, stable references/constraints, tools, and human decisions.
+5. Separate shared durable context from local/ephemeral state.
+6. Separate system-level configuration from per-run input.
+7. Identify optional capabilities and observable conditions controlling them.
+8. Identify tool prerequisites and whether each is required/optional.
+9. Discover reusable Agent Skills/capabilities when they can replace custom duplicated material.
+10. Present materially ambiguous architecture assumptions before irreversible restructuring.
 
-Discovery output must capture stages, inputs/outputs, shared context, configurable variables, optional stages, tools, and selected skills.
+Discovery MUST determine whether the target should remain an existing form, become upstream-native to a supported system, adopt a named CCA profile, or use a custom CCA-compatible composition.
 
 ## Phase 2: Mapping
 
-Convert discovery into explicit contracts and authority boundaries.
+Map the discovered environment through CCA without replacing its authorities.
 
-1. Write a contract for every stage.
-2. For native ICM use the exact contract sections and Inputs columns:
+1. Identify boundaries.
+2. Identify semantic roles needed inside each boundary.
+3. Resolve/choose bindings.
+4. Identify authority, mutability, lifecycle, and provenance rules.
+5. Assign one canonical home per substantive rule/value.
+6. Check dependencies for cycles where one-way flow is required.
+7. Verify every produced artifact/state has an intended consumer or durable purpose.
+8. Preserve upstream-native contracts exactly where they are part of the upstream conformance surface.
+
+The CCA interoperability primitive is:
 
 ```text
-Inputs
-Source | File/Location | Section/Scope | Why
-Process
-Outputs
+boundary + semantic role -> binding
 ```
 
-3. Map which outputs feed which later stages.
-4. Assign one canonical home per substantive rule/value. Consumers point to the authority; they do not create competing copies.
-5. Check the dependency graph for cycles. Dependencies flow one way.
-6. Verify every non-final output has an intended downstream consumer or an explicitly documented human/external consumer.
-7. Identify where checkpoints are justified by creative/decision-heavy work and where audits are justified by creative/build work.
-8. For specification stages, preserve WHAT/WHEN as the contract and keep implementation HOW in later build/execution stages.
-
-For native ICM, do not change naming, Layer 0-4 semantics, contract columns, handoff conventions, or other current upstream requirements because another CCA profile would prefer something else.
+Do not turn a default path into semantic identity.
 
 ## Phase 3: Scaffolding
 
-Create only structure justified by the mapped workflow.
+Create only structure justified by the selected form/profile.
 
-For native ICM, scaffold the complete applicable native surface, including:
+### Upstream-native ICM
 
-- native Layer 0 `CLAUDE.md` entry behavior;
-- root `CONTEXT.md` task routing;
+When native ICM is selected, scaffold the complete applicable current upstream surface, including where applicable:
+
+- current native Layer-0 `CLAUDE.md` behavior;
+- root `CONTEXT.md` routing;
 - numbered `stages/NN-name/` folders;
-- stage `CONTEXT.md` contracts;
-- per-stage `output/` handoff folders and `.gitkeep` where intentionally empty;
-- stable references/factory material outside working outputs;
-- shared references only when genuinely shared;
+- per-stage `CONTEXT.md` contracts;
+- per-stage `output/` handoff folders and persistent-empty-folder conventions;
+- stable Layer-3 references/factory material;
 - setup/questionnaire material;
-- tool setup guides with verification steps when system prerequisites exist;
-- bundled selected Agent Skills when the workspace requires them;
-- checkpoints/audits where applicable;
-- value framework material where applicable to content-producing work;
-- shared constants/configurable values where applicable to code-producing work.
+- tool setup/verification guidance;
+- selected bundled Agent Skills;
+- checkpoints/audits/value validation where upstream requires them;
+- shared constants/configuration where applicable.
 
-Keep `CONTEXT.md` as routing/process rather than substantive reference content. Route to exact sections when a whole reference is unnecessary.
+Use the current upstream contract shape and naming exactly. Portable `AGENTS.md` MAY be added as interoperability hardening only if it does not replace or invalidate native authority.
 
-CCA may add an `AGENTS.md` portable counterpart only when it improves cross-agent use without replacing or invalidating the native `CLAUDE.md` path. When added under native ICM, its skeleton map should mirror the upstream filenames.
+### Generic/custom CCA-compatible target
 
-For non-native CCA / hybrid scaffolds, include an L0 skeleton map (roles → paths), defaulting L1/L2 to `CONTEXT.md`, and resolve contract paths only through that map. Emit a mapped folder contract (`assets/templates/folder-context.md`) in every working folder; seed live L3 stamps; declare status-without-memory. The result must remain cold-agent isomorphic with ICM (`../core/spec.md` §2.1): same walk behavior if skill context is stripped.
+Do not force ICM stages, ICM filenames, a wiki, PARA, a manifest, or a CCA-owned tree merely because CCA can model them. Preserve existing application/method structure and add only the routing/bindings needed for deterministic human+agent navigation.
 
-## Phase 4: Questionnaire design
+Cold-agent walkability is desirable, but generic CCA compatibility does **not** mean every workspace must mimic an ICM pipeline or satisfy the Hybrid Workspace Profile.
 
-Build onboarding from the scaffolded configuration surface, not from a generic fixed questionnaire.
+### CCA Hybrid Workspace Profile
 
-1. Scan the generated workspace for configurable placeholders/fields and conditional blocks.
-2. Split variables into:
-   - **system-level**: stable across runs; eligible for setup questions;
-   - **per-run**: changes each run; collect at the appropriate entry stage, not global setup.
-3. Create one flat numbered list of system-level questions.
-4. Ask all setup questions in one pass so the user can answer in one message.
-5. Every question must have a sensible default or concrete example where a default is meaningful.
-6. Derive values from prior answers/filesystem evidence instead of asking duplicate questions.
-7. Record every derived field under the answer/source that determines it.
-8. Map each answer to its canonical destination and every configurable destination back to one answer, derivation, or explicit default.
-9. For optional stages/sections, map a yes/no or observable condition to removal/retention behavior.
-10. Prefer concrete examples for style/voice configuration when pattern evidence is more useful than abstract labels.
-11. If generated rules require interpretation, present the derived rules for human review before finalizing.
+Use only when selected by architecture or already present. Read [`hybrid-workspace.md`](hybrid-workspace.md).
 
-No system-level placeholder may be orphaned. No question may exist without a consumer.
+The complete implementation remains inside the installed skill:
 
-## Setup execution
+```text
+assets/hybrid-workspace/
+├── WORKSPACE.yaml
+├── AGENTS.md
+├── schema.py
+├── generate.py
+├── audit.py
+├── requirements.txt
+└── tests/
+```
 
-When the workspace receives the native `setup` trigger:
+Initialize an explicit target:
 
-1. Read its setup questionnaire and current configured state.
-2. If setup was already completed, do not silently re-run it; report that state and ask only if the user explicitly wants reconfiguration.
-3. Ask the flat questionnaire conversationally in one pass.
-4. Apply direct answers, derived values, and defaults to their canonical destinations.
-5. Resolve optional/conditional blocks and stages according to their declared conditions.
-6. Replace every applicable `{{SCREAMING_SNAKE_CASE}}` placeholder and valid conditional block using current native ICM syntax.
-7. Remove optional structures that the native condition says should not exist rather than leaving dead hidden stages.
-8. Configure tool/setup guidance and selected bundled skills.
-9. Scan the entire workspace for unresolved placeholders, orphan questions, invalid conditional sections, and duplicate competing configuration homes.
-10. Present any interpreted rules requiring human review, apply corrections, then mark setup complete only after acceptance passes.
+```bash
+python <cca-skill>/assets/hybrid-workspace/generate.py --target <workspace> --init
+```
+
+The generator MUST NOT use its own package directory as the workspace. `--init` copies only missing human-authored bootstrap templates, then all generated artifacts are written to `<workspace>` according to target bindings.
+
+Customize the target by editing allowed bindings in its `WORKSPACE.yaml`; do not fork semantic keys to obtain a different folder name. Regenerate after binding changes.
+
+## Phase 4: Questionnaire/onboarding
+
+Only create onboarding when the selected upstream/profile/workspace actually needs it.
+
+For native ICM, preserve the current upstream questionnaire/setup semantics, including system-level vs per-run separation, derivation of inferable values, complete placeholder mapping, defaults/examples, conditionals, and acceptance checks.
+
+For the Hybrid Workspace Profile, initial binding/authority choices are architectural configuration. Ask only decisions that cannot be safely inferred from user intent/existing filesystem evidence. Do not ask the user to choose defaults merely because the schema lists them.
+
+For ordinary/custom targets, do not invent a setup questionnaire just because the builder has one for other profiles.
+
+## Setup execution for native ICM
+
+When the workspace receives native `setup`:
+
+1. read its current setup/questionnaire state;
+2. do not silently re-run completed setup;
+3. collect the required current upstream system-level answers;
+4. apply answers/derivations/defaults to canonical destinations;
+5. resolve native conditionals/optional structures;
+6. resolve applicable placeholders using current upstream syntax;
+7. configure required tooling/selected skills;
+8. scan for unresolved/orphaned configuration;
+9. complete setup only after current upstream acceptance passes.
 
 ## Phase 5: Validation and repair
 
-Validate the generated workspace before calling it ready. For native ICM, current upstream validation is the acceptance floor.
+Validate the claim actually being made.
 
-Check at least:
+### Upstream-native ICM
 
-1. every routed file/reference exists;
-2. the dependency graph is acyclic;
-3. every placeholder has one source and every setup question has a consumer;
-4. conditional sections/stages use valid complete-section semantics;
-5. stage handoffs form the intended unbroken chain;
-6. `CONTEXT.md` files contain routing/contracts rather than copied reference material;
-7. applicable creative stages contain usable human checkpoints;
-8. applicable creative/build stages contain specific audits;
-9. specification stages define WHAT/WHEN rather than implementation HOW;
-10. native line/size/naming/format rules pass against the current upstream profile;
-11. tool prerequisites have install and verification guidance;
-12. selected bundled skills resolve and are actually referenced where needed;
-13. previous generated outputs are not used as authority over stable docs;
-14. shared constants/configurable values have one canonical home where applicable;
-15. native Layer 0-4 semantics remain intact;
-16. CCA additions do not override upstream-native behavior.
+Current upstream acceptance is the floor. Validate the complete applicable surface including routing, contracts, naming, handoffs, dependency direction, selective loading, canonical sources, setup/status, placeholders/conditionals, tooling, checkpoints/audits/value validation, docs-over-outputs, shared constants, quality guardrails, and workspace-builder-equivalent acceptance.
 
-If a check fails, repair the generated workspace and re-run the failed check. A validation report that merely lists known failures is not acceptance.
+Repair failures before describing the generated native workspace as ready.
+
+### Hybrid Workspace Profile
+
+Use the bundled implementation on the explicit target:
+
+```bash
+python <cca-skill>/assets/hybrid-workspace/audit.py --target <workspace> --self-test
+python <cca-skill>/assets/hybrid-workspace/generate.py --target <workspace> --check
+```
+
+Profile acceptance MUST verify at least:
+
+1. frozen semantic/policy/authority contract;
+2. binding/path safety;
+3. generated-artifact integrity;
+4. human-authored `AGENTS.md` control contract;
+5. non-breaking binding relocation across all generated consumers;
+6. `context.router` output follows its binding rather than a hardcoded `CONTEXT.md`;
+7. moved `_state/`, `_runtime/`, or other defaults do not leak into generated artifacts;
+8. generation/audit touch the explicit target, not the installed skill package;
+9. nested upstream-native boundaries remain valid under their own authorities;
+10. fresh human/agent orientation works from durable target files.
+
+### Generic/custom target
+
+Validate only the contracts intentionally adopted. Do not fail the target for missing a profile it never chose.
 
 ## Status execution
 
-For native staged workspaces, `status` preserves ICM semantics:
+For upstream-native staged ICM, preserve current ICM status semantics and presentation. Do not infer completion from chat history or mere directory existence.
 
-1. enumerate numbered stage folders in pipeline order;
-2. inspect each stage's `output/` folder;
-3. ignore `.gitkeep` when deciding completion;
-4. mark a stage **COMPLETE** when output contains a real artifact and list the artifact name(s);
-5. otherwise mark it **PENDING**;
-6. render a compact ASCII pipeline using the workspace/stage names.
-
-Do not infer completion from chat history, plans, or a stage directory merely existing.
+For the Hybrid Workspace Profile or a custom CCA-conformant target, status is governed by its declared state/binding semantics; do not invent native ICM status behavior.
 
 ## Fresh-agent verification
 
-After native/profile validation passes, run the CCA fresh-agent walk:
+After applicable upstream/profile acceptance passes, perform the CCA portability walk where the target claims it:
 
-1. **Orient** from durable Layer 0/root routing without chat memory.
-2. **Act** through one representative route using only files/tools the workspace exposes.
-3. **Report** produced artifacts, changes, remaining work, and unresolved ambiguity.
+1. **Orient** from durable files without prior chat memory.
+2. **Act** through one representative route using resolved authority/semantic bindings.
+3. **Report** changes, outputs, remaining work, and ambiguity.
 
-This supplements upstream acceptance; it never turns an upstream failure into a pass.
+This supplements upstream/profile acceptance; it never converts a failed native/profile contract into a pass.
 
-## Generic and hybrid builder use
+## Personal hybrid architecture
 
-The builder may also construct ordinary code-context workspaces, PARA/PKM arrangements, LLM Wiki integrations, Record Libraries, Context Maps, System Maps, or nested hybrids. In those cases:
+When discovery shows a personal/team hybrid combining coding projects, human notes/research, preserved sources, maintained wiki/knowledge, tasks/state, and reusable capabilities:
 
-- detect the existing/local authority first;
-- load `methods.md` or advisor material only when needed;
-- do not impose ICM stages merely because the builder itself uses staged reasoning;
-- do not copy ICM-native trigger/naming/size rules into a non-ICM workspace unless the target deliberately adopts them;
-- preserve nested native boundaries rather than flattening them into one CCA schema.
+1. preserve the user's chosen human organizational method rather than forcing PARA;
+2. separate epistemic roles (capture, source/reference, human notes, durable synthesis) from organizational shelves/lenses;
+3. keep ordinary repos capable of remaining ordinary repos or native child boundaries;
+4. ensure agents route before broad search as the workspace grows;
+5. prefer stable semantic roles with movable bindings over hardcoded folder names;
+6. select the CCA Hybrid Workspace Profile when its reviewed semantics fit rather than rebuilding an equivalent custom schema;
+7. if the profile does not fit, compose a custom CCA-compatible target instead of mutating the frozen profile contract ad hoc.
 
-When discovery shows a **personal hybrid** (coding projects + notes/research/second brain + immutable sources vs growing wiki), load the Personal hybrid section in `methods.md` and satisfy its defaults before calling the workspace ready—especially under deferred trust. Prefer the user's named outer method; apply ICM skeleton roles to those shelves. Do not force PARA when another overlay was requested.
+Load `methods.md` only when method composition is relevant. Load `hybrid-workspace.md` only when the optional profile is selected/detected.
 
-### Fresh personal-hybrid acceptance (non-ICM)
+## Production rule
 
-Before describing such a scaffold as ready, it must pass **cold-agent isomorphism** (`../core/spec.md` §2.1): a fresh agent with only the files on disk walks it like an ICM skeleton workspace (names via L0 map or defaults).
-
-1. Projects shelf exists and is allowed to hold normal repos.
-2. Human notes shelf exists and is **not** the immutable source shelf.
-3. Immutable source area and growing wiki area are distinct; raw rewrite is forbidden; **supersession** is documented.
-4. Capture affordance exists (`inbox/` and/or a capture script).
-5. Agent routing exists (`AGENTS.md` or profile-native entry + portable pointer pattern).
-6. A **seeded** source→wiki citation chain exists (real file bodies, not only empty dirs / `.gitkeep`).
-7. CCA-hardened bundles include a **checkable** integrity path (copy `assets/scripts/verify-sources.py` / `capture-source.py` into the workspace `bin/` or equivalent, or implement the same behavior).
-8. Workspace daily use does not require inventing mandatory external skill modes.
-9. If the user asked for a new-session handoff, `README.md` covers day-to-day flows.
-10. Run the fresh-agent walk: orient via L0 → resolve L1/L2 from skeleton map → open wiki index → reach the seeded page → follow citation to raw → open one folder contract and name its Inputs / Human check.
-11. L0 skeleton map present (roles → paths), including defaults so agents do not assume filenames.
-12. **Every working shelf and operable knowledge subfolder** has a local folder contract at the mapped L2 name (copy from `assets/templates/folder-context.md`), with Purpose / Inputs / Process / Outputs / Human check — not README-only, and not nested `AGENTS.md` unless the map says that file **is** L2 and contains those sections.
-13. Root L1 router exists (mapped name) and declares **status without memory** (what to scan).
-14. Live L3 factory stamps exist in the workspace (at least knowledge `_templates/`; Project/Area stubs when those shelves exist). Skills are not the only stamp home.
-15. Primary knowledge procedures are covered by folder or procedure contracts with exact paths and Human check.
-
-Copy scripts and templates from this skill's `assets/` into the workspace; do not leave the workspace depending on the skill path at runtime.
-
-The builder is successful when a cold agent can operate without knowing CCA or ICM by name — same skeleton behavior as an ICM-built workspace, even if filenames differ via the map.
+The builder succeeds when the target remains understandable and operable by humans and agents, preserves upstream/native authority, exposes enough deterministic routing to avoid unnecessary broad search, and passes every acceptance surface it actually claims.

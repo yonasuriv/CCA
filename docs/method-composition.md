@@ -1,189 +1,130 @@
-# Method composition: BASB, PARA, Zettelkasten, LLM Wiki, ICM, and CCA
+# Method composition: humans, agents, and CCA
 
-CCA does not flatten these systems into one taxonomy. They solve different problems and can coexist when their boundaries remain explicit.
+Explanatory. Normative composition rules live inside the installable skill at [`../skills/cca/references/core/method-composition.md`](../skills/cca/references/core/method-composition.md) and compatibility vocabulary at [`../skills/cca/references/core/compatibility.md`](../skills/cca/references/core/compatibility.md).
 
-## The layer model
+CCA does not flatten methods, standards, or upstream systems into one taxonomy. It preserves their authority and maps the boundaries between them.
 
-| System | Concern | Primary job |
-|---|---|---|
-| **Building a Second Brain / CODE** | human knowledge-work lifecycle | Capture, Organize, Distill, Express |
-| **PARA** | action-oriented organization | Projects, Areas, Resources, Archives |
-| **Zettelkasten** | knowledge development | small addressable ideas connected through links |
-| **LLM Wiki** | agent-maintained durable knowledge | persistent synthesis that compounds across sessions |
-| **ICM / MWP** | staged workflow/context architecture | route work through explicit stages, contracts, selective context, and handoffs |
-| **AGENTS.md** | scoped portable instructions | tell compatible agents how to operate in repository scopes |
-| **Agent Skills** | portable capabilities | package focused operational procedures with progressive disclosure |
-| **CCA** | interoperability and composition | preserve those boundaries and let agents route across them without forcing one universal tree |
+## Different systems, different jobs
 
-BASB, PARA, and Zettelkasten are **method overlays** in CCA terminology. They are not structural compatibility profiles equivalent to native ICM compatibility or ICM skeleton compatibility. The overlay list is open: Eisenhower, GTD, custom domain shelves, and similar filesystem-compatible methods use the same rules. CCA does not claim a universal filesystem acceptance test for them.
+| System | Primary concern |
+|---|---|
+| BASB / CODE | human knowledge-work lifecycle: Capture, Organize, Distill, Express |
+| PARA | action-oriented organization: Projects, Areas, Resources, Archives |
+| Zettelkasten | addressable linked idea development |
+| LLM Wiki | persistent maintained synthesis over durable sources |
+| ICM / MWP | filesystem-native agent workflow/context methodology: routing, contracts, progressive disclosure, handoffs |
+| AGENTS.md | portable scoped agent instructions |
+| Agent Skills / `SKILL.md` | portable progressively disclosed capabilities |
+| CCA | interoperability across those systems through boundaries, semantic roles, bindings, authority, and compatibility mappings |
 
-**Two layers:** the outer overlay adapts to the user (where things live); the **ICM skeleton** stays stable (how a cold agent walks: entry, map, folder contracts, factory vs product, stamps, status). Prefer the user's named method; under deferred trust, PARA is a convenience default, not a requirement.
+The important distinction is not “which tree wins?” but “which authority governs this boundary, what semantic role is needed here, and where is it bound?”
 
-## How the methods relate
-
-```mermaid
-flowchart TB
-    subgraph HUMAN["Human knowledge-work methods"]
-        BASB["BASB / CODE\nCapture · Organize · Distill · Express"]
-        PARA["PARA\nProjects · Areas · Resources · Archives"]
-        ZK["Zettelkasten\nAddressable linked ideas"]
-    end
-
-    subgraph CONTEXT["Agent context methods"]
-        WIKI["LLM Wiki\nPersistent maintained synthesis"]
-        ICM["ICM / MWP\nStages · routing · handoffs"]
-    end
-
-    subgraph STANDARDS["Ecosystem conventions"]
-        AGENTS["AGENTS.md\nScoped instructions"]
-        SKILLS["Agent Skills / SKILL.md\nFocused capabilities"]
-    end
-
-    CCA["CCA\nComposition + interoperability semantics"]
-
-    BASB --> CCA
-    PARA --> CCA
-    ZK --> CCA
-    WIKI --> CCA
-    ICM --> CCA
-    AGENTS --> CCA
-    SKILLS --> CCA
-
-    CCA --> CODE["Coding projects"]
-    CCA --> BRAIN["Second brains / PKM"]
-    CCA --> CLIENT["Client workspaces"]
-    CCA --> RESEARCH["Research systems"]
-    CCA --> HYBRID["Hybrid workspaces"]
+```text
+boundary + semantic role -> binding
 ```
 
-The arrows do not imply that every source has the same compatibility contract. CCA has explicit upstream-compatibility responsibilities toward the standards and agent-context conventions it adopts. Human methodologies are preserved as overlays unless a concrete workspace intentionally defines stricter local rules.
+## Human organization and epistemic roles are different axes
 
-## BASB and PARA
+An organizational shelf answers **where work is managed**. An epistemic role answers **what kind of knowledge it is**.
 
-BASB describes how knowledge moves through a human workflow. PARA is primarily an organization method and fits naturally within BASB's Organize step.
+For example, PARA `Resources` is broader than CCA's preserved-source/reference role. A CCA profile may map a subset of Resources to `knowledge.reference`, but that is an interoperability mapping, not semantic equivalence.
 
-```mermaid
-flowchart LR
-    C["Capture"] --> O["Organize"] --> D["Distill"] --> E["Express"]
-    O -. "often" .-> P["PARA"]
-    D -. "may use" .-> Z["Zettelkasten"]
-    D -. "may use" .-> W["LLM Wiki"]
-    E -. "may execute through" .-> I["ICM workflow"]
-    E -. "may produce" .-> S["Software / docs / client deliverables"]
-```
+Likewise:
 
-CCA does not claim to implement BASB. It can preserve a BASB-shaped lifecycle while routing the files, knowledge, workflows, and capabilities that participate in it.
+- a Project may contain raw evidence, human notes, tasks, software, outputs, and maintained synthesis;
+- a Zettelkasten note is not automatically agent-writable synthesis;
+- an LLM Wiki page is not automatically a PARA Resource merely because it is informative;
+- an ICM workflow can live inside a PARA Project without becoming PARA internally.
 
-## Zettelkasten and LLM Wiki
+## Nested boundaries
 
-These can coexist without being merged into one concept.
+The composition rule is:
 
-- **Zettelkasten** is useful for idea-level development: small addressable notes, deliberate links, and evolving relationships between ideas.
-- **LLM Wiki** is useful for maintained higher-level synthesis: the agent integrates sources and existing knowledge into durable pages that compound across sessions.
-
-A workspace may keep Zettelkasten notes as human-authored/reference material while maintaining an LLM Wiki beside them. CCA must not assume every zettel is agent-writable. File authority and maintenance behavior come from the workspace's own instructions.
+> **Nest boundaries; do not merge schemas merely because they coexist.**
 
 Example:
 
 ```text
-Resources/
-└── knowledge/
-    ├── zettelkasten/
-    │   ├── context-engineering.md
-    │   ├── agent-routing.md
-    │   └── progressive-disclosure.md
-    └── llm-wiki/
-        ├── raw/
-        ├── wiki/
-        │   ├── index.md
-        │   ├── concepts/
-        │   └── synthesis/
-        └── log.md
-```
-
-The LLM Wiki tree above is only an example of a CCA-hardened implementation. Native LLM Wiki compatibility remains behavioral and implementation-flexible.
-
-## PARA around coding, client, and ICM work
-
-PARA can organize the outer workspace while nested projects preserve their own native semantics.
-
-```text
 workspace/
-├── AGENTS.md
 ├── Projects/
-│   ├── cca/
-│   │   ├── AGENTS.md
-│   │   ├── src/
-│   │   └── tests/
-│   └── client-acme/
-│       ├── assessment/
-│       │   ├── CLAUDE.md
-│       │   ├── CONTEXT.md
-│       │   └── stages/
-│       ├── code/
-│       │   ├── AGENTS.md
-│       │   ├── src/
-│       │   └── tests/
-│       └── notes/
+│   ├── ordinary-code-repo/
+│   └── client-assessment/        # upstream-native ICM boundary
 ├── Areas/
-│   ├── cybersecurity/
-│   └── ai/
 ├── Resources/
-│   └── knowledge/
+│   ├── zettelkasten/
+│   └── maintained-wiki/
 └── Archives/
 ```
 
-If `Projects/client-acme/assessment/` is a **native ICM root**, the outer PARA/CCA organization must not rewrite its internals to match another taxonomy. An ICM-only consumer should be able to open that nested root and operate it as ICM.
+If `client-assessment/` is upstream-native ICM, current ICM remains authoritative inside that boundary. The outer method may decide where it lives; it does not rewrite the ICM internals for visual uniformity.
 
-This is the core composition rule: **nest boundaries; do not merge schemas merely because they coexist.**
+## ICM and CCA
 
-## Profiles versus method overlays
+ICM is not a CCA-owned profile. A valid native ICM workspace is **CCA-compatible** because CCA can resolve its native semantics without structural migration.
 
-CCA keeps its compatibility vocabulary narrow:
+CCA uses ICM directly where its routing/progressive-disclosure/work-contract model is already the better abstraction. Partial borrowing remains **ICM-derived** unless the full upstream-native ICM acceptance surface passes.
 
-- **Native-compatible** — an upstream profile remains valid and consumable without structural migration.
-- **CCA-hardened** — optional CCA improvements were added without replacing the native profile.
-- **CCA-conformant** — the workspace intentionally adopts CCA requirements.
-- **ICM-derived** — selected ICM patterns are used without claiming full native ICM compatibility.
+A CCA-owned profile may adopt ICM-proven navigation behavior without claiming native ICM.
 
-PARA, Zettelkasten, and BASB do not create additional native compatibility states. A workspace may instead be described informally as **PARA-organized**, **Zettelkasten-style**, **BASB-guided**, **Eisenhower-organized**, or similarly when that is useful. ICM skeleton compatibility is separate: same walkable roles regardless of which overlay named the shelves.
+## Optional CCA Hybrid Workspace Profile
 
-## Skill routing
+CCA ships an optional Hybrid Workspace Profile for a recurring case: a filesystem-native environment containing projects, preserved sources, human notes/research, maintained knowledge, tasks/state, reusable capabilities, and human + agent operation.
 
-CCA ships a suite of focused Agent Skills. The suite is the intended capability surface; skills remain package-local so installation paths do not become architecture.
+It is:
+
+- CCA-owned;
+- optional;
+- not an eighth mode;
+- not a universal CCA tree;
+- not native ICM;
+- implemented completely inside `skills/cca/`;
+- configurable through stable semantic keys and mutable bindings.
+
+See [`../skills/cca/references/architect/hybrid-workspace.md`](../skills/cca/references/architect/hybrid-workspace.md).
+
+## One skill, seven modes
+
+CCA is distributed as one `cca` Agent Skill:
 
 ```mermaid
 flowchart TD
     U["User intent"]
-    U -->|"Design / restructure / combine methods"| A["cca-architect"]
-    U -->|"Add minimal routing/context"| S["cca-scaffold"]
-    U -->|"Repair stale navigation"| Y["cca-sync"]
-    U -->|"Integrate evidence"| I["cca-ingest"]
-    U -->|"Query maintained knowledge"| Q["cca-query"]
-    U -->|"Validate workspace"| L["cca-lint"]
+    U --> A["architect"]
+    U --> S["scaffold"]
+    U --> Y["sync"]
+    U --> I["ingest"]
+    U --> Q["query"]
+    U --> L["lint"]
+    U --> V["advise"]
 
-    A --> M["Lazy-load method/form references"]
-    A -. "semantic delegation when needed" .-> S
-    A -. "semantic delegation when needed" .-> Y
-    A -. "semantic delegation when needed" .-> I
-    A -. "semantic delegation when needed" .-> Q
-    A -. "semantic delegation when needed" .-> L
+    A -. "select/compose profiles" .-> S
+    A -. "validate result" .-> L
 ```
 
-`cca` in `architect` mode is the primary entry point for compound architecture questions such as "combine PARA, Zettelkasten, LLM Wiki, and an ICM client workflow." It is **not** a mandatory gateway for direct operations. A request to lint should route directly to `cca` in `lint` mode; an ingest request should route directly to `cca` in `ingest` mode.
+Modes describe **operations**. Profiles describe **workspace contracts**. Human methodologies describe their own concerns. Those dimensions should not be collapsed into one naming system.
 
-Cross-skill coordination is semantic, for example `Use `lint` mode to validate the selected profile.` A skill must not reach into `../cca-lint/` or another sibling's implementation files.
+## Compatibility vocabulary
+
+CCA uses independent claims:
+
+- **Upstream-native** — passes the upstream's own current rules.
+- **CCA-compatible** — CCA resolves/operates without structural migration or semantic replacement.
+- **CCA-conformant** — explicitly adopts CCA's normative interoperability contract.
+- **Profile-conformant** — passes a named optional CCA-owned profile.
+- **CCA-hardened** — optional CCA capabilities added without invalidating native semantics.
+
+PARA-organized, Zettelkasten-style, BASB-guided, Scrum-managed, etc. remain descriptions of independent methods, not invented CCA compatibility states.
 
 ## Metadata discipline
 
-CCA should infer ordinary filesystem structure when it can do so safely. Do not add a giant manifest merely to restate obvious paths such as Projects, Areas, Resources, Archives, stages, or wiki folders.
+Do not serialize obvious filesystem facts merely because CCA can name them. Use explicit metadata when a semantic/authority/binding fact cannot safely be inferred or a selected profile/upstream requires it.
 
-Explicit metadata is appropriate only when a real workspace-specific fact cannot safely be inferred or when the active upstream/profile already requires it. Filesystem-native context should not become YAML-native context.
+Filesystem-native context should not become YAML-native context.
 
-## Composition invariant
+## Composition test
 
-A useful test for any proposed integration is:
+Ask:
 
-> Can each nested native boundary still be understood by the consumer that owns that convention, while a CCA-aware agent can also understand how the boundaries relate?
+> Can the native consumer still understand and operate each nested boundary according to its own convention, while a CCA-aware human or agent can also resolve how those boundaries relate?
 
-If yes, the methods are composing. If one method requires silently rewriting another's native semantics, CCA should preserve the native boundary instead.
+If yes, the systems are composing. If interoperability requires silently redefining one of them, preserve the original authority instead.
