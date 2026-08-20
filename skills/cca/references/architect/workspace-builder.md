@@ -74,7 +74,16 @@ When native ICM is selected, scaffold the complete applicable current upstream s
 - checkpoints/audits/value validation where upstream requires them;
 - shared constants/configuration where applicable.
 
-Use the current upstream contract shape and naming exactly. Portable `AGENTS.md` MAY be added as interoperability hardening only if it does not replace or invalidate native authority.
+For each native stage contract, preserve the current upstream section shape and canonical Inputs columns exactly:
+
+```text
+Inputs
+Source | File/Location | Section/Scope | Why
+Process
+Outputs
+```
+
+Preserve one-way dependency flow between stages and references where upstream requires it. Use the current upstream contract shape and naming exactly. Portable `AGENTS.md` MAY be added as interoperability hardening only if it does not replace or invalidate native authority.
 
 ### Generic/custom CCA-compatible target
 
