@@ -8,7 +8,11 @@ CCA is an agent-agnostic interoperability architecture for filesystem-native con
 
 ## Before modifying repository content
 
-Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before making any repository change, including documentation, skills, schemas, tests, evals, examples, publications, CI, or tooling. It defines the contribution workflow, changelog behavior, pull-request expectations, and the complete validation suite. Use [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) as the pre-integration checklist.
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before making any repository change, including documentation, skills, schemas, tests, evals, examples, publications, CI, or tooling. It defines the contribution workflow, issue-vs-direct-PR guidance, changelog behavior, pull-request expectations, and the complete validation suite.
+
+For intake/discussion, use [`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/) when applicable: concrete observed failures route to the bug form; proposed architectural/semantic/profile/interoperability changes route to the proposal form. Issues are not mandatory for every change. Well-defined work may proceed as a direct pull request under `CONTRIBUTING.md`.
+
+Use [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) as the pre-integration change-summary and review checklist.
 
 This file tells you **where to route**. `CONTRIBUTING.md` tells you **how to change the repository safely**.
 
@@ -23,9 +27,10 @@ This file tells you **where to route**. `CONTRIBUTING.md` tells you **how to cha
 | `examples/conversations/` | Worked conversations used as explanatory material |
 | `examples/transcripts/` | Source/inspiration transcripts; not normative CCA authority |
 | `evals/` | Repository evaluation suites, fixtures, scoring, and release-readiness regressions |
+| `.github/ISSUE_TEMPLATE/` | Structured bug/proposal intake and issue-form configuration |
+| `.github/PULL_REQUEST_TEMPLATE.md` | Evidence-backed contribution summary and review contract |
 | `.github/workflows/` | CI validation entry points |
 | `.github/scripts/` | Repository and portable-distribution validation tooling |
-| `.github/PULL_REQUEST_TEMPLATE.md` | Contribution review checklist for authority, compatibility, documentation, and validation |
 | `README.md` | Human-facing product overview |
 | `docs/README.md` | Exhaustive documentation/repository index |
 | `CONTRIBUTING.md` | Contribution workflow and complete validation suite |
@@ -44,6 +49,8 @@ This file tells you **where to route**. `CONTRIBUTING.md` tells you **how to cha
 - Inspect all explanatory documentation → `docs/README.md`.
 - Inspect scenario behavior → `docs/scenarios.md`.
 - Answer common integration questions → `docs/faq.md`.
+- Report a concrete defect → `.github/ISSUE_TEMPLATE/bug.yml` when an issue is useful.
+- Propose a change requiring design discussion → `.github/ISSUE_TEMPLATE/proposal.yml`.
 - Contribute any repository change → `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md`.
 - Run the complete validation suite → follow `CONTRIBUTING.md`; CI mirrors it in `.github/workflows/validate.yml`.
 

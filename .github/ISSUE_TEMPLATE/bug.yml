@@ -1,0 +1,89 @@
+name: Bug report
+description: Report a concrete defect, contradiction, regression, or broken repository/CCA behavior.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when something is demonstrably wrong. If you are proposing a new semantic, profile capability, interoperability rule, or architectural change, use the proposal form instead.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the defect and the observable behavior.
+      placeholder: What is broken, contradictory, stale, or behaving incorrectly?
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: Describe the behavior or invariant you expected instead.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected-surface
+    attributes:
+      label: Affected surface
+      description: Select the closest owning surface. This is routing metadata, not a semantic reclassification.
+      options:
+        - CCA core / normative semantics
+        - Hybrid Workspace Profile
+        - Portable cca skill
+        - Upstream compatibility / mapping
+        - Documentation / publication
+        - Evaluation / validation / CI
+        - Repository tooling / packaging
+        - Other / unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Provide the smallest reliable sequence that reproduces the issue. Use N/A only when reproduction does not apply.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Include failing commands, validator output, exact files/sections, screenshots, diffs, or upstream primary sources where applicable.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+      description: CCA version, Git commit/tag, skill version, or branch where the issue was observed.
+      placeholder: v1.0.0 / commit SHA / branch
+    validations:
+      required: true
+
+  - type: textarea
+    id: authority
+    attributes:
+      label: Authority / compatibility context
+      description: If the defect involves an upstream-native or compatibility claim, identify the affected authority and current primary source. Otherwise write N/A.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and pull requests for the same defect.
+          required: true
+        - label: I am reporting observed behavior rather than proposing a new CCA semantic through the bug form.
+          required: true

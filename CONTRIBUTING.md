@@ -10,15 +10,42 @@ This workflow applies to **every repository change**, including documentation, s
 
 1. Read [`AGENTS.md`](AGENTS.md) and this file before editing.
 2. Identify the authority and boundary affected by the change. If an upstream claim is involved, verify the current primary source.
-3. Work on a branch. Keep the change scoped to the smallest semantically correct unit.
-4. For behavioral, normative, or regression-prone changes, add a failing deterministic/adversarial test before the implementation where practical.
-5. Change the canonical authority first. Then update every affected explanatory document, example, publication, index/map, citation surface, and regression check in the same change.
-6. Update [`CHANGELOG.md`](CHANGELOG.md) under `## Unreleased` for user-visible, compatibility, semantic, profile, packaging, or release-relevant changes. Pure internal maintenance may omit a changelog entry when it has no user-facing effect, but that should be obvious from the PR.
-7. Run the complete validation suite below on the **exact PR head**.
-8. Open a pull request and complete [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md). Do not merge while applicable CI or upstream acceptance checks are red.
-9. Release tags are created only from a merged `main` commit after the complete `main` validation run is green.
+3. Decide whether the work needs an issue first using [When to open an issue](#when-to-open-an-issue). Issues are useful intake/discussion surfaces, not a mandatory gate for every change.
+4. Work on a branch. Keep the change scoped to the smallest semantically correct unit.
+5. For behavioral, normative, or regression-prone changes, add a failing deterministic/adversarial test before the implementation where practical.
+6. Change the canonical authority first. Then update every affected explanatory document, example, publication, index/map, citation surface, and regression check in the same change.
+7. Update [`CHANGELOG.md`](CHANGELOG.md) under `## Unreleased` for user-visible, compatibility, semantic, profile, packaging, governance, or release-relevant changes. Pure internal maintenance may omit a changelog entry when it has no user-facing effect, but that should be obvious from the PR.
+8. Run the complete validation suite below on the **exact PR head**.
+9. Open a pull request and complete [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md). Do not merge while applicable CI or upstream acceptance checks are red.
+10. Release tags are created only from a merged `main` commit after the complete `main` validation run is green.
 
-The pull-request template is a review checklist, not a second specification. The changelog records release history and pending user-visible changes; normative semantics remain in the skill-local specification.
+The pull-request template is a review/change-summary contract, not a second specification. The changelog records release history and pending user-visible changes; normative semantics remain in the skill-local specification.
+
+## When to open an issue
+
+CCA keeps issue intake intentionally small:
+
+```text
+something is wrong       -> bug
+something should change  -> proposal
+```
+
+Use [`.github/ISSUE_TEMPLATE/bug.yml`](.github/ISSUE_TEMPLATE/bug.yml) for a concrete defect, contradiction, regression, stale current guidance, broken validator/tooling behavior, packaging problem, or other observed failure. A useful bug report identifies what happened, what was expected, the affected surface, a reproduction path, evidence, and the version/commit involved.
+
+Use [`.github/ISSUE_TEMPLATE/proposal.yml`](.github/ISSUE_TEMPLATE/proposal.yml) when the change may alter CCA architecture, semantics, profiles, interoperability, authority/policy, compatibility claims, or other behavior where the problem and design should be discussed before implementation. Proposals should start from the concrete problem, identify the affected authority/scope, consider existing standards/conventions, state semantic/version impact, and explain why CCA itself should change.
+
+A **direct pull request** is appropriate when the change is already well-defined and does not need design discussion, for example:
+
+- a narrow bug fix with clear expected behavior;
+- a documentation/reference correction;
+- a deterministic test or validator improvement;
+- repository maintenance or packaging with no unresolved semantic question;
+- implementation of an already accepted issue/proposal;
+- a small change where the PR itself provides enough evidence and review context.
+
+An issue is not a substitute for the pull-request contract. A PR should still explain **why**, **scope/non-goals**, **what changed**, **compatibility/version impact**, **verification evidence**, and any **follow-up/known debt**.
+
+Blank issues remain available for cases that genuinely do not fit either form, but bug/proposal forms are preferred when applicable.
 
 ## Before changing behavior
 

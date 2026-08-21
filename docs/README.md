@@ -14,8 +14,10 @@ CCA keeps runtime authority inside the installable `skills/cca/` package. Reposi
 - [Standards](standards.md) — tracked upstream compatibility surfaces.
 - [References](references.md) — upstream, methodology, and citation links.
 - [Migration](migration.md) — preserving existing structures while adopting CCA guidance.
-- [Contributing](../CONTRIBUTING.md) — contribution workflow and the complete validation suite.
-- [Pull request template](../.github/PULL_REQUEST_TEMPLATE.md) — review checklist for authority, compatibility, documentation, and validation.
+- [Contributing](../CONTRIBUTING.md) — contribution workflow, issue-vs-direct-PR guidance, changelog behavior, and the complete validation suite.
+- [Bug issue form](../.github/ISSUE_TEMPLATE/bug.yml) — structured intake for concrete defects and regressions.
+- [Proposal issue form](../.github/ISSUE_TEMPLATE/proposal.yml) — structured intake for architectural, semantic, profile, interoperability, and governance proposals.
+- [Pull request template](../.github/PULL_REQUEST_TEMPLATE.md) — evidence-backed change summary and review contract.
 - [Evaluation protocol](../evals/README.md) — behavioral-evaluation contracts, release-test boundaries, and benchmark methodology.
 - [Changelog](../CHANGELOG.md) — released CCA milestones and the current unreleased change bucket.
 
@@ -95,6 +97,10 @@ CCA/
 │   ├── personal-hybrid-intent/
 │   └── tests/
 └── .github/
+    ├── ISSUE_TEMPLATE/
+    │   ├── bug.yml
+    │   ├── proposal.yml
+    │   └── config.yml
     ├── PULL_REQUEST_TEMPLATE.md
     ├── workflows/
     │   └── validate.yml
@@ -105,4 +111,4 @@ CCA/
 
 `examples/` and `docs/` are explanatory/non-normative unless a file explicitly says otherwise. Normative CCA runtime semantics live under `skills/cca/references/core/` so they remain available after the skill is installed. `docs/_wip.md` is historical/development material and must not be treated as normative or current release authority.
 
-`evals/` and `.github/` are repository-development surfaces rather than installed CCA runtime authority. They exist to exercise behavioral claims, release-readiness invariants, Hybrid profile behavior, and distribution integrity against the exact repository candidate.
+`evals/` and `.github/` are repository-development surfaces rather than installed CCA runtime authority. They exist to exercise behavioral claims, release-readiness invariants, Hybrid profile behavior, contribution governance, and distribution integrity against the exact repository candidate.
