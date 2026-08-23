@@ -58,6 +58,23 @@ class WorkspaceAuditContractTests(unittest.TestCase):
         changelog = self.read("CHANGELOG.md")
         self.assertIn("workspace architecture audit", changelog.lower())
 
+    def test_detached_boundary_portability_is_explicit(self) -> None:
+        spec = self.read("skills/cca/references/core/spec.md")
+        architect = self.read("skills/cca/references/architect/mode.md")
+        lint = self.read("skills/cca/references/operations/lint.md")
+
+        self.assertIn("Detached-boundary portability", spec)
+        self.assertIn("independently addressable", spec.lower())
+        self.assertIn("incidental parent filesystem placement", spec.lower())
+        self.assertIn("intentional and declared", spec.lower())
+
+        self.assertIn("boundary portability / outward coupling", architect.lower())
+        self.assertIn("escaping relative", architect.lower())
+        self.assertIn("exact embedding path", architect.lower())
+
+        self.assertIn("detached-boundary portability", lint.lower())
+        self.assertIn("hardening opportunity", lint.lower())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -89,6 +89,7 @@ Architect mode may consult advisor references when a structural decision require
 12. Use harness-native adapter files only where needed; portable guidance should remain canonical in the workspace's chosen portable authority.
 13. When uncertainty crosses a hard-stop boundary, use `references/advisor/escalation-triggers.md`.
 14. Preserve the user-requested audit boundary: inspecting or validating a nested child does not silently narrow a parent/workspace audit.
+15. An independently addressable child boundary SHOULD remain locally orientable when detached unless parent dependence is intentional and declared; do not make required routing depend on incidental parent filesystem placement.
 
 ## Upstream-change rule
 

@@ -42,6 +42,8 @@ Where relevant:
 
 Do not add an ICM-shaped structural requirement to this universal set. Navigation requirements come from the active upstream, named profile, or local contract.
 
+**Detached-boundary portability** is normally an architecture/hardening concern, not a new compatibility or conformance claim. If lint encounters an independently addressable boundary whose required routing depends on incidental parent placement, report it as a **hardening opportunity** unless the active contract explicitly requires detached portability. If a referenced path is already broken in the inspected target, or an adopted contract requires standalone/detached behavior, validate that as an applicable failure instead of downgrading it to advice.
+
 ## 3. Upstream-native ICM checks
 
 When a boundary claims native ICM/MWP, validate the complete applicable **current upstream profile**, not only stage-folder syntax. Treat upstream ICM `_core/CONVENTIONS.md` and the applicable workspace-builder validation behavior as the authority.
@@ -234,7 +236,7 @@ Claims/boundaries detected:
 [Declared/observable overlay findings; not native certification]
 
 ## Hardening opportunities
-[Optional improvements]
+[Optional improvements, including detached-boundary portability/outward-coupling findings when they are not contract failures]
 
 ## Verification limits
 [What available evidence cannot prove]
