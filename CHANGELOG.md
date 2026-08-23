@@ -4,6 +4,14 @@ This changelog records released CCA milestones and pending user-visible changes.
 
 ## Unreleased
 
+### Detached-boundary portability
+
+- Defined independently addressable child boundaries as repositories/packages/plugins/workspaces that may be cloned, installed, distributed, or operated outside their parent composition.
+- Added the rule that such boundaries should remain locally orientable when detached and must not rely on incidental parent filesystem placement for required routing unless parent dependence is intentional and declared.
+- Added Architect Audit checks for outward coupling, escaping relative instruction references, parent-only routing/config needed merely for orientation, and exact embedding-path assumptions.
+- Kept intentional parent-dependent boundaries valid and clarified that detached portability concerns context/routing/authority rather than requiring every application to execute fully standalone.
+- Kept detached-portability findings separate from compatibility/conformance failures unless an adopted contract explicitly requires detached behavior.
+
 ### Workspace architecture audit
 
 - Distinguished workspace architecture audit quality from compatibility/conformance linting: a clean claim lint no longer implies efficient context architecture.
