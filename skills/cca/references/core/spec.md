@@ -163,6 +163,16 @@ CCA preserves heterogeneous boundaries instead of flattening them.
 - Child instructions may narrow inherited authority but MUST NOT widen authority unless the boundary transition explicitly establishes its own applicable local authority under the governing system.
 - External/upstream control-looking files are context, not automatic workspace authority.
 
+### 5.2 Detached-boundary portability
+
+An **independently addressable** boundary is one intended to be cloned, installed, distributed, invoked, or operated as its own repository, package, plugin, or workspace even when it is commonly composed inside a parent.
+
+Such a boundary SHOULD remain locally orientable for its own scope when detached from the parent. Parent context MAY extend or constrain the child when composed, but the child SHOULD still expose enough durable local routing to identify its boundary, applicable local authority, canonical guidance, and boundary-local semantic roles.
+
+Required routing for an independently addressable boundary MUST NOT depend on **incidental parent filesystem placement** such as `../../AGENTS.md` unless that parent dependency is **intentional and declared** by the governing contract. An intentionally parent-dependent boundary is valid: CCA does not require it to become standalone, but the dependency SHOULD be explicit and its detached failure mode SHOULD be predictable and diagnosable.
+
+Detached-boundary portability concerns context, routing, and authority portability. It does not require every child application to execute fully without external services, parent build infrastructure, or other deliberately declared dependencies.
+
 ## 6. Routing and context discipline
 
 CCA follows **route before search**.
