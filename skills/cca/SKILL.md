@@ -1,6 +1,6 @@
 ---
 name: cca
-description: Use to design or restructure context systems, create or set up native or hybrid workspaces, scaffold portable routing, synchronize navigation, ingest or query maintained knowledge, validate CCA/ICM/LLM-Wiki compatibility, or advise on engineering judgment, software engineering principle/framework/methodology/process trade-offs, and security, autonomy, model, and context decisions. Supports existing code repositories, human knowledge systems, ICM, LLM Wiki, PARA, Zettelkasten, BASB/CODE, delivery methods, and hybrid workspaces without replacing their native authorities. Trigger whenever a request touches how context, knowledge, or navigation is structured for humans and agents together, even when the user never names CCA. Do not use for ordinary implementation, coding, editing, or project work when no context, knowledge, compatibility, routing, or advisory operation is involved.
+description: Use to design or restructure context systems, audit workspace context/routing architecture, create or set up native or hybrid workspaces, scaffold portable routing, synchronize navigation, ingest or query maintained knowledge, validate CCA/ICM/LLM-Wiki compatibility, or advise on engineering judgment, software engineering principle/framework/methodology/process trade-offs, and security, autonomy, model, and context decisions. Supports existing code repositories, human knowledge systems, ICM, LLM Wiki, PARA, Zettelkasten, BASB/CODE, delivery methods, and hybrid workspaces without replacing their native authorities. Trigger whenever a request touches how context, knowledge, or navigation is structured for humans and agents together, even when the user never names CCA. Do not use for ordinary implementation, coding, editing, or project work when no context, knowledge, compatibility, routing, or advisory operation is involved.
 ---
 
 # CCA
@@ -21,7 +21,7 @@ If the task is ordinary implementation, coding, editing, testing, or project wor
 
 | Mode | Use for | Load first |
 |---|---|---|
-| `architect` | design, create/setup/status, restructure, boundary/profile selection, hybrid composition | `references/architect/mode.md` |
+| `architect` | workspace architecture audit/review, design, create/setup/status, restructure, boundary/profile selection, hybrid composition | `references/architect/mode.md` |
 | `scaffold` | add minimal routing/context without restructuring | `references/operations/scaffold.md` |
 | `sync` | reconcile routing/navigation with the filesystem | `references/operations/sync.md` |
 | `ingest` | integrate evidence into maintained knowledge | `references/operations/ingest.md` |
@@ -30,6 +30,8 @@ If the task is ordinary implementation, coding, editing, testing, or project wor
 | `advise` | engineering judgment, process/method trade-offs, security/autonomy/model/context decisions | `references/advisor/mode.md` |
 
 Do not load every mode or reference. Progressive disclosure is part of the architecture.
+
+A workspace architecture audit or review is compound architecture work: use `architect` to preserve the requested boundary, inspect nested boundaries, evaluate navigation/context quality, and decide whether remediation is warranted. Lint is claim validation; use `lint` directly only when the user is asking whether specific upstream/CCA/profile claims pass, or delegate to it from Architect for the claim-validation portion of a broader audit. A child-boundary lint pass never completes a parent/workspace architecture audit.
 
 For workspace creation or material rebuild, Architect lazily loads `references/architect/workspace-builder.md`. For the optional CCA Hybrid Workspace Profile, Architect additionally loads `references/architect/hybrid-workspace.md`; its complete reviewed reference implementation is bundled under `assets/hybrid-workspace/`. This profile is not an eighth mode.
 
@@ -86,6 +88,7 @@ Architect mode may consult advisor references when a structural decision require
 11. For destructive restructuring, surface the migration map before moves, merges, renames, or deletions unless the user has explicitly authorized direct remediation.
 12. Use harness-native adapter files only where needed; portable guidance should remain canonical in the workspace's chosen portable authority.
 13. When uncertainty crosses a hard-stop boundary, use `references/advisor/escalation-triggers.md`.
+14. Preserve the user-requested audit boundary: inspecting or validating a nested child does not silently narrow a parent/workspace audit.
 
 ## Upstream-change rule
 

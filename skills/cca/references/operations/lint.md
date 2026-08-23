@@ -2,9 +2,11 @@
 
 Validate the target it actually is. Do not fail upstream systems for omitting CCA conventions they never adopted, and do not invent native profiles for human methods that do not define one.
 
-## 1. Detect claims and boundaries
+Lint is claim validation, not a substitute for a workspace architecture audit. If the user asks whether a repository/workspace's context, routing, navigation, authority, or context efficiency is well designed, route the compound request through Architect Audit mode and use lint only for the claim-validation portion.
 
-Determine applicable claims from durable files/instructions:
+## 1. Detect claims, target, and boundaries
+
+Record the requested boundary before inspecting descendants. Determine applicable claims from durable files/instructions:
 
 - **upstream-native ICM**;
 - **ICM-derived patterns**;
@@ -17,7 +19,11 @@ Determine applicable claims from durable files/instructions:
 
 Also detect method overlays where declared or structurally clear, such as PARA, Zettelkasten, or BASB/CODE. Treat them as preservation/context boundaries rather than inventing structural certification.
 
+Report the **requested boundary**, **inspected boundaries**, and any excluded/unresolved boundaries. A pass for one inspected child establishes only that child's result; it must not be promoted into a parent/workspace pass.
+
 If detection is ambiguous, report the ambiguity. Do not silently choose the strictest claim.
+
+A missing explicit CCA contract makes `CCA-conformant` N/A; it does not make `CCA-compatible` N/A. Evaluate CCA compatibility independently where there is enough evidence to determine whether CCA can resolve and operate on the boundary without structural migration or semantic replacement.
 
 ## 2. Universal structural checks
 
@@ -200,6 +206,11 @@ When remediation is authorized, automatically repair only unambiguous issues. Do
 ```text
 # Lint report — [target]
 
+Scope:
+- Requested boundary: [target]
+- Inspected boundaries: [list]
+- Excluded/unresolved boundaries: [list | none]
+
 Claims/boundaries detected:
 - Upstream-native ICM: PASS | FAIL | N/A
 - ICM-derived patterns: PASS | FAIL | N/A
@@ -234,4 +245,6 @@ Claims/boundaries detected:
 
 ## Production rule
 
-A clean lint report means the target satisfies the claims checked within the evidence inspected. CCA compatibility/conformance and the fresh-agent walk test never waive a failed upstream-native acceptance check.
+A clean lint report means the inspected boundaries satisfy the claims checked within the evidence inspected. It does not promote uninspected parent boundaries to PASS. CCA compatibility/conformance and the fresh-agent walk test never waive a failed upstream-native acceptance check.
+
+Lint success does not certify architecture quality. For workspace/context architecture quality, use Architect Audit mode and preserve the requested parent/workspace boundary through completion.

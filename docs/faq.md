@@ -33,6 +33,16 @@ The semantic role is stable meaning. The binding is the concrete local path/impl
 
 These are independent claims, not a maturity ladder.
 
+## Does a clean CCA lint mean the workspace has good context architecture?
+
+No.
+
+`lint` validates the claims and contracts that actually apply to the inspected boundary. It can tell you that an upstream-native, CCA-compatible/conformant, or named-profile claim passes without proving that the broader workspace is efficient to navigate.
+
+For an audit/review of a repository or workspace's context architecture, use Architect Audit mode. That audit preserves the requested parent boundary, checks meaningful nested boundaries, evaluates human and agent navigation, context selectivity, authority clarity, canonicality, search dependency, drift resistance, and scalability, then uses `lint` only for the claim-validation portion.
+
+A child-boundary pass does not make the parent audit done. If the requested workspace contains material boundaries that were not inspected, the result is partial/incomplete rather than a parent PASS.
+
 ## Is a valid native ICM workspace CCA-compatible?
 
 Yes.
@@ -232,7 +242,7 @@ Progressive disclosure is achieved through skill-local references/assets/scripts
 
 No.
 
-Use `architect` for compound architecture/profile/boundary decisions. A clearly scoped lint, sync, ingest, query, or scaffold request should route directly to that mode.
+Use `architect` for compound architecture/profile/boundary decisions, including workspace architecture audits/reviews. A clearly scoped claim lint, sync, ingest, query, or scaffold request should route directly to that mode.
 
 ## Can CCA work with Obsidian, VS Code, Cursor, Codex, Claude Code, Gemini, etc.?
 
@@ -275,7 +285,9 @@ It does not replace the runtime/message-passing layer. Tight-loop collaboration 
 
 ## How do I know a workspace is healthy?
 
-Use `lint` against the claims the boundary actually makes:
+First decide what question you are asking.
+
+For claim validity, use `lint` against the claims the boundary actually makes:
 
 - upstream-native ICM → current ICM acceptance;
 - ICM-derived → borrowed constructs only;
@@ -284,7 +296,7 @@ Use `lint` against the claims the boundary actually makes:
 - Hybrid Profile → frozen-v1 baseline + current v2 admission/provenance audit plus generated-artifact check;
 - human methods → preservation findings, not invented certification.
 
-Then use the CCA fresh-agent walk test where applicable. The walk test supplements stricter upstream/profile validation; it never replaces it.
+For broader context-architecture health, use Architect Audit mode from the requested workspace root. Then use the CCA fresh-agent walk test where applicable. The walk test supplements stricter upstream/profile validation; it never replaces it.
 
 ## Can CCA evolve without becoming another competing methodology?
 

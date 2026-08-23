@@ -118,6 +118,23 @@ A valid native ICM workspace is CCA-compatible because CCA resolves its native s
 
 See [`compatibility.md`](compatibility.md) for acceptance and swap guarantees.
 
+### 4.1 Compatibility vs architecture quality
+
+Compatibility is not an architecture-quality certification.
+
+Compatibility/conformance lint asks whether a boundary satisfies the claims and contracts that actually apply to it. A workspace architecture audit asks a different question: whether the requested workspace boundary is efficiently understandable, navigable, and operable by humans and agents with clear authority and bounded context loading.
+
+When CCA is asked to audit or review a workspace's context/routing architecture:
+
+- the **requested audit boundary** MUST remain the unit of completion unless the user explicitly narrows scope;
+- nested boundaries MAY be inspected independently, but a successful child result establishes only that child's coverage;
+- **A child-boundary pass MUST NOT imply a parent-boundary pass**;
+- the audit MUST report the requested boundary, inspected boundaries, excluded or unresolved boundaries, and any resulting coverage limitation;
+- if material parts of the requested boundary were not inspected, the parent audit MUST be reported as partial/incomplete rather than passed/done;
+- architecture-quality findings MUST remain separate from upstream validity, CCA compatibility/conformance, named-profile conformance, and optional hardening claims.
+
+Architecture-quality evaluation SHOULD consider, where relevant: boundary discovery, root orientation, intent routing, context selectivity, authority clarity, canonicality, human navigation, agent navigation, routing-hop/search dependency, drift resistance, and scalability. These dimensions are evidence surfaces, not permission to force new files, manifests, profiles, or numeric scores where they add no value.
+
 ## 5. Workspace and boundary model
 
 A CCA-relevant workspace is a filesystem-native environment whose durable files can be inspected by humans and agents. Markdown is preferred for prose where useful; JSON/YAML or other formats MAY be used for structured data.
@@ -289,12 +306,12 @@ The skill package MUST:
 
 | Mode | Purpose |
 |---|---|
-| `architect` | design/map a workspace, preserve existing authority, and coordinate compound composition |
+| `architect` | design/map/audit a workspace, preserve existing authority, and coordinate compound composition |
 | `scaffold` | add the smallest approved routing/profile layer without unintended restructuring |
 | `sync` | reconcile declared routing/bindings/derived artifacts with disk without inventing content |
 | `ingest` | integrate new evidence into maintained knowledge under applicable authority |
 | `query` | resolve and navigate relevant knowledge/evidence with minimum sufficient context |
-| `lint` | validate the actual upstream/CCA/profile claims separately |
+| `lint` | validate the actual upstream/CCA/profile claims separately; it does not certify architecture quality |
 | `advise` | apply engineering, process, security, autonomy, context, and model judgment without turning priors into enforcement |
 
 Modes describe **what the agent is doing**. Profiles describe **which optional workspace contract it is operating against**. Do not create a new mode merely because a profile has its own schemas/scripts.
