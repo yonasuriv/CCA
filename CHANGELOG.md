@@ -4,6 +4,14 @@ This changelog records released CCA milestones and pending user-visible changes.
 
 ## Unreleased
 
+### Workspace architecture audit
+
+- Distinguished workspace architecture audit quality from compatibility/conformance linting: a clean claim lint no longer implies efficient context architecture.
+- Routed broad repository/workspace audit requests through Architect, preserving the user-requested parent boundary instead of silently narrowing completion to a convenient child boundary.
+- Added explicit audit coverage reporting, human/agent navigation quality dimensions, and the hard rule that a child-boundary pass cannot close a parent/workspace audit.
+- Clarified that absence of an explicit CCA conformance contract makes `CCA-conformant` inapplicable without automatically making `CCA-compatible` inapplicable.
+- Added deterministic regression coverage for the workspace architecture audit contract.
+
 ### Repository governance
 
 - Added structured GitHub Issue Forms for concrete bug reports and CCA change proposals while keeping blank issues available for exceptional cases.
