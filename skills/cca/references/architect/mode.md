@@ -84,6 +84,7 @@ Evaluate the actual target with evidence. Do not invent a profile or require fil
 - **canonicality** — are substantive rules/facts owned once rather than duplicated across registries, adapters, routers, or docs?
 - **human navigation** — can a person locate important context and understand the structure without tribal knowledge?
 - **agent navigation** — can a fresh agent orient and act from durable workspace files without prior chat memory?
+- **boundary portability / outward coupling** — if a nested boundary is independently addressable, can it orient locally when detached, or does required routing escape through parent-only paths or assumptions?
 - **search dependency** — how often does successful routing still require broad filesystem search, excessive hops, or path guessing?
 - **drift resistance** — are stale/broken routes, bindings, generated views, or duplicate authorities detectable?
 - **scalability** — can local/federated routing grow without requiring one global manifest or ever-expanding root context?
@@ -95,13 +96,15 @@ Do not fabricate numeric precision. Use qualitative status/severity plus concret
 1. Identify existing human and agent entry points before adding new ones.
 2. Identify existing registries, routers, indexes, manifests, contracts, and instruction scopes; reuse canonical surfaces where possible instead of creating a second routing authority.
 3. Map representative high-value routes through `boundary + semantic role -> binding` and record authority/ownership where ambiguity matters.
-4. Test common root-to-leaf intents from the requested audit boundary, not from a preselected child directory.
-5. Run both human-oriented and fresh-agent navigation checks where practical.
-6. Separate architecture-quality findings from compatibility/conformance findings.
-7. Use `lint` for the claim-validation portion; a clean lint result is evidence about claims, not proof that the architecture is efficient.
-8. Identify the smallest hardening/remediation that would materially improve routing, context efficiency, authority clarity, or drift resistance.
-9. If remediation is authorized, delegate focused implementation to `scaffold` and/or `sync`, then repeat the affected routes and claim checks.
-10. Close the audit only when requested-boundary coverage is complete or explicitly narrowed by the user.
+4. For independently addressable repositories, submodules, packages, plugins, or workspaces, inspect required routing for **escaping relative** references, parent-only routers/configuration needed merely to orient, and assumptions about an **exact embedding path**. Distinguish intentional declared parent coupling from incidental filesystem coupling.
+5. Test common root-to-leaf intents from the requested audit boundary, not from a preselected child directory.
+6. Where practical, test independently addressable child boundaries from their own root as if detached from the parent; do not require full application execution when only context/routing portability is under review.
+7. Run both human-oriented and fresh-agent navigation checks where practical.
+8. Separate architecture-quality findings from compatibility/conformance findings.
+9. Use `lint` for the claim-validation portion; a clean lint result is evidence about claims, not proof that the architecture is efficient.
+10. Identify the smallest hardening/remediation that would materially improve routing, context efficiency, authority clarity, portability, or drift resistance.
+11. If remediation is authorized, delegate focused implementation to `scaffold` and/or `sync`, then repeat the affected routes and claim checks.
+12. Close the audit only when requested-boundary coverage is complete or explicitly narrowed by the user.
 
 ### Audit report
 
@@ -119,7 +122,8 @@ Coverage: COMPLETE | PARTIAL | BLOCKED
 ## Architecture-quality findings
 [boundary discovery, root orientation, intent routing, context selectivity,
 authority clarity, canonicality, human navigation, agent navigation,
-search dependency, drift resistance, scalability — only where material]
+boundary portability/outward coupling, search dependency, drift resistance,
+scalability — only where material]
 
 ## Claim lint summary
 [upstream/CCA/profile claims, explicitly separate from architecture quality]
@@ -128,7 +132,8 @@ search dependency, drift resistance, scalability — only where material]
 [smallest changes that materially improve the target]
 
 ## Verification
-[root-to-leaf human/agent walks, validator/CI evidence, remaining limits]
+[root-to-leaf human/agent walks, detached-boundary checks where applicable,
+validator/CI evidence, remaining limits]
 
 Completion: DONE | PARTIAL | BLOCKED
 ```
@@ -182,6 +187,7 @@ The target MUST be explicitly resolved outside the installed package. The implem
 - Routing files point; they do not become knowledge dumps.
 - Load minimum sufficient context for the active operation.
 - Preserve the requested audit boundary until coverage is complete or the user explicitly narrows it.
+- Independently addressable boundaries remain locally orientable when detached unless parent dependence is intentional and declared.
 - Nest boundaries; do not merge schemas merely because several methods coexist.
 - Stable semantic roles are distinct from concrete bindings and orthogonal classifications.
 - Bindings may move where their governing contract permits; consumers follow the semantic role.
@@ -201,7 +207,7 @@ After applicable upstream/profile validation, simulate a fresh consumer with no 
 2. **Act**: perform one representative operation using only the files/tools exposed by the target.
 3. **Report**: state what changed, what was produced, what remains, and what is ambiguous.
 
-For architecture audits, start the walk at the requested audit boundary. Starting inside a child boundary proves only that child's navigation.
+For architecture audits, start the walk at the requested audit boundary. Starting inside a child boundary proves only that child's navigation. For independently addressable child boundaries, also perform a detached-orientation walk from that child root when practical.
 
 If required operating knowledge exists only in chat history or someone's head, improve the durable target rather than explaining around the gap.
 
