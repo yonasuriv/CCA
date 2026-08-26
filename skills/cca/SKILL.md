@@ -1,6 +1,8 @@
 ---
 name: cca
 description: Use to design or restructure context systems, audit workspace context/routing architecture, create or set up native or hybrid workspaces, scaffold portable routing, synchronize navigation, ingest or query maintained knowledge, validate CCA/ICM/LLM-Wiki compatibility, or advise on engineering judgment, software engineering principle/framework/methodology/process trade-offs, and security, autonomy, model, and context decisions. Supports existing code repositories, human knowledge systems, ICM, LLM Wiki, PARA, Zettelkasten, BASB/CODE, delivery methods, and hybrid workspaces without replacing their native authorities. Trigger whenever a request touches how context, knowledge, or navigation is structured for humans and agents together, even when the user never names CCA. Do not use for ordinary implementation, coding, editing, or project work when no context, knowledge, compatibility, routing, or advisory operation is involved.
+metadata:
+  version: "1.1.0"
 ---
 
 # CCA
@@ -39,19 +41,24 @@ For native ICM (Interpretable Context Methodology), the builder performs the inh
 
 ## Shared authority
 
-Before making a claim about CCA semantics, compatibility, or composition, use only the skill-local canonical material needed for that claim under `references/core/`:
+Before making a claim about CCA semantics, compatibility, composition, contract identity, or versioned conformance, use only the skill-local canonical material needed for that claim under `references/core/`:
 
 - `spec.md` — normative CCA semantics and operation model;
+- `versioning.md` — normative CCA contract identity, SemVer evolution, and version-versus-source-provenance rules;
 - `compatibility.md` — upstream/CCA/profile compatibility vocabulary and preservation rules;
 - `method-composition.md` — how methods coexist without being absorbed;
 - `adapters.md` — harness-specific interoperability guidance;
 - `icm-inheritance.md` — provenance map for preserving the current applicable ICM capability floor without redefining ICM.
 
-Do not preload the whole core set. Load a core reference when the current operation actually depends on its authority.
+Do not preload the whole core set. Load a core reference when the current operation actually depends on its authority. Any operation that creates, validates, migrates, or reports a CCA compatibility/conformance/profile identity MUST load `references/core/versioning.md`.
 
 For native ICM work, `icm-inheritance.md` is a compatibility map only. The current upstream ICM authority and acceptance surface still win if CCA documentation drifts.
 
 These files are inside the installable skill so runtime behavior never depends on repository-global specification files that may not exist after installation.
+
+## Contract version
+
+The installed CCA skill and normative CCA interoperability contract share one SemVer identity. The canonical contract version is `metadata.version` in this file; current version is **1.1.0**. Consumer CCA identity is version-based. Repository/source revisions are optional provenance and never substitute for the CCA contract version; see `references/core/versioning.md`.
 
 ## Portable distribution boundary
 
