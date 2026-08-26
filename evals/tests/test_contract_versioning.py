@@ -33,6 +33,19 @@ class ContractVersioningTests(unittest.TestCase):
         self.assertIn("contract version", skill.lower())
         self.assertIn("semver", skill.lower())
 
+    def test_compatibility_and_claim_operations_route_to_versioning_authority(self) -> None:
+        expectations = {
+            "skills/cca/references/core/compatibility.md": "versioning.md",
+            "skills/cca/references/operations/lint.md": "../core/versioning.md",
+            "skills/cca/references/architect/mode.md": "../core/versioning.md",
+            "skills/cca/references/architect/workspace-builder.md": "../core/versioning.md",
+        }
+        for relative, locator in expectations.items():
+            text = self.read(relative)
+            self.assertIn(locator, text, relative)
+            self.assertIn("contract version", text.lower(), relative)
+            self.assertIn("provenance", text.lower(), relative)
+
     def test_installed_skill_never_advertises_reference_commit_identity(self) -> None:
         offenders = []
         for path in SKILL_ROOT.rglob("*"):
