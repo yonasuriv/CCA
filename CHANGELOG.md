@@ -4,6 +4,18 @@ This changelog records released CCA milestones and pending user-visible changes.
 
 ## Unreleased
 
+## 1.1.0 - 2026-08-26
+
+Backwards-compatible expansion of the CCA interoperability contract and installed skill behavior.
+
+### Versioned contract identity
+
+- Exposed the installed CCA contract version as `metadata.version: "1.1.0"` in `skills/cca/SKILL.md`.
+- Defined CCA compatibility, conformance, and CCA-owned profile identity by semantic version rather than repository commit, tree, blob, branch, tag-target, file-hash, or installation revision.
+- Kept source revisions available only as non-normative provenance for audit, debugging, reproduction, and source-nearest verification.
+- Added a canonical skill-local versioning contract and CI enforcement so contract-sensitive installed behavior cannot change without an explicit version decision.
+- Clarified that upstream compatibility-mapping source pins are separate provenance and do not become a consumer's CCA identity.
+
 ### Detached-boundary portability
 
 - Defined independently addressable child boundaries as repositories/packages/plugins/workspaces that may be cloned, installed, distributed, or operated outside their parent composition.
