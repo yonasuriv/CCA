@@ -14,7 +14,7 @@ CCA keeps runtime authority inside the installable `skills/cca/` package. Reposi
 - [Standards](standards.md) — tracked upstream compatibility surfaces.
 - [References](references.md) — upstream, methodology, and citation links.
 - [Migration](migration.md) — preserving existing structures while adopting CCA guidance.
-- [Contributing](../CONTRIBUTING.md) — contribution workflow, issue-vs-direct-PR guidance, changelog behavior, and the complete validation suite.
+- [Contributing](../CONTRIBUTING.md) — contribution workflow, Semantic Versioning decisions, issue-vs-direct-PR guidance, changelog behavior, and the complete validation suite.
 - [Bug issue form](../.github/ISSUE_TEMPLATE/bug.yml) — structured intake for concrete defects and regressions.
 - [Proposal issue form](../.github/ISSUE_TEMPLATE/proposal.yml) — structured intake for architectural, semantic, profile, interoperability, and governance proposals.
 - [Pull request template](../.github/PULL_REQUEST_TEMPLATE.md) — evidence-backed change summary and review contract.
@@ -34,6 +34,7 @@ skills/cca/
 ├── references/
 │   ├── core/
 │   │   ├── spec.md
+│   │   ├── versioning.md
 │   │   ├── compatibility.md
 │   │   ├── method-composition.md
 │   │   ├── adapters.md
@@ -68,6 +69,8 @@ skills/cca/
     ├── scripts/             # reusable source/knowledge helpers
     └── templates/           # portable workspace/context templates
 ```
+
+`skills/cca/SKILL.md` `metadata.version` is the canonical installed CCA contract version. `skills/cca/references/core/versioning.md` defines its SemVer evolution and the rule that consumer CCA identity is version-based while source revisions are optional provenance.
 
 Architect and advisor references are deliberately separate domains. Architect owns workspace structure and composition; advisor owns engineering/process judgment. Architect may consult advisor references lazily, but does not absorb or duplicate them.
 
@@ -105,10 +108,11 @@ CCA/
     ├── workflows/
     │   └── validate.yml
     └── scripts/
+        ├── validate_contract_version.py
         ├── validate_repo.py
         └── validate_distribution.py
 ```
 
 `examples/` and `docs/` are explanatory/non-normative unless a file explicitly says otherwise. Normative CCA runtime semantics live under `skills/cca/references/core/` so they remain available after the skill is installed. `docs/_wip.md` is historical/development material and must not be treated as normative or current release authority.
 
-`evals/` and `.github/` are repository-development surfaces rather than installed CCA runtime authority. They exist to exercise behavioral claims, release-readiness invariants, Hybrid profile behavior, contribution governance, and distribution integrity against the exact repository candidate.
+`evals/` and `.github/` are repository-development surfaces rather than installed CCA runtime authority. They exist to exercise behavioral claims, release-readiness invariants, CCA contract-version decisions, Hybrid profile behavior, contribution governance, and distribution integrity against the exact repository candidate.

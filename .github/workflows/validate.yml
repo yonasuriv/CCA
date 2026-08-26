@@ -12,9 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+      - name: Validate CCA contract version decision
+        run: python .github/scripts/validate_contract_version.py
       - name: Run evaluation harness tests
         run: python -m unittest discover -s evals/tests -v
       - name: Run personal-hybrid intent scorer tests

@@ -14,10 +14,11 @@ This workflow applies to **every repository change**, including documentation, s
 4. Work on a branch. Keep the change scoped to the smallest semantically correct unit.
 5. For behavioral, normative, or regression-prone changes, add a failing deterministic/adversarial test before the implementation where practical.
 6. Change the canonical authority first. Then update every affected explanatory document, example, publication, index/map, citation surface, and regression check in the same change.
-7. Update [`CHANGELOG.md`](CHANGELOG.md) under `## Unreleased` for user-visible, compatibility, semantic, profile, packaging, governance, or release-relevant changes. Pure internal maintenance may omit a changelog entry when it has no user-facing effect, but that should be obvious from the PR.
-8. Run the complete validation suite below on the **exact PR head**.
-9. Open a pull request and complete [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md). Do not merge while applicable CI or upstream acceptance checks are red.
-10. Release tags are created only from a merged `main` commit after the complete `main` validation run is green.
+7. Make the required CCA Semantic Versioning decision. Contract-sensitive installed behavior must update `skills/cca/SKILL.md` `metadata.version` in the same change; no-bump changes must genuinely leave installed CCA behavior unchanged.
+8. Update [`CHANGELOG.md`](CHANGELOG.md) under `## Unreleased` for user-visible, compatibility, semantic, profile, packaging, governance, or release-relevant changes. Pure internal maintenance may omit a changelog entry when it has no user-facing effect, but that should be obvious from the PR.
+9. Run the complete validation suite below on the **exact PR head**.
+10. Open a pull request and complete [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md). Do not merge while applicable CI or upstream acceptance checks are red.
+11. Release tags are created only from a merged `main` commit after the complete `main` validation run is green.
 
 The pull-request template is a review/change-summary contract, not a second specification. The changelog records release history and pending user-visible changes; normative semantics remain in the skill-local specification.
 
@@ -61,6 +62,21 @@ Identify which authority the change affects:
 
 If an upstream compatibility claim is affected, verify the current primary source before editing. CCA's existing wording is not evidence that the upstream still behaves the same way.
 
+## CCA Semantic Versioning
+
+CCA's installed skill and normative interoperability contract share one Semantic Versioning identity. The canonical version is `skills/cca/SKILL.md` `metadata.version`; [`skills/cca/references/core/versioning.md`](skills/cca/references/core/versioning.md) is the normative evolution contract.
+
+Use these rules for any CCA-owned installed behavior change:
+
+- **MAJOR** — incompatible change to normative semantics or an advertised contract.
+- **MINOR** — backwards-compatible addition or expansion of semantics, modes, lint/audit behavior, compatibility handling, profile behavior, or other advertised installed behavior.
+- **PATCH** — backwards-compatible correction to behavior already promised by the current contract.
+- **No bump** — only when the installed CCA contract and advertised runtime behavior are unchanged, such as typo-only explanatory documentation or internal CI maintenance.
+
+Do not use repository commits as the CCA version. Consumer compatibility/conformance binds to the declared CCA contract version; source revisions are optional provenance only. CCA's own upstream compatibility mappings may retain source revisions as mapping provenance without turning those revisions into consumer CCA identity.
+
+The repository gate `.github/scripts/validate_contract_version.py` compares contract-sensitive installed surfaces against the applicable Git baseline and fails if they changed without a forward version decision. Historical CCA releases that predate `metadata.version` are resolved from their normative specification version only for migration/baseline comparison; the current tree must expose `metadata.version`.
+
 ## Core contribution checks
 
 - [ ] Does the change preserve upstream authority rather than redefine it?
@@ -71,6 +87,7 @@ If an upstream compatibility claim is affected, verify the current primary sourc
 - [ ] Is a new CCA convention actually necessary, or does an upstream/ecosystem convention already solve it better?
 - [ ] Does the change improve or preserve human agency, comprehension, portability, and inspectability?
 - [ ] Are deterministic invariants mechanically testable where practical?
+- [ ] If installed CCA behavior changed, is the `metadata.version` bump correct for its SemVer impact?
 
 ## Compatibility vocabulary
 
@@ -180,6 +197,7 @@ Follow the current Agent Skills standard. In particular:
 Before proposing integration, run the same complete validation surface used by CI:
 
 ```bash
+python .github/scripts/validate_contract_version.py
 python -m unittest discover -s evals/tests -v
 python evals/personal-hybrid-intent/tests/test_score_intent.py
 python -m pip install -r skills/cca/assets/hybrid-workspace/requirements.txt
@@ -189,6 +207,8 @@ python .github/scripts/validate_repo.py
 python .github/scripts/validate_distribution.py
 ```
 
+On a feature branch, the version gate compares against the applicable base branch when CI provides one or when `origin/main` is available. For a local explicit check, use `python .github/scripts/validate_contract_version.py --base origin/main`.
+
 These are CCA repository/profile regression gates. They do not replace a supported upstream's own acceptance tests for an upstream-native claim.
 
 ## Proposals
@@ -196,7 +216,7 @@ These are CCA repository/profile regression gates. They do not replace a support
 A new CCA semantic should answer:
 
 1. What real interoperability/maintenance problem breaks without it?
-2. Why does an existing upstream or ordinary filesystem convention not already solve it?
+2. Why does an existing upstream or ordinary filesystem convention not already solve it better?
 3. Which boundary owns the semantic?
 4. What remains optional for consumers that do not need it?
 5. How does it remain agent/vendor/runtime/path agnostic?
