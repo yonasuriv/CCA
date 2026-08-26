@@ -1,8 +1,8 @@
 # CCA Specification
 
-**Version 1.0.0** — Status: Stable, tracking ICM, LLM Wiki, AGENTS.md, Agent Skills, and other directly supported upstreams.
+**Version 1.1.0** — Status: Stable, tracking ICM, LLM Wiki, AGENTS.md, Agent Skills, and other directly supported upstreams.
 
-Normative. CCA runtime behavior and CCA-conformant examples must conform to this document. Compatibility details are governed by [`compatibility.md`](compatibility.md); method composition by [`method-composition.md`](method-composition.md).
+Normative. CCA runtime behavior and CCA-conformant examples must conform to this document. Contract identity and SemVer evolution are governed by [`versioning.md`](versioning.md); compatibility details by [`compatibility.md`](compatibility.md); method composition by [`method-composition.md`](method-composition.md).
 
 The key words **MUST**, **SHOULD**, and **MAY** are interpreted as in RFC 2119.
 
@@ -116,7 +116,7 @@ CCA distinguishes five composable claims:
 
 A valid native ICM workspace is CCA-compatible because CCA resolves its native semantics without structural migration through the CCA boundary/role/binding model. That does not make ICM CCA-owned or require the workspace to become CCA-conformant.
 
-See [`compatibility.md`](compatibility.md) for acceptance and swap guarantees.
+See [`compatibility.md`](compatibility.md) for acceptance and swap guarantees and [`versioning.md`](versioning.md) for the versioned identity of CCA compatibility/conformance claims.
 
 ### 4.1 Compatibility vs architecture quality
 
@@ -197,7 +197,6 @@ Available context is not automatically useful context. CCA SHOULD load the minim
 CCA routing is federated by boundary. A root bootstrap/router MUST NOT require one root manifest to enumerate arbitrary descendants merely so the workspace can grow.
 
 As a collection grows, a boundary MAY expose local routers, catalogs, indexes, or search adapters that describe only their own scope. Nested boundaries MAY repeat the same pattern recursively. A consumer should descend through the smallest applicable routing surface before searching the bounded collection.
-
 Derived catalogs, search indexes, embeddings, caches, and graph projections MUST remain rebuildable views over canonical durable state unless a separately declared authority explicitly owns that data. Their loss MUST NOT erase the semantic identity or canonical content they index.
 
 CCA does not prescribe one scale threshold or retrieval engine. At hundreds, tens of thousands, or hundreds of thousands of artifacts, implementations MAY introduce progressively stronger local indexing/search infrastructure while preserving the same boundary/role/binding semantics and avoiding a mandatory universe-wide manifest.
@@ -407,6 +406,6 @@ Real-time tight-loop multi-agent coordination requires appropriate orchestration
 
 ## 18. Maintenance and evolution
 
-Repository maintainers MUST keep this skill-local specification, [`compatibility.md`](compatibility.md), affected mode references, portable implementation assets, examples, and regression checks consistent when CCA semantics change.
+Repository maintainers MUST keep this skill-local specification, [`versioning.md`](versioning.md), [`compatibility.md`](compatibility.md), affected mode references, portable implementation assets, examples, and regression checks consistent when CCA semantics change.
 
 The repository outside `skills/cca/` is a development, research, documentation, publication, and validation environment. It may explain CCA more broadly, but installed-skill meaning must not disappear when the repository is absent.
