@@ -32,19 +32,16 @@ class ContractVersioningTests(unittest.TestCase):
         self.assertIn("versioning.md", skill)
         self.assertIn("contract version", skill.lower())
         self.assertIn("semver", skill.lower())
+        self.assertIn(
+            "Any operation that creates, validates, migrates, or reports a CCA compatibility/conformance/profile identity MUST load `references/core/versioning.md`.",
+            skill,
+        )
 
-    def test_compatibility_and_claim_operations_route_to_versioning_authority(self) -> None:
-        expectations = {
-            "skills/cca/references/core/compatibility.md": "versioning.md",
-            "skills/cca/references/operations/lint.md": "../core/versioning.md",
-            "skills/cca/references/architect/mode.md": "../core/versioning.md",
-            "skills/cca/references/architect/workspace-builder.md": "../core/versioning.md",
-        }
-        for relative, locator in expectations.items():
-            text = self.read(relative)
-            self.assertIn(locator, text, relative)
-            self.assertIn("contract version", text.lower(), relative)
-            self.assertIn("provenance", text.lower(), relative)
+    def test_versioning_authority_defines_lint_and_creation_behavior(self) -> None:
+        versioning = self.read("skills/cca/references/core/versioning.md")
+        self.assertIn("When CCA creates, audits, remediates, or lints a consumer", versioning)
+        self.assertIn("normative CCA commit/revision pin as a conformance error", versioning)
+        self.assertIn("Permit source revisions in clearly non-authoritative evidence/provenance", versioning)
 
     def test_installed_skill_never_advertises_reference_commit_identity(self) -> None:
         offenders = []
