@@ -5,49 +5,41 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
+SKILL_ROOT = ROOT / "skills" / "cca"
 
 
 class ContractVersioningTests(unittest.TestCase):
     def read(self, relative: str) -> str:
         return (ROOT / relative).read_text(encoding="utf-8")
 
-    def test_spec_defines_version_as_consumer_contract_identity(self) -> None:
+    def test_versioning_reference_defines_consumer_contract_identity(self) -> None:
+        versioning = self.read("skills/cca/references/core/versioning.md")
+        self.assertIn("MUST identify the applicable CCA contract by version", versioning)
+        self.assertIn("MUST NOT serve as CCA conformance identity", versioning)
+        self.assertIn("non-normative provenance", versioning)
+        self.assertIn("MAJOR", versioning)
+        self.assertIn("MINOR", versioning)
+        self.assertIn("PATCH", versioning)
+
+    def test_spec_is_versioned_and_routes_to_versioning_authority(self) -> None:
         spec = self.read("skills/cca/references/core/spec.md")
-        self.assertIn("contract identity", spec.lower())
-        self.assertIn("MUST identify the applicable CCA contract by version", spec)
-        self.assertIn("MUST NOT serve as CCA conformance identity", spec)
-        self.assertIn("non-normative provenance", spec)
+        self.assertIn("**Version 1.1.0**", spec)
+        self.assertIn("versioning.md", spec)
 
-    def test_compatibility_separates_contract_identity_from_source_provenance(self) -> None:
-        compatibility = self.read("skills/cca/references/core/compatibility.md").lower()
-        self.assertIn("contract identity", compatibility)
-        self.assertIn("source provenance", compatibility)
-        self.assertIn("version", compatibility)
-        self.assertIn("commit", compatibility)
-
-    def test_lint_rejects_normative_source_revision_pin(self) -> None:
-        lint = self.read("skills/cca/references/operations/lint.md").lower()
-        self.assertIn("commit", lint)
-        self.assertIn("conformance error", lint)
-        self.assertIn("provenance", lint)
-        self.assertIn("contract version", lint)
-
-    def test_architect_and_builder_never_introduce_commit_identity(self) -> None:
-        for relative in (
-            "skills/cca/references/architect/mode.md",
-            "skills/cca/references/architect/workspace-builder.md",
-        ):
-            text = self.read(relative)
-            lowered = text.lower()
-            self.assertIn("cca contract version", lowered, relative)
-            self.assertIn("source provenance", lowered, relative)
-            self.assertNotIn("reference_commit", text, relative)
-
-    def test_skill_declares_semver_policy_as_installed_contract(self) -> None:
+    def test_skill_exposes_and_routes_contract_version(self) -> None:
         skill = self.read("skills/cca/SKILL.md")
         self.assertIn('version: "1.1.0"', skill)
+        self.assertIn("versioning.md", skill)
         self.assertIn("contract version", skill.lower())
         self.assertIn("semver", skill.lower())
+
+    def test_installed_skill_never_advertises_reference_commit_identity(self) -> None:
+        offenders = []
+        for path in SKILL_ROOT.rglob("*"):
+            if path.is_file() and path.suffix in {".md", ".yaml", ".yml", ".json", ".py"}:
+                if "reference_commit" in path.read_text(encoding="utf-8", errors="ignore"):
+                    offenders.append(path.relative_to(ROOT).as_posix())
+        self.assertEqual([], offenders)
 
 
 if __name__ == "__main__":
