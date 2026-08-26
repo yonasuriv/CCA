@@ -41,6 +41,23 @@ class ContractVersionGateTests(unittest.TestCase):
             encoding="utf-8",
         )
 
+    def write_unversioned_skill(self, repo: Path, body: str = "# CCA\n") -> None:
+        path = repo / "skills" / "cca" / "SKILL.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            textwrap.dedent(
+                f'''\
+                ---
+                name: cca
+                description: Historical pre-metadata CCA skill.
+                ---
+
+                {body}
+                '''
+            ),
+            encoding="utf-8",
+        )
+
     def make_repo(self) -> tuple[tempfile.TemporaryDirectory[str], Path]:
         temp = tempfile.TemporaryDirectory()
         repo = Path(temp.name)
@@ -54,6 +71,23 @@ class ContractVersionGateTests(unittest.TestCase):
         (repo / "README.md").write_text("# Repo\n", encoding="utf-8")
         self.git(repo, "add", ".")
         self.git(repo, "commit", "-m", "baseline")
+        return temp, repo
+
+    def make_pre_metadata_repo(self) -> tuple[tempfile.TemporaryDirectory[str], Path]:
+        temp = tempfile.TemporaryDirectory()
+        repo = Path(temp.name)
+        self.git(repo, "init", "-b", "main")
+        self.git(repo, "config", "user.email", "cca-tests@example.invalid")
+        self.git(repo, "config", "user.name", "CCA Tests")
+        self.write_unversioned_skill(repo)
+        core = repo / "skills" / "cca" / "references" / "core"
+        core.mkdir(parents=True, exist_ok=True)
+        (core / "spec.md").write_text(
+            "# CCA Specification\n\n**Version 1.0.0** — Status: Stable\n",
+            encoding="utf-8",
+        )
+        self.git(repo, "add", ".")
+        self.git(repo, "commit", "-m", "historical baseline")
         return temp, repo
 
     def run_gate(self, repo: Path) -> subprocess.CompletedProcess[str]:
@@ -94,6 +128,19 @@ class ContractVersionGateTests(unittest.TestCase):
         self.commit(repo, "versioned contract change")
         result = self.run_gate(repo)
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
+    def test_pre_metadata_baseline_uses_normative_spec_version(self) -> None:
+        temp, repo = self.make_pre_metadata_repo()
+        self.addCleanup(temp.cleanup)
+        self.write_skill(repo, "1.1.0")
+        (repo / "skills/cca/references/core/spec.md").write_text(
+            "# CCA Specification\n\n**Version 1.1.0** — Status: Stable\n",
+            encoding="utf-8",
+        )
+        self.commit(repo, "introduce version metadata")
+        result = self.run_gate(repo)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+        self.assertIn("1.0.0 -> 1.1.0", result.stdout + result.stderr)
 
     def test_skill_body_change_with_same_version_fails(self) -> None:
         temp, repo = self.make_repo()
