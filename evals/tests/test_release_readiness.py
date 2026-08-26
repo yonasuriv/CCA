@@ -12,11 +12,17 @@ class ReleaseReadinessTests(unittest.TestCase):
     def read(self, relative: str) -> str:
         return (ROOT / relative).read_text(encoding="utf-8")
 
-    def test_normative_spec_is_1_0_0_stable(self) -> None:
+    def test_normative_spec_is_1_1_0_stable(self) -> None:
         spec = self.read("skills/cca/references/core/spec.md")
-        self.assertIn("**Version 1.0.0**", spec)
+        self.assertIn("**Version 1.1.0**", spec)
         self.assertRegex(spec, r"\bStatus:\s*Stable\b")
         self.assertNotIn("Status: Draft", spec)
+
+    def test_installed_skill_exposes_1_1_0_contract_version(self) -> None:
+        skill = self.read("skills/cca/SKILL.md")
+        frontmatter = skill.split("---", 2)[1]
+        self.assertRegex(frontmatter, r"(?m)^metadata:\s*$")
+        self.assertRegex(frontmatter, r'(?m)^\s+version:\s*["\']1\.1\.0["\']\s*$')
 
     def test_public_readme_has_no_release_placeholder(self) -> None:
         readme = self.read("README.md")
@@ -138,17 +144,18 @@ class ReleaseReadinessTests(unittest.TestCase):
         root_cff = self.read("CITATION.cff")
         skill_cff = self.read("skills/cca/CITATION.cff")
         for text in (root_cff, skill_cff):
-            self.assertIn("version: '1.0.0'", text)
-            self.assertIn("date-released: '2026-08-21'", text)
+            self.assertIn("version: '1.1.0'", text)
+            self.assertIn("date-released: '2026-08-26'", text)
             self.assertIn("CCA is an agent-agnostic interoperability architecture", text)
             self.assertIn("title: 'CCA: Convergent Context Architecture'", text)
             self.assertIn("repository-code: 'https://github.com/yonasuriv/CCA'", text)
 
     def test_release_history_exists(self) -> None:
         changelog = ROOT / "CHANGELOG.md"
-        self.assertTrue(changelog.is_file(), "CHANGELOG.md is required for the 1.0.0 release")
+        self.assertTrue(changelog.is_file(), "CHANGELOG.md is required for released CCA versions")
         text = changelog.read_text(encoding="utf-8")
         self.assertIn("## Unreleased", text)
+        self.assertIn("## 1.1.0 - 2026-08-26", text)
         self.assertIn("## 1.0.0 - 2026-08-21", text)
 
 
