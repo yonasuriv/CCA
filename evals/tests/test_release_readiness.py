@@ -58,6 +58,7 @@ class ReleaseReadinessTests(unittest.TestCase):
             "evals/",
             "PULL_REQUEST_TEMPLATE.md",
             "validate.yml",
+            "validate_contract_version.py",
             "validate_repo.py",
             "validate_distribution.py",
         ):
@@ -66,6 +67,7 @@ class ReleaseReadinessTests(unittest.TestCase):
     def test_contributing_documents_complete_ci_suite(self) -> None:
         contributing = self.read("CONTRIBUTING.md")
         required_commands = (
+            "python .github/scripts/validate_contract_version.py",
             "python -m unittest discover -s evals/tests -v",
             "python evals/personal-hybrid-intent/tests/test_score_intent.py",
             "python -m unittest discover -s skills/cca/assets/hybrid-workspace/tests -v",
@@ -84,6 +86,11 @@ class ReleaseReadinessTests(unittest.TestCase):
             "CHANGELOG.md",
             "Unreleased",
             "exact PR head",
+            "Semantic Versioning",
+            "MAJOR",
+            "MINOR",
+            "PATCH",
+            "metadata.version",
         ):
             self.assertIn(required, contributing, required)
 
