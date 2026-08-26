@@ -11,6 +11,7 @@ import sys
 
 
 SKILL_PATH = "skills/cca/SKILL.md"
+SPEC_PATH = "skills/cca/references/core/spec.md"
 CONTRACT_SENSITIVE_PREFIXES = (
     "skills/cca/references/",
     "skills/cca/assets/",
@@ -19,6 +20,7 @@ SEMVER_RE = re.compile(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
 VERSION_RE = re.compile(
     r"(?ms)^metadata:\s*$.*?^\s+version:\s*[\"']([^\"']+)[\"']\s*$"
 )
+SPEC_VERSION_RE = re.compile(r"\*\*Version\s+((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))\*\*")
 
 
 class VersionGateError(RuntimeError):
@@ -55,6 +57,15 @@ def parse_version(skill_text: str, source: str) -> str:
     return version
 
 
+def parse_historical_spec_version(spec_text: str, source: str) -> str:
+    match = SPEC_VERSION_RE.search(spec_text)
+    if not match:
+        raise VersionGateError(
+            f"{source}: cannot recover historical CCA version; expected '**Version x.y.z**'"
+        )
+    return match.group(1)
+
+
 def semver_tuple(version: str) -> tuple[int, int, int]:
     return tuple(int(part) for part in version.split("."))  # type: ignore[return-value]
 
@@ -78,7 +89,7 @@ def resolve_base(repo: Path, explicit: str | None) -> str | None:
     if ref_name and ref_name != "main":
         candidates.append("origin/main")
 
-    candidates.extend(("HEAD^",))
+    candidates.append("HEAD^")
 
     for candidate in candidates:
         if ref_exists(repo, candidate):
@@ -97,8 +108,24 @@ def is_contract_sensitive(path: str) -> bool:
 
 
 def version_at(repo: Path, ref: str) -> str:
-    result = run_git(repo, "show", f"{ref}:{SKILL_PATH}")
-    return parse_version(result.stdout, f"{ref}:{SKILL_PATH}")
+    skill_result = run_git(repo, "show", f"{ref}:{SKILL_PATH}", check=False)
+    if skill_result.returncode != 0:
+        raise VersionGateError(
+            f"{ref}: historical baseline is missing {SKILL_PATH}; cannot determine CCA version"
+        )
+
+    try:
+        return parse_version(skill_result.stdout, f"{ref}:{SKILL_PATH}")
+    except VersionGateError as skill_error:
+        if "metadata.version is required" not in str(skill_error):
+            raise
+
+    spec_result = run_git(repo, "show", f"{ref}:{SPEC_PATH}", check=False)
+    if spec_result.returncode != 0:
+        raise VersionGateError(
+            f"{ref}: historical SKILL.md has no metadata.version and {SPEC_PATH} is unavailable"
+        )
+    return parse_historical_spec_version(spec_result.stdout, f"{ref}:{SPEC_PATH}")
 
 
 def validate(repo: Path, base: str | None) -> int:
