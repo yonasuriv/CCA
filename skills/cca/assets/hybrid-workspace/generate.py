@@ -54,21 +54,27 @@ def slots_by_key(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
 def gen_paths(data: dict[str, Any]) -> str:
     lines = [
-        "#!/usr/bin/env bash",
-        "# GENERATED from WORKSPACE.yaml — do not edit. Source this file.",
+        "# GENERATED from WORKSPACE.yaml — do not edit. Source this file (bash or zsh).",
         "# WS_BINDING contains canonical relative bindings; WS contains absolute paths.",
-        'WS_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"',
-        "declare -Arg WS_BINDING=(",
+        'if [ -n "${BASH_SOURCE:-}" ]; then',
+        '  _ws_self="${BASH_SOURCE[0]}"',
+        'elif [ -n "${ZSH_VERSION:-}" ]; then',
+        '  _ws_self="${(%):-%x}"',
+        "else",
+        '  _ws_self="$0"',
+        "fi",
+        'WS_ROOT="$(cd -- "$(dirname -- "$_ws_self")" && pwd)"',
+        "unset _ws_self",
+        "declare -Ar WS_BINDING=(",
     ]
     for slot in data["slots"]:
         lines.append(f"  [{shlex.quote(slot['key'])}]={shlex.quote(slot['binding'])}")
+    lines.append(")")
+    lines.append("declare -Ar WS=(")
+    for slot in data["slots"]:
+        lines.append(f'  [{shlex.quote(slot["key"])}]="${{WS_ROOT}}/{slot["binding"]}"')
     lines.extend([
         ")",
-        "declare -Ag WS=()",
-        'for _ws_key in "${!WS_BINDING[@]}"; do',
-        '  WS["${_ws_key}"]="${WS_ROOT}/${WS_BINDING[${_ws_key}]}"',
-        "done",
-        "unset _ws_key",
         f'export WS_SCHEMA_VERSION={shlex.quote(str(data["schema_version"]))}',
         "",
     ])

@@ -59,6 +59,6 @@ When CCA creates, audits, remediates, or lints a consumer:
 
 ## Current version
 
-CCA contract version: **1.1.0**.
+CCA contract version: **1.1.1**.
 
-CCA 1.1.0 includes the backwards-compatible post-1.0 expansion of workspace-architecture audit semantics, detached-boundary portability guidance, and this explicit versioned-contract identity rule.
+CCA 1.1.0 includes the backwards-compatible post-1.0 expansion of workspace-architecture audit semantics, detached-boundary portability guidance, and this explicit versioned-contract identity rule. CCA 1.1.1 is a patch: the Hybrid Workspace Profile's generated `paths.sh` now resolves correctly when sourced from zsh as well as bash (it previously relied on bash-only associative-array key iteration and `BASH_SOURCE`, which failed silently under zsh); the promised `WS`/`WS_BINDING` lookup behavior is unchanged.

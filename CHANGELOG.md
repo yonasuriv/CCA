@@ -4,6 +4,14 @@ This changelog records released CCA milestones and pending user-visible changes.
 
 ## Unreleased
 
+## 1.1.1 - 2026-08-27
+
+Patch: Hybrid Workspace Profile generated-tooling fix, no semantic/policy change.
+
+### Fixed
+
+- Generated `paths.sh` now resolves the workspace root and sources cleanly under zsh as well as bash. It previously used bash-only `BASH_SOURCE` and `${!array[@]}` key iteration, which failed (`bad substitution`) when sourced from zsh. `WS_BINDING`/`WS` are now emitted as fully literal associative-array declarations (no runtime key loop), and the workspace-root probe branches on `BASH_SOURCE`/`ZSH_VERSION`/`$0`. The promised `WS`/`WS_BINDING` lookup behavior is unchanged.
+
 ## 1.1.0 - 2026-08-26
 
 Backwards-compatible expansion of the CCA interoperability contract and installed skill behavior.
