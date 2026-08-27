@@ -4,6 +4,18 @@ This changelog records released CCA milestones and pending user-visible changes.
 
 ## Unreleased
 
+## 1.2.0 - 2026-08-27
+
+Minor: makes CCA's versioned-conformance-identity rule (1.1.0) enforceable for the Hybrid Workspace Profile instead of only documented.
+
+### Added
+
+- `WORKSPACE.yaml` gained an optional `cca.specification` field declaring the CCA contract version a workspace targets.
+- `audit.py` now checks that field against the installed `skills/cca/SKILL.md` version on every `--target` audit: same major and installed-at-least-declared is compatible; a missing field warns without failing existing workspaces; a major mismatch or an installed version older than declared fails.
+- The bundled `WORKSPACE.yaml` template now declares `cca.specification: "1.2.0"`, so `--init` scaffolds a compatibility declaration by default.
+
+This directly replaces the anti-pattern versioning.md already forbade: pinning a CCA source commit/tree/blob hash as a consumer's compatibility gate. `audit.py` never reads or requires a CCA repository revision to determine compatibility — only the declared and installed SemVer.
+
 ## 1.1.1 - 2026-08-27
 
 Patch: Hybrid Workspace Profile generated-tooling fix, no semantic/policy change.

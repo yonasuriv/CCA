@@ -19,6 +19,34 @@ import yaml
 from schema import load_schema, resolves_within, validate_binding_text, validate_key
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
+INSTALLED_SKILL_MD = PACKAGE_ROOT.parent.parent / "SKILL.md"
+
+CCA_SEMVER_RE = re.compile(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
+CCA_SKILL_VERSION_RE = re.compile(r'(?ms)^metadata:\s*$.*?^\s+version:\s*["\']([^"\']+)["\']\s*$')
+
+
+def cca_semver_tuple(version: str) -> tuple[int, int, int]:
+    return tuple(int(part) for part in version.split("."))  # type: ignore[return-value]
+
+
+def resolve_installed_cca_version() -> str:
+    """Read the installed CCA contract version from the sibling skill's SKILL.md.
+
+    This never reads a repository commit/tree/blob identity: per
+    references/core/versioning.md, CCA conformance identity is the SemVer
+    contract version, not a source-control revision.
+    """
+    text = INSTALLED_SKILL_MD.read_text(encoding="utf-8")
+    if not text.startswith("---\n"):
+        raise ValueError(f"{INSTALLED_SKILL_MD}: SKILL.md is missing YAML frontmatter")
+    frontmatter = text.split("---", 2)[1]
+    match = CCA_SKILL_VERSION_RE.search(frontmatter)
+    if not match:
+        raise ValueError(f"{INSTALLED_SKILL_MD}: metadata.version is required")
+    version = match.group(1)
+    if not CCA_SEMVER_RE.fullmatch(version):
+        raise ValueError(f"{INSTALLED_SKILL_MD}: metadata.version must be stable SemVer x.y.z, got {version!r}")
+    return version
 
 SLOT_FIELDS = (
     "id", "category", "key", "binding", "arity", "mutability", "indexed",
@@ -324,6 +352,29 @@ def validate_schema(data: dict[str, Any], root: Path = PACKAGE_ROOT) -> tuple[li
         fail("version", f"status must be 'frozen', got {data.get('status')!r}")
     if "version" in data:
         fail("version", "redundant top-level 'version' is forbidden; use schema_version only")
+
+    cca_contract = data.get("cca")
+    if cca_contract is None:
+        warn("cca-version", "workspace does not declare cca.specification; CCA contract-version compatibility cannot be checked (see references/core/versioning.md). Add `cca: {specification: \"<installed version>\"}` to WORKSPACE.yaml.")
+    elif not isinstance(cca_contract, dict) or "specification" not in cca_contract:
+        fail("cca-version", "cca.specification is required when a 'cca' block is present")
+    else:
+        declared = cca_contract["specification"]
+        if not isinstance(declared, str) or not CCA_SEMVER_RE.fullmatch(declared):
+            fail("cca-version", f"cca.specification must be a stable SemVer string, got {declared!r}")
+        else:
+            try:
+                installed = resolve_installed_cca_version()
+            except (OSError, ValueError) as exc:
+                warn("cca-version", f"could not resolve installed CCA contract version to check against: {exc}")
+            else:
+                declared_t, installed_t = cca_semver_tuple(declared), cca_semver_tuple(installed)
+                if declared_t[0] != installed_t[0]:
+                    fail("cca-version", f"workspace targets CCA {declared} (major {declared_t[0]}) but installed CCA is {installed} (major {installed_t[0]}); a major version difference is a breaking incompatibility, not something this audit can wave through")
+                elif installed_t < declared_t:
+                    fail("cca-version", f"workspace targets CCA {declared} but the installed CCA is older ({installed}); upgrade the installed cca skill before this workspace can be validated against what it declares")
+                # installed_t >= declared_t with the same major: compatible, no fail/warn.
+
     if data.get("identifier", {}).get("id") != "ordinal/display metadata only; never a downstream reference":
         fail("identifier", "identifier.id must explicitly be ordinal/display-only")
     if data.get("policy_defaults", {}).get("unspecified") != "prohibited":

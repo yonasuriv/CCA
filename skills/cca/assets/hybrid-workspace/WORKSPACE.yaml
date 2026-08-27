@@ -10,6 +10,15 @@
 schema_version: 2
 status: frozen
 
+# ── CCA contract identity ────────────────────────────────────────────────────
+# Declares the CCA contract SemVer this workspace targets. Compatibility is
+# checked by version only (see references/core/versioning.md) — never by
+# pinning a CCA repository commit/tree/blob hash as conformance identity. A
+# consumer MAY separately record a source revision as non-normative
+# provenance/evidence, but it must never gate compatibility.
+cca:
+  specification: "1.2.0"
+
 # ── vocabularies ────────────────────────────────────────────────────────────
 # Every column value is drawn from these closed sets. A generator or validator
 # rejects any value not listed here.

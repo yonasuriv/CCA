@@ -31,10 +31,12 @@ Consumers SHOULD record only the version required by their local contract, for e
 
 ```yaml
 cca:
-  specification: 1.1.0
+  specification: "1.2.0"
 ```
 
 They SHOULD NOT add a CCA source revision to the active conformance identity. Historical evidence MAY separately note which CCA checkout was inspected.
+
+For the Hybrid Workspace Profile specifically, this is not just a documentation convention: `WORKSPACE.yaml`'s optional `cca.specification` field is read and checked by `audit.py` against the installed `skills/cca/SKILL.md` version on every `--target` audit. Same major and installed-at-least-declared is compatible; a missing field warns without failing (so existing workspaces are not broken by adopting this rule); a major mismatch or an installed version older than declared fails the audit. `audit.py` never reads or requires a CCA repository commit, tree, or blob identity to determine this.
 
 ## SemVer policy
 
@@ -59,6 +61,6 @@ When CCA creates, audits, remediates, or lints a consumer:
 
 ## Current version
 
-CCA contract version: **1.1.1**.
+CCA contract version: **1.2.0**.
 
-CCA 1.1.0 includes the backwards-compatible post-1.0 expansion of workspace-architecture audit semantics, detached-boundary portability guidance, and this explicit versioned-contract identity rule. CCA 1.1.1 is a patch: the Hybrid Workspace Profile's generated `paths.sh` now resolves correctly when sourced from zsh as well as bash (it previously relied on bash-only associative-array key iteration and `BASH_SOURCE`, which failed silently under zsh); the promised `WS`/`WS_BINDING` lookup behavior is unchanged.
+CCA 1.1.0 includes the backwards-compatible post-1.0 expansion of workspace-architecture audit semantics, detached-boundary portability guidance, and this explicit versioned-contract identity rule. CCA 1.1.1 is a patch: the Hybrid Workspace Profile's generated `paths.sh` now resolves correctly when sourced from zsh as well as bash (it previously relied on bash-only associative-array key iteration and `BASH_SOURCE`, which failed silently under zsh); the promised `WS`/`WS_BINDING` lookup behavior is unchanged. CCA 1.2.0 makes the versioned-identity rule above enforceable rather than only documented: the Hybrid Workspace Profile's `WORKSPACE.yaml` now carries an optional `cca.specification` field declaring the target CCA contract version, and `audit.py` checks it against the installed `SKILL.md` version (same-major and installed-version-at-least-declared is compatible; a missing declaration warns rather than fails; a major mismatch or an installed version older than declared fails). This gives consumers a real version-based compatibility check to depend on instead of pinning a CCA source commit/tree/blob hash, which `audit.py` never reads or requires.
