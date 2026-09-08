@@ -14,7 +14,7 @@ Do not label a workspace upstream-native ICM unless its complete applicable upst
 - **setup** on native ICM — run the workspace's native onboarding/setup contract.
 - **status** on native staged ICM — preserve upstream status semantics.
 - **hybrid profile init** — after profile selection, initialize the explicit target with bundled target-safe tooling.
-- **rebuild / migrate** — inspect first; preserve authorities; use an explicit migration map before destructive changes.
+- **rebuild / migrate** — inspect first; preserve authorities; load [`reference-integrity.md`](reference-integrity.md), verify move safety, and use an explicit migration map before destructive changes.
 
 ## Phase 1: Discovery
 
@@ -45,6 +45,7 @@ Map the discovered environment through CCA without replacing its authorities.
 6. Check dependencies for cycles where one-way flow is required.
 7. Verify every produced artifact/state has an intended consumer or durable purpose.
 8. Preserve upstream-native contracts exactly where they are part of the upstream conformance surface.
+9. When existing paths may move, enumerate in-boundary, sibling-relative, symlink, and bounded known external referrers before proposing the migration; do not classify apparent disuse as move safety.
 
 The CCA interoperability primitive is:
 
@@ -142,13 +143,25 @@ When the workspace receives native `setup`:
 8. scan for unresolved/orphaned configuration;
 9. complete setup only after current upstream acceptance passes.
 
+## Migration/rebuild safety
+
+When rebuild/migrate changes existing paths, [`reference-integrity.md`](reference-integrity.md) is mandatory before the approval/execution boundary.
+
+1. Add referrers to the migration map: `current path -> function/authority -> destination -> action -> referrers -> compatibility impact`.
+2. Check each destination case-folded before copy/rename so case-insensitive aliases cannot silently overwrite an existing path.
+3. Treat live referrers as blockers unless the same change updates them or intentionally preserves compatibility.
+4. Prefer copy -> verify parity -> remove rather than move-and-hope for substantive existing content.
+5. After migration, re-run every pre-move reference expected to survive before calling the restructure valid.
+
+These mechanics do not create a CCA-specific fork of native ICM. For upstream-native ICM, current upstream restructure acceptance remains the floor.
+
 ## Phase 5: Validation and repair
 
 Validate the claim actually being made.
 
 ### Upstream-native ICM
 
-Current upstream acceptance is the floor. Validate the complete applicable surface including routing, contracts, naming, handoffs, dependency direction, selective loading, canonical sources, setup/status, placeholders/conditionals, tooling, checkpoints/audits/value validation, docs-over-outputs, shared constants, quality guardrails, and workspace-builder-equivalent acceptance.
+Current upstream acceptance is the floor. Validate the complete applicable surface including routing, contracts, naming, handoffs, dependency direction, selective loading, canonical sources, setup/status, placeholders/conditionals, tooling, checkpoints/audits/value validation, docs-over-outputs, shared constants, quality guardrails, current restructure/reference-integrity behavior, and workspace-builder-equivalent acceptance.
 
 Repair failures before describing the generated native workspace as ready.
 
@@ -180,7 +193,7 @@ Validate only the contracts intentionally adopted. Do not fail the target for mi
 
 ## Status execution
 
-For upstream-native staged ICM, preserve current ICM status semantics and presentation. Do not infer completion from chat history or mere directory existence.
+For upstream-native staged ICM, preserve current ICM status semantics and presentation. COMPLETE requires a real output artifact; a placeholder whose only purpose is to keep an empty directory present does not count. Do not infer completion from chat history or mere directory existence.
 
 For the Hybrid Workspace Profile or a custom CCA-conformant target, status is governed by its declared state/binding semantics; do not invent native ICM status behavior.
 
@@ -191,6 +204,8 @@ After applicable upstream/profile acceptance passes, perform the CCA portability
 1. **Orient** from durable files without prior chat memory.
 2. **Act** through one representative route using resolved authority/semantic bindings.
 3. **Report** changes, outputs, remaining work, and ambiguity.
+
+For restructures, also verify pre-existing references expected to survive still resolve after the move.
 
 This supplements upstream/profile acceptance; it never converts a failed native/profile contract into a pass.
 
