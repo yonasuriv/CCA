@@ -45,9 +45,12 @@ System-map construction can be expensive. Work in slices and stop for human revi
 2. **Objects**: create source-cited noun cards. Mark verified only when citations/revision evidence support the claim.
 3. **Processes**: add only recurring movements that can be evidenced. State input → movement → output and link affected objects.
 4. **Effects**: create the change-impact index. `Hits` and `Does not hit` should capture first-order boundaries, not invented waterfalls.
-5. **Re-verify**: re-open source for load-bearing claims, especially impact boundaries, after the initial fill or material subject changes.
+5. **Inbound/reverse walk**: for important mapped objects, determine what known consumers **outside** the subject tree point into them. Ask the owner and inspect bounded known integration surfaces such as configs, sibling/parent repositories, issue/project automation, agents, harnesses, CI/deploy definitions, and scheduled jobs. Record each external consumer on the card it lands on; absence from the subject tree is not evidence that no inbound dependency exists.
+6. **Re-verify**: re-open source for load-bearing claims, especially impact boundaries and inbound dependencies, after the initial fill or material subject changes.
 
 A person does not have to approve every trivial file; the gate exists before costly/speculative expansion. Linear verification may continue when evidence is deterministic.
+
+`effects/CONTEXT.md` answers the outward question: “if I change X, what inside the mapped subject moves?” The inbound/reverse walk answers the complementary question: “what outside this tree points into X?” Keep those directions distinct so a useful internal impact index does not create false confidence about external consumers.
 
 ## Card requirements
 
@@ -58,7 +61,7 @@ A useful object/process card identifies:
 - source-of-truth path(s) and revision/verification context when available;
 - connected objects/processes;
 - **Hits** and **Does not hit** for useful first-order change boundaries;
-- who/what reads or writes it;
+- who/what reads or writes it, including verified inbound external consumers where material;
 - inference versus observed fact.
 
 Do not mark a card verified without source evidence. Do not cite another explanatory card as the final source when the real code/file is available.
@@ -72,7 +75,8 @@ A fresh agent with no chat memory should be able to:
 3. open one card and land on the real source it cites;
 4. answer one stated change-impact question from `effects/CONTEXT.md` plus the minimum relevant cards;
 5. state both what the change hits and an obvious nearby thing it does **not** hit;
-6. identify which claims are inferred or stale and need re-verification.
+6. identify known material inbound consumers from outside the subject tree, or state explicitly that the bounded reverse walk did not verify any;
+7. identify which claims are inferred or stale and need re-verification.
 
 If the agent must load the whole map or the map merely duplicates source files, split/shrink it rather than adding a longer reading guide.
 
@@ -84,4 +88,6 @@ If the agent must load the whole map or the map merely duplicates source files, 
 - treating ghost/leftover material as live;
 - verified labels without evidence;
 - unlimited transitive impact claims;
+- an outward-only effects index that ignores what points into the tree from outside;
+- claiming there are no external consumers merely because no internal file names them;
 - a map that becomes more expensive to maintain than direct navigation.
