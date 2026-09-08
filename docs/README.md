@@ -46,6 +46,7 @@ skills/cca/
 │   │   ├── forms.md
 │   │   ├── methods.md
 │   │   ├── workspace-builder.md
+│   │   ├── reference-integrity.md
 │   │   ├── native-icm-setup.md
 │   │   ├── hybrid-workspace.md
 │   │   └── system-map.md
