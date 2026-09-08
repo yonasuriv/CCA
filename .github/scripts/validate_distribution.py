@@ -49,6 +49,7 @@ required = [
     "references/architect/forms.md",
     "references/architect/methods.md",
     "references/architect/workspace-builder.md",
+    "references/architect/reference-integrity.md",
     "references/architect/native-icm-setup.md",
     "references/architect/hybrid-workspace.md",
     "references/architect/system-map.md",
