@@ -84,9 +84,11 @@ Native ICM validation includes, where applicable:
 6. cross-reference integrity and an acyclic one-way dependency graph;
 7. selective section routing and canonical-source discipline;
 8. contract-file purity;
-9. current `setup` and `status` trigger behavior;
+9. current `setup` and `status` trigger behavior, including real-artifact versus placeholder-only completion semantics;
 10. current questionnaire, placeholder, conditional-placeholder, tooling, bundled-skill, checkpoint, audit, validation, documentation, shared-constant, size, formatting, and readability requirements where applicable;
-11. workspace-builder-equivalent end-to-end validation before a generated workspace is described as ready.
+11. current restructure move-safety behavior where path-changing work applies: pre-proposal referrer discovery (including sibling-relative paths, symlinks, and bounded known external consumers), case-fold destination collision checks, copy-verify-remove migration discipline, and post-move verification of references expected to survive;
+12. current System Map inbound/reverse-walk behavior where that form applies, so known consumers outside the mapped tree are not hidden by an outward-only effects index;
+13. workspace-builder-equivalent end-to-end validation before a generated workspace is described as ready.
 
 CCA extensions must be ignorable by an ICM-only consumer. A native ICM root may be nested inside an outer PARA, BASB-guided, coding, client, hybrid, or CCA-conformant workspace; the outer boundary may organize where it lives but must not rewrite native ICM internals merely for uniformity.
 

@@ -36,7 +36,7 @@ Before setup is complete verify both directions:
 
 `setup` is an inherited native behavior implemented by Architect through `workspace-builder.md`. It must collect the generated questionnaire, hydrate direct/derived/default values, resolve conditional sections/stages, verify no unresolved placeholders remain, and avoid repeating setup after successful configuration.
 
-`status` is also inherited runtime behavior: scan real stage outputs, ignore `.gitkeep`, and render COMPLETE/PENDING state. Do not infer status from plans or conversation history.
+`status` is also inherited runtime behavior: scan real stage outputs and render COMPLETE/PENDING from actual output artifacts. A placeholder whose only purpose is to keep an otherwise empty directory present, including `.gitkeep`, does not count as an artifact. Do not infer status from plans, conversation history, or directory existence alone.
 
 ## Acceptance
 

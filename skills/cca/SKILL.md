@@ -2,7 +2,7 @@
 name: cca
 description: Use to design or restructure context systems, audit workspace context/routing architecture, create or set up native or hybrid workspaces, scaffold portable routing, synchronize navigation, ingest or query maintained knowledge, validate CCA/ICM/LLM-Wiki compatibility, or advise on engineering judgment, software engineering principle/framework/methodology/process trade-offs, and security, autonomy, model, and context decisions. Supports existing code repositories, human knowledge systems, ICM, LLM Wiki, PARA, Zettelkasten, BASB/CODE, delivery methods, and hybrid workspaces without replacing their native authorities. Trigger whenever a request touches how context, knowledge, or navigation is structured for humans and agents together, even when the user never names CCA. Do not use for ordinary implementation, coding, editing, or project work when no context, knowledge, compatibility, routing, or advisory operation is involved.
 metadata:
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 # CCA
@@ -35,9 +35,9 @@ Do not load every mode or reference. Progressive disclosure is part of the archi
 
 A workspace architecture audit or review is compound architecture work: use `architect` to preserve the requested boundary, inspect nested boundaries, evaluate navigation/context quality, and decide whether remediation is warranted. Lint is claim validation; use `lint` directly only when the user is asking whether specific upstream/CCA/profile claims pass, or delegate to it from Architect for the claim-validation portion of a broader audit. A child-boundary lint pass never completes a parent/workspace architecture audit.
 
-For workspace creation or material rebuild, Architect lazily loads `references/architect/workspace-builder.md`. For the optional CCA Hybrid Workspace Profile, Architect additionally loads `references/architect/hybrid-workspace.md`; its complete reviewed reference implementation is bundled under `assets/hybrid-workspace/`. This profile is not an eighth mode.
+For workspace creation or material rebuild, Architect lazily loads `references/architect/workspace-builder.md`. For path-changing restructures/migrations, Architect additionally loads `references/architect/reference-integrity.md` before the approval/execution boundary. For the optional CCA Hybrid Workspace Profile, Architect additionally loads `references/architect/hybrid-workspace.md`; its complete reviewed reference implementation is bundled under `assets/hybrid-workspace/`. This profile is not an eighth mode.
 
-For native ICM (Interpretable Context Methodology), the builder performs the inherited discovery, mapping, scaffolding, questionnaire, validation/repair, `setup`, and `status` behaviors while current upstream ICM remains the acceptance authority.
+For native ICM (Interpretable Context Methodology), the builder performs the inherited discovery, mapping, scaffolding, questionnaire, validation/repair, `setup`, `status`, and current restructure-safety behaviors while current upstream ICM remains the acceptance authority.
 
 ## Shared authority
 
@@ -58,7 +58,7 @@ These files are inside the installable skill so runtime behavior never depends o
 
 ## Contract version
 
-The installed CCA skill and normative CCA interoperability contract share one SemVer identity. The canonical contract version is `metadata.version` in this file; current version is **1.2.0**. Consumer CCA identity is version-based. Repository/source revisions are optional provenance and never substitute for the CCA contract version; see `references/core/versioning.md`.
+The installed CCA skill and normative CCA interoperability contract share one SemVer identity. The canonical contract version is `metadata.version` in this file; current version is **1.2.1**. Consumer CCA identity is version-based. Repository/source revisions are optional provenance and never substitute for the CCA contract version; see `references/core/versioning.md`.
 
 ## Portable distribution boundary
 
@@ -74,7 +74,7 @@ Keep these domains separate:
 
 - `references/core/` owns normative CCA semantics shared by all modes plus compatibility/provenance maps for inherited upstream behavior.
 - `references/advisor/` owns engineering judgment and methodology priors. Its seven references remain independent and are never folded into architect references.
-- `references/architect/` owns workspace forms, builder/onboarding behavior, boundaries, structural composition, optional profile definitions, and migration design.
+- `references/architect/` owns workspace forms, builder/onboarding behavior, boundaries, structural composition, restructure reference integrity, optional profile definitions, and migration design.
 - `references/operations/` owns focused operational procedures.
 - `assets/` owns skill-local templates, executable/reference tooling, and other portable implementation resources already used by the current package topology.
 
@@ -92,7 +92,7 @@ Architect mode may consult advisor references when a structural decision require
 8. Native ICM create/setup/status requests use Architect's `workspace-builder.md`; they do not require the upstream workspace-builder checkout at runtime, although upstream remains the semantic/acceptance authority.
 9. The optional Hybrid Workspace Profile is CCA-owned and profile-conformant only when its bundled contract passes. Its default bindings are not semantic identities.
 10. Do not create structure merely because a template exists.
-11. For destructive restructuring, surface the migration map before moves, merges, renames, or deletions unless the user has explicitly authorized direct remediation.
+11. For destructive or path-changing restructuring, load `references/architect/reference-integrity.md`, verify referrers and destination safety, then surface the evidence-bearing migration map before moves, merges, renames, archives, or deletions unless the user has explicitly authorized direct remediation.
 12. Use harness-native adapter files only where needed; portable guidance should remain canonical in the workspace's chosen portable authority.
 13. When uncertainty crosses a hard-stop boundary, use `references/advisor/escalation-triggers.md`.
 14. Preserve the user-requested audit boundary: inspecting or validating a nested child does not silently narrow a parent/workspace audit.

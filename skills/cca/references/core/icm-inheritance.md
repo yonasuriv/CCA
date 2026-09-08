@@ -6,6 +6,8 @@ For a workspace that claims **upstream-native ICM**, the current upstream ICM re
 
 CCA may extend an ICM workspace only when the extension is additive and does not weaken, replace, rename, or silently reinterpret native ICM semantics.
 
+Mapping provenance: the restructure/reference-integrity additions below were revalidated against upstream `RinDig/icm-architect` commit `e16cafe6a664dcf6d787a726b452adba77d913f4`. That revision is evidence for this mapping, not ICM identity and not CCA conformance identity; current upstream authority still wins.
+
 ## Provenance classes
 
 - **Inherited / preserved**: an ICM capability remains available with the same native semantics.
@@ -35,7 +37,7 @@ Outside upstream-native ICM, these layer roles are **not universal CCA requireme
 | Canonical sources | Preserve one canonical home per substantive fact/rule | Also aligns with CCA's independent one-fact-one-home principle. |
 | Contract-file routing purity | Keep native routers/contracts compact | Apply only to routers/contracts the target actually has. |
 | Tool prerequisites | Preserve applicable setup/verification guidance | Local implementation decision. |
-| `setup` / `status` triggers | Preserve current native behavior | Do not export native trigger semantics into non-native targets unless explicitly adopted. |
+| `setup` / `status` triggers | Preserve current native behavior, including artifact-vs-placeholder status semantics | Do not export native trigger semantics into non-native targets unless explicitly adopted. |
 | Questionnaire design | Preserve current applicable upstream behavior | Local/profile onboarding contract decides. |
 | Bundled skills | Preserve applicable native behavior | Agent Skills/package strategy belongs to the adopting target. |
 | Specs as contracts | Preserve upstream WHAT/WHEN discipline where applicable | Optional ICM-derived workflow pattern. |
@@ -46,6 +48,11 @@ Outside upstream-native ICM, these layer roles are **not universal CCA requireme
 | Shared constants | Preserve where applicable | Local implementation decision. |
 | Quality guardrails | Check current upstream rules | Do not impose ICM formatting/size rules on generic CCA-compatible workspaces. |
 | Placeholder syntax/coverage | Preserve current upstream syntax and coverage | Local/profile configuration contract decides. |
+| Pre-move reference integrity | Before proposing path-changing/destructive restructure work, enumerate in-workspace, sibling-relative, symlink, and bounded known external referrers; apparent disuse is not proof of safety | Reusable safety mechanic for CCA-owned/custom restructures when path changes are in scope. |
+| Case-fold destination collision | Check intended destinations case-folded before copy/rename so case-insensitive aliases cannot overwrite an existing path | Reusable filesystem-safety mechanic; does not make a concrete path semantic identity. |
+| Copy-verify-remove migration | For substantive moves/renames, copy, verify parity, then remove the source; update/preserve live referrers in the same approved change | Reusable recoverability mechanic when migration mutates existing content. |
+| Post-move reference preservation | Re-run references that resolved before the move and were expected to survive | Reusable restructure verification mechanic. |
+| System Map inbound consumers | Walk change-impact maps backward to identify bounded known external consumers that point into the mapped tree | Reusable System Map hardening; does not require every CCA target to have a System Map. |
 
 ## Workspace-builder behavior
 
@@ -69,13 +76,23 @@ When a form is upstream-native ICM, upstream constraints win. When it merely bor
 
 ## Build and restructure behavior
 
-CCA Architect retains construction and restructuring workflows: inspect first, preserve authorities, map semantics before paths, require explicit migration decisions for destructive changes, and validate the claims actually made.
+CCA Architect retains construction and restructuring workflows: inspect first, preserve authorities, map semantics before paths, require reference integrity before destructive/path-changing proposals, require explicit migration decisions, and validate the claims actually made.
+
+For upstream-native ICM restructures, the inherited current floor includes pre-move referrer discovery, case-fold collision checks, copy-verify-remove migration for substantive existing content, and post-move verification that surviving references still resolve. `../architect/reference-integrity.md` packages these mechanics for Architect without redefining upstream authority.
 
 Where a behavior is borrowed from ICM, CCA may acknowledge that provenance without converting it into a universal CCA conformance requirement.
+
+## System Map reverse walk
+
+For current upstream-native ICM System Map behavior, outward `effects/` reasoning is not sufficient to establish complete change impact. Known consumers outside the mapped tree can point inward without leaving evidence inside the subject.
+
+CCA therefore preserves the inbound/reverse-walk behavior in `../architect/system-map.md`: inspect bounded known external consumers such as configs, sibling/parent repositories, scheduled jobs, agents, harnesses, CI/deploy definitions, and issue/project automation, and record verified inbound dependencies on the card they land on.
 
 ## Walk validation
 
 CCA retains a fresh-agent walk test as a portability check for intentionally structured CCA-conformant/profile targets. It is inspired by ICM's durable routing properties but is not equivalent to native ICM validation.
+
+For restructures, a passing walk also requires every pre-move reference expected to survive to resolve after the migration.
 
 Passing the CCA walk test never converts an upstream ICM failure into a pass, and generic CCA compatibility alone does not require an ICM-shaped Layer 0/1/2 skeleton.
 

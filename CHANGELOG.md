@@ -4,6 +4,21 @@ This changelog records released CCA milestones and pending user-visible changes.
 
 ## Unreleased
 
+## 1.2.1 - 2026-09-08
+
+Patch: restores CCA's already-promised current-upstream ICM compatibility floor after upstream `icm-architect` hardened restructure safety in `e16cafe6a664dcf6d787a726b452adba77d913f4` without changing its core invariants.
+
+### Fixed
+
+- Architect restructuring now performs a pre-proposal reference-integrity gate over in-boundary references, sibling `../` paths, symlinks, and bounded known external consumers; apparent disuse is no longer treated as move-safety evidence.
+- Path-changing migrations check destinations case-folded before copy/rename, then use copy → parity verification → remove for substantive existing content and re-run surviving pre-move references afterward.
+- System Maps now include an inbound/reverse dependency walk for known consumers outside the mapped tree, including configs, sibling/parent repositories, scheduled jobs, agents/harnesses, CI/deploy definitions, and issue/project automation where material.
+- Native ICM status semantics now distinguish real output artifacts from placeholder-only files generally; `.gitkeep` remains an example rather than the semantic definition.
+- The ICM parity capability suite gained explicit coverage for pre-move reference integrity, case-fold collisions, copy-verify-remove migration, and inbound external consumers.
+- Added `references/architect/reference-integrity.md` as a lazy move-safety reference; upstream ICM remains the authority for upstream-native boundaries.
+
+No new CCA semantic identity or Hybrid Workspace Profile behavior is introduced.
+
 ## 1.2.0 - 2026-08-27
 
 Minor: makes CCA's versioned-conformance-identity rule (1.1.0) enforceable for the Hybrid Workspace Profile instead of only documented.
