@@ -117,6 +117,7 @@ CCA distinguishes five composable claims:
 A valid native ICM workspace is CCA-compatible because CCA resolves its native semantics without structural migration through the CCA boundary/role/binding model. That does not make ICM CCA-owned or require the workspace to become CCA-conformant.
 
 See [`compatibility.md`](compatibility.md) for acceptance and swap guarantees and [`versioning.md`](versioning.md) for the versioned identity of CCA compatibility/conformance claims.
+
 ### 4.1 Compatibility vs architecture quality
 
 Compatibility is not an architecture-quality certification.
@@ -236,6 +237,7 @@ This is a CCA portability objective, not a universal requirement that every CCA-
 When a named CCA profile explicitly adopts ICM-style cold-agent behavior, that profile MUST define its own required router/contracts and acceptance surface. The Hybrid Workspace Profile does this through semantic-key bindings and its bundled validation tooling.
 
 ## 8. Maintained-knowledge interoperability
+
 CCA can interoperate with the LLM Wiki idea pattern of persistent maintained synthesis over durable source material without making a wiki mandatory for CCA compatibility.
 
 When a boundary uses or claims compatibility with an LLM Wiki-style maintained-knowledge pattern, it SHOULD provide:
@@ -356,6 +358,7 @@ At minimum `lint` supports:
 A missing optional CCA convention MAY be reported as a hardening opportunity but MUST NOT be reported as an upstream compatibility failure.
 
 ## 15. CCA walk test
+
 For intentionally structured CCA-conformant workspaces, the portability walk test is:
 
 > A fresh agent with no prior chat memory can orient, perform a representative operation, and report status using durable workspace files alone.
