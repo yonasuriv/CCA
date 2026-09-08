@@ -2,7 +2,7 @@
 
 Design the smallest filesystem/context architecture that makes the work navigable, durable, human-understandable, and agent-agnostic.
 
-Read `../core/spec.md` and `core.md` before designing or auditing. Read `forms.md` only when choosing a workspace form. Read `workspace-builder.md` when the request is to create, initialize, set up, report status for, or materially rebuild a workspace. Read `methods.md` when the request involves PARA, Zettelkasten, BASB/CODE, second brains, PKM, LLM Wiki/ICM composition, or another hybrid knowledge-work architecture. Read `hybrid-workspace.md` only when the optional CCA Hybrid Workspace Profile is selected or detected. Read `../core/adapters.md` only when a harness-specific adapter is needed.
+Read `../core/spec.md` and `core.md` before designing or auditing. Read `forms.md` only when choosing a workspace form. Read `workspace-builder.md` when the request is to create, initialize, set up, report status for, or materially rebuild a workspace. Read `reference-integrity.md` before any restructure or migration that can move, rename, merge, archive, or delete existing content. Read `methods.md` when the request involves PARA, Zettelkasten, BASB/CODE, second brains, PKM, LLM Wiki/ICM composition, or another hybrid knowledge-work architecture. Read `hybrid-workspace.md` only when the optional CCA Hybrid Workspace Profile is selected or detected. Read `../core/adapters.md` only when a harness-specific adapter is needed.
 
 ## Role in the CCA skill
 
@@ -17,7 +17,7 @@ It is not a mandatory gateway for already-clear operations. Direct claim lint, i
 - **personal/team hybrid profile** → load `workspace-builder.md`, `methods.md` only if method composition matters, then `hybrid-workspace.md` when the profile fits.
 - **setup** for upstream-native ICM → load `workspace-builder.md` plus `native-icm-setup.md` and preserve current upstream onboarding semantics.
 - **status** for upstream-native ICM → load `workspace-builder.md` and preserve current upstream status behavior.
-- **restructure / migrate** → use Restructure mode; do not conflate migration with scaffold.
+- **restructure / migrate** → use Restructure mode and load `reference-integrity.md`; do not conflate migration with scaffold.
 
 When another CCA capability is needed, delegate semantically by mode name, e.g. `Use scaffold mode to implement the approved structure` or `Use lint mode to validate the claims`. Never depend on removed sibling skill directories.
 
@@ -161,11 +161,12 @@ A `DONE` audit means the requested boundary was actually covered. It MUST NOT me
 2. **Preserve upstream semantics** before proposing CCA hardening.
 3. **Preserve method boundaries** before proposing taxonomy changes.
 4. **Map semantics before paths**: current boundary/role/binding → intended boundary/role/binding.
-5. **Propose a migration map**: current path → function/authority → destination → action → compatibility impact.
-6. **Stop for explicit approval** before moves, merges, renames, or deletions unless the user already authorized direct remediation.
-7. Apply only the approved map and preserve content unless deletion was explicitly approved.
-8. Use sync mode after structural/binding changes.
-9. Validate upstream-native claims, then intentional CCA/profile conformance.
+5. **Verify reference integrity before proposing**: load `reference-integrity.md`; enumerate in-boundary referrers, sibling `../` paths, symlinks, and bounded known external consumers. Check intended destinations case-folded. A path with a live dependency is held unless the same approved change updates or preserves that dependency.
+6. **Propose a migration map**: current path → function/authority → destination → action → referrers → compatibility impact.
+7. **Stop for explicit approval** before moves, merges, renames, archives, or deletions unless the user already authorized direct remediation. Approval is against the reference-integrity evidence, not apparent disuse.
+8. **Migrate recoverably**: copy to the approved destination, verify parity appropriate to the artifact, then remove the original only after parity succeeds and required referrers are updated/preserved. Preserve content unless deletion was explicitly approved.
+9. Use sync mode after structural/binding changes.
+10. Re-run pre-move references that were expected to survive; then validate upstream-native claims and intentional CCA/profile conformance.
 
 ## Hybrid profile target rule
 
@@ -208,6 +209,8 @@ After applicable upstream/profile validation, simulate a fresh consumer with no 
 3. **Report**: state what changed, what was produced, what remains, and what is ambiguous.
 
 For architecture audits, start the walk at the requested audit boundary. Starting inside a child boundary proves only that child's navigation. For independently addressable child boundaries, also perform a detached-orientation walk from that child root when practical.
+
+After a restructure, also verify that every pre-move reference expected to remain valid still resolves. A clean destination tree does not compensate for a broken surviving reference.
 
 If required operating knowledge exists only in chat history or someone's head, improve the durable target rather than explaining around the gap.
 
