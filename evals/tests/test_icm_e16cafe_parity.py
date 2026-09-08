@@ -57,6 +57,18 @@ class ICME16CafeParityTests(unittest.TestCase):
         ):
             self.assertIn(anchor, text, f"ICM inheritance map missing e16cafe capability: {anchor!r}")
 
+    def test_normative_compatibility_surface_includes_current_restructure_floor(self):
+        text = (CORE / "compatibility.md").read_text(encoding="utf-8").lower()
+        for anchor in (
+            "referrer discovery",
+            "case-fold destination collision",
+            "copy-verify-remove",
+            "post-move verification",
+            "inbound/reverse-walk",
+            "placeholder-only",
+        ):
+            self.assertIn(anchor, text, f"normative compatibility surface missing e16cafe behavior: {anchor!r}")
+
     def test_parity_suite_tracks_e16cafe_capabilities(self):
         data = json.loads(PARITY.read_text(encoding="utf-8"))
         by_id = {capability["id"]: capability for capability in data["capabilities"]}
