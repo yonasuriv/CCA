@@ -75,7 +75,7 @@ An upstream-native system can be CCA-compatible without becoming CCA-conformant.
 
 For upstream-native ICM claims, current upstream ICM is the authority. CCA's local compatibility material is a mapping/operational aid, not a fork.
 
-CCA must preserve current applicable ICM requirements such as its native entry/routing layers, exact contract representation, naming, handoff/dependency semantics, selective loading, canonical-source discipline, setup/status behavior, onboarding/placeholder rules, tooling, checkpoints/audits/value validation, shared constants, quality guardrails, and workspace-builder-equivalent acceptance where applicable.
+CCA must preserve current applicable ICM requirements such as its native entry/routing layers, exact contract representation, naming, handoff/dependency semantics, selective loading, canonical-source discipline, setup/status behavior, onboarding/placeholder rules, tooling, checkpoints/audits/value validation, shared constants, quality guardrails, restructure move-safety (including workspace-root durability confirmation, referrer discovery, case-fold checks, copy-verify-remove discipline, and post-move verification), System Map inbound/reverse-walk behavior, and workspace-builder-equivalent acceptance where applicable.
 
 If upstream ICM changes any of these, CCA must re-verify the primary source and adapt/version its mapping rather than freezing stale local wording.
 

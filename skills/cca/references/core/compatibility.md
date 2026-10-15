@@ -70,7 +70,7 @@ Semantic overlap is not permission to force identical directory trees or ownersh
 
 ### 4.1 Upstream-native ICM
 
-CCA recognizes a boundary as **upstream-native: ICM** only when it satisfies the complete applicable current ICM/MWP contract. Upstream ICM `_core/CONVENTIONS.md` is the semantic authority; the upstream workspace-builder validation behavior is the practical acceptance surface for generated workspaces.
+CCA recognizes a boundary as **upstream-native: ICM** only when it satisfies the complete applicable current ICM/MWP contract. Upstream ICM `_core/CONVENTIONS.md` is the canonical pattern-level authority; the icm-architect skill references (`references/core.md`, `references/forms.md`, `references/system-map.md`, `references/reference-integrity.md`) are the effective operational spec for Build, Restructure, and System Map behavior; and the upstream workspace-builder validation behavior is the practical acceptance surface for generated workspaces. Where the two upstream sources diverge, icm-architect's field-tested references take precedence for operational detail; `_core/CONVENTIONS.md` remains authoritative for the foundational ICM pattern.
 
 A native ICM boundary is also **CCA-compatible** by design. CCA does not require renaming stages, rewriting contracts, replacing `CLAUDE.md`, adding CCA metadata, or structurally migrating the workspace before resolving it.
 
@@ -86,7 +86,7 @@ Native ICM validation includes, where applicable:
 8. contract-file purity;
 9. current `setup` and `status` trigger behavior, including real-artifact versus placeholder-only completion semantics;
 10. current questionnaire, placeholder, conditional-placeholder, tooling, bundled-skill, checkpoint, audit, validation, documentation, shared-constant, size, formatting, and readability requirements where applicable;
-11. current restructure move-safety behavior where path-changing work applies: pre-proposal referrer discovery (including sibling-relative paths, symlinks, and bounded known external consumers), case-fold destination collision checks, copy-verify-remove migration discipline, and post-move verification of references expected to survive;
+11. current restructure move-safety behavior where path-changing work applies: workspace-root durability confirmation (workspace root is tracked or backed up before reorganizing), pre-proposal referrer discovery (including sibling-relative paths, symlinks, and bounded known external consumers), case-fold destination collision checks, copy-verify-remove migration discipline, and post-move verification of references expected to survive;
 12. current System Map inbound/reverse-walk behavior where that form applies, so known consumers outside the mapped tree are not hidden by an outward-only effects index;
 13. workspace-builder-equivalent end-to-end validation before a generated workspace is described as ready.
 

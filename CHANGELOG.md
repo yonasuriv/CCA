@@ -4,6 +4,12 @@ This changelog records released CCA milestones and pending user-visible changes.
 
 ## Unreleased
 
+### Changed
+
+- `compatibility.md §4.1`: updated the ICM semantic-authority description to acknowledge that icm-architect's skill references (`references/core.md`, `references/forms.md`, `references/system-map.md`, `references/reference-integrity.md`) are the effective operational spec for Build, Restructure, and System Map behavior; `_core/CONVENTIONS.md` remains the canonical pattern-level authority. Where the two sources diverge on operational detail, icm-architect's field-tested references take precedence.
+- `compatibility.md §4.1 item 11`: extended restructure move-safety to include workspace-root durability confirmation (confirm root is tracked or backed up before reorganizing) as the first gate, ahead of referrer discovery. This reflects the requirement added in icm-architect `references/reference-integrity.md` (2026-08-25).
+- `docs/standards.md`: added restructure move-safety (including workspace-root durability confirmation) and System Map inbound/reverse-walk to the ICM authority prose, keeping the explanatory document consistent with the normative compatibility reference.
+
 ## 1.2.1 - 2026-09-08
 
 Patch: restores CCA's already-promised current-upstream ICM compatibility floor after upstream `icm-architect` hardened restructure safety in `e16cafe6a664dcf6d787a726b452adba77d913f4` without changing its core invariants.
