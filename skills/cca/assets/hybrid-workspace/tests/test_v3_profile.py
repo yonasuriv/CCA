@@ -675,6 +675,11 @@ class ReReviewRegressionTests(unittest.TestCase):
         collected.mkdir(parents=True)
         (collected / "d.md").write_text(clip(original_acquisition_time="2024-13-45"), encoding="utf-8")
         self.assertNotEqual(audit(target).returncode, 0)
+        (collected / "d.md").write_text("---\nprovenance:\n  origin: o\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n  original_acquisition_time: 2026-02-30\n---\nb\n", encoding="utf-8")
+        result = audit(target)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("d.md: invalid provenance metadata", failures(result))
+        self.assertNotIn("Traceback", failures(result))
 
 
 if __name__ == "__main__":

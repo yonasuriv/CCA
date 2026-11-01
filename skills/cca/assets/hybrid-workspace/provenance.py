@@ -237,7 +237,8 @@ def validate_object(obj: SourceObject, contract: dict[str, Any], *, curated: boo
             if not isinstance(loaded, dict) or not isinstance(loaded.get("provenance"), dict):
                 return problems + ["provenance metadata must contain a provenance mapping"]
             prov = {name: _normalise(value) for name, value in loaded["provenance"].items()}
-    except (OSError, UnicodeError, yaml.YAMLError) as exc:
+    except (OSError, UnicodeError, ValueError, yaml.YAMLError) as exc:
+        # ValueError: YAML resolves an unquoted impossible date (2026-02-30) and fails while constructing it.
         return problems + [f"invalid provenance metadata: {exc}"]
 
     for name in contract["required_fields"]:
@@ -450,7 +451,7 @@ def main(argv: list[str] | None = None) -> int:
                     status = stamp_markdown(obj.path, rep)
                     if status == "stamped":
                         print(f"  stamped {rel}")
-            except (StampError, yaml.YAMLError, UnicodeError) as exc:
+            except (StampError, yaml.YAMLError, UnicodeError, ValueError) as exc:
                 status = "refused"
                 failed = True
                 print(f"  ! {rel}: {exc}", file=sys.stderr)
