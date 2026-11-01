@@ -91,6 +91,11 @@ def _generated_destinations(data: Mapping[str, Any]) -> list[str]:
     router = slots.get("context.router", {})
     router_binding = router.get("binding") if isinstance(router, Mapping) else None
 
+    outputs = data.get("generation_contract", {}).get("outputs")
+    if isinstance(outputs, Mapping):
+        # Schema v3: every output resolves through a declared slot binding.
+        return list(generated_outputs(data).values())
+
     destinations: list[str] = []
     for entry in data.get("generation_contract", {}).get("derived", []):
         # `CONTEXT.md` is the historical/default declaration. Newer contracts
@@ -101,6 +106,43 @@ def _generated_destinations(data: Mapping[str, Any]) -> list[str]:
         elif isinstance(entry, str):
             destinations.append(entry)
     return destinations
+
+
+def generated_outputs(data: Mapping[str, Any]) -> dict[str, str]:
+    """Resolve schema-v3 generation_contract.outputs to target-relative files.
+
+    `{slot: <file key>}` uses that file binding; `{slot: <dir key>, file: <name>}`
+    places a single filename segment inside that directory binding. Unknown
+    slots or unsafe names raise ValueError; nothing defaults to the target root.
+    """
+    slots = {
+        slot.get("key"): slot
+        for slot in data.get("slots", [])
+        if isinstance(slot, Mapping) and isinstance(slot.get("key"), str)
+    }
+    resolved: dict[str, str] = {}
+    outputs = data.get("generation_contract", {}).get("outputs", {})
+    if not isinstance(outputs, Mapping):
+        raise ValueError("generation_contract.outputs must be a mapping")
+    for name, spec in outputs.items():
+        if not isinstance(spec, Mapping) or not isinstance(spec.get("slot"), str):
+            raise ValueError(f"generated output {name!r} must name a slot")
+        slot = slots.get(spec["slot"])
+        if not isinstance(slot, Mapping) or not isinstance(slot.get("binding"), str):
+            raise ValueError(f"generated output {name!r} references undeclared slot {spec['slot']!r}")
+        binding = slot["binding"]
+        file_name = spec.get("file")
+        if file_name is None:
+            if slot.get("arity") != "file":
+                raise ValueError(f"generated output {name!r} needs a file name inside directory slot {spec['slot']!r}")
+            resolved[str(name)] = binding
+            continue
+        if not isinstance(file_name, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", file_name):
+            raise ValueError(f"generated output {name!r} file must be one safe filename segment, got {file_name!r}")
+        if slot.get("arity") != "dir":
+            raise ValueError(f"generated output {name!r} file requires a directory slot")
+        resolved[str(name)] = binding.rstrip("/") + "/" + file_name
+    return resolved
 
 
 def _validate_generated_destinations(data: Mapping[str, Any], root: Path) -> None:

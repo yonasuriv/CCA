@@ -73,11 +73,16 @@ required = [
     "assets/hybrid-workspace/schema.py",
     "assets/hybrid-workspace/generate.py",
     "assets/hybrid-workspace/audit.py",
+    "assets/hybrid-workspace/provenance.py",
+    "assets/hybrid-workspace/profiles/v2/WORKSPACE.yaml",
+    "assets/hybrid-workspace/profiles/v2/AGENTS.md",
     "assets/hybrid-workspace/requirements.txt",
     "assets/hybrid-workspace/tests/test_freeze.py",
     "assets/hybrid-workspace/tests/test_targeting.py",
     "assets/hybrid-workspace/tests/test_adversarial_targeting.py",
     "assets/hybrid-workspace/tests/test_reference_admission.py",
+    "assets/hybrid-workspace/tests/test_cca_contract_version.py",
+    "assets/hybrid-workspace/tests/test_v3_profile.py",
 ]
 for rel in required:
     if not (SKILL / rel).is_file():

@@ -6,16 +6,22 @@ It is **not** a new CCA mode and it is **not** a universal CCA tree. Use it only
 
 ## Current profile version
 
-The bundled reference schema is **v2**. V2 preserves the complete frozen-v1 semantic-role, policy, authority, vocabulary, generation, and invariant baseline and adds one narrowly scoped extension: two admission classifications beneath `knowledge.reference`.
+The bundled reference schema is **v3** (CCA 1.3.0). Schema **v2** remains supported unchanged: a target declaring `schema_version: 2` is audited and generated under exactly the v2 rules documented in [Schema v2 (supported)](#schema-v2-supported), and its generated output is byte-for-byte what the v2 implementation produced. A target opts into v3 by declaring `schema_version: 3`; nothing upgrades a v2 target silently.
 
-The version bump is required by the v1 evolution contract itself: adding semantic/classification keys is a `schema-version-bump`. The patch therefore does not pretend to remain schema v1 or silently mutate its frozen key set.
+V3 is a schema-version bump under the profile's own evolution contract because it:
 
-V2 adds:
+- adds keys and vocabulary — `state.hotset`, `system.operations`, `system.documentation`, `asset.library`, `asset.templates`, and the `asset` category (`key_add_remove_or_rename`, `axis_or_vocab_change`);
+- changes the meaning of `reference.curated` / `reference.collected` from *acquisition actor* to *curation state* (`key_meaning_change`);
+- changes generation, provenance, and archive policy semantics (`policy_semantics_change`).
 
-- `reference.curated` — human-admitted source provenance;
-- `reference.collected` — automatically acquired source provenance.
+V3 preserves the complete frozen-v1 slot/policy/authority baseline and the v2 classification keys with their slot policies. It adds:
 
-Neither is a new knowledge role. Both compose with `semantic.role = knowledge.reference`.
+- **relocatable generated outputs** — no generated artifact has a fixed root filename; `WORKSPACE.yaml` is the only fixed bootstrap path;
+- **workspace identity** — an optional machine-readable `identity` block in `WORKSPACE.yaml`;
+- **actor-independent curation** — collected vs curated records explicit curation state, orthogonal to who or what acquired the bytes;
+- **representation-aware provenance** — Markdown frontmatter, file sidecars, directory/corpus manifests, with organizational containers no longer mistaken for acquisition batches;
+- **the state hotset**, **operating documentation**, and **human/editor asset** bindings;
+- **scoped archive manifests** — required for formal semantic retirement, never for ordinary cold storage.
 
 ## Relationship to CCA and upstreams
 
@@ -31,9 +37,9 @@ Tools MUST resolve declared keys/bindings and MUST NOT infer identity from defau
 
 The profile uses proven ICM navigation principles where they fit, but it does not redefine ICM and does not make the profile native ICM. A nested native ICM boundary remains governed by current upstream ICM. LLM Wiki, PARA, Zettelkasten, BASB/CODE, AGENTS.md, Agent Skills, and other upstream methods or standards retain their own authority; profile crosswalks are mappings/influences, not semantic equivalence.
 
-## Reference admission classification
+## Reference curation classification (v3)
 
-The source corpus is physically separated by **admission provenance**, not by semantic role:
+The source corpus is physically separated by **curation state**, not by semantic role and not by acquisition actor:
 
 ```text
 20-sources/
@@ -44,66 +50,129 @@ The source corpus is physically separated by **admission provenance**, not by se
 Conceptually:
 
 ```text
-20-sources/curated/paper.pdf
-  classification = reference.curated
+20-sources/collected/clippings/article.md
+  classification = reference.collected   (not explicitly curated)
   semantic.role  = knowledge.reference
+  acquired_by    = human | agent | crawler | tool | integration | workflow
 
-20-sources/collected/paper.pdf
-  classification = reference.collected
+20-sources/curated/standard.pdf
+  classification = reference.curated     (explicitly human-curated)
   semantic.role  = knowledge.reference
 ```
 
-The invariant is:
+The invariants are:
 
 ```text
-source provenance/admission
+acquisition (who/how/when/origin/identity)
+!= curation state (collected | curated)
 != content authorship
 != semantic role
 ```
 
-`knowledge.reference` defines **WHAT** the material is: preserved source/evidence.
-
-`reference.curated` vs `reference.collected` defines **HOW** that source entered the workspace.
-
-`knowledge.durable` defines what the workspace **LEARNED** from evidence.
-
-`output.artifact` defines what the workspace deliberately **PRODUCED** for external consumption.
+`knowledge.reference` defines **WHAT** the material is: preserved source/evidence. `reference.curated` vs `reference.collected` defines whether it has been **explicitly curated**. `knowledge.durable` defines what the workspace **LEARNED** from evidence. `output.artifact` defines what the workspace deliberately **PRODUCED** for external consumption.
 
 Research is an activity/workflow, not a new top-level knowledge role. A finite research effort is a `work.project`; it may traverse `context.capture` → `knowledge.reference` → `knowledge.durable` → `output.artifact` while tasks/state represent execution.
 
-### `reference.curated`
-
-- Human-admitted raw/reference evidence.
-- Human-authoritative.
-- Agents may read but not admit, edit, replace, rename, relocate, or delete source objects.
-- Existing evidence is immutable.
-- “Curated” means human-admitted provenance, not “high quality,” “verified,” or “true.”
-
 ### `reference.collected`
 
-- Raw/reference evidence automatically acquired by an agent, crawler, API, integration, workflow, or equivalent tool.
-- Uses the existing `append` mutability semantics: agents may add new child objects; already-present source objects are frozen.
-- Agent deposit is not generic authority to edit, replace, rename, relocate, or delete existing evidence.
-- A collected source remains collected after human review because the classification records how it originally entered the corpus. Review/approval is metadata, not filesystem promotion.
+- Preserved raw/reference material that has **not been explicitly promoted** to curated.
+- Any actor may acquire it: a human clipping an article, saving a transcript, bookmark, or PDF; an agent, crawler, tool, integration, or workflow.
+- Collected is a legitimate permanent home. It is not a queue and nothing implies that collected material is expected to become curated.
+- Append/add-child: new provenance-bearing objects may be deposited; existing objects are frozen. The only sanctioned exit is human-authorized promotion (`privileged_operations.reference.collected.promotion: human-authorized`).
 - Presence means preserved evidence, not truth or endorsement. Collected evidence may be unreviewed.
 
-The parent `knowledge.reference` binding may not contain loose source objects. Raw/reference objects must resolve through one of the two child classifications. Most-specific binding policy wins for filesystem operations, so the human/read-only parent cannot erase the append-only deposit capability of `reference.collected`, and a broader writable ancestor can never widen `reference.curated`.
+### `reference.curated`
 
-### Collected provenance
+- Deliberately human-admitted, **maintained** reference.
+- Entered only by an explicit, human-authorized act: **promotion** of an existing collected object or **direct deliberate human admission**.
+- Review alone never promotes. Agents may recommend curation; the human performs it.
+- Promotion preserves the source bytes and their provenance and adds a curation record (`curated_by`, `curated_at`).
+- Human-authoritative and agent-read-only. “Curated” means maintained, not “high quality,” “verified,” or “true.”
 
-Automatically collected source objects MUST preserve acquisition provenance. The bundled v2 contract requires at least:
+The parent `knowledge.reference` binding may not contain loose source objects. Most-specific binding policy wins for filesystem operations, so the human/read-only parent cannot erase the add-child capability of `reference.collected`, and a broader writable ancestor can never widen `reference.curated`.
 
-- acquisition actor (`acquired_by`);
-- acquisition method (`acquisition_method`);
-- original source/origin (`origin`);
-- acquisition timestamp with timezone (`acquired_at`);
-- content identity, with SHA-256 `content_hash` required for ordinary file objects.
+### Provenance (v3)
 
-The reference implementation represents file provenance beside the source as `<source>.source.yaml`; collected directory objects use `.source.yaml` inside the directory. Another conforming implementation may expose equivalent durable metadata only if it preserves the same semantic guarantees and remains independently auditable.
+Every object under either class MUST be able to answer: original source (`origin`), acquisition actor (`acquired_by`), acquisition method (`acquisition_method`), acquisition timestamp with timezone (`acquired_at`), and a **verifiable content identity**.
 
-Changing collected content without updating its identity is detected as integrity failure. Updating metadata to conceal a source mutation is itself outside normal agent authority; provenance is evidence, not disposable bookkeeping.
+`acquired_at` is never invented. When the original acquisition time is unknown, record the time the object entered this workspace's custody with `acquired_at_basis: import` and `original_acquisition_time: unknown`.
+
+The contract supports one representation per object type:
+
+| object | representation | content identity |
+|---|---|---|
+| Markdown capture (`.md`) | `provenance:` mapping in the note's own frontmatter | `content_hash: sha256:<hex>` of the **body** — every byte after the closing frontmatter line — with `content_hash_scope: body` |
+| any other file | `<file>.source.yaml` sidecar | `content_hash: sha256:<hex>` of the file bytes |
+| acquisition batch / imported directory | directory `.source.yaml` | `content_identity: sha256-tree:<hex>` |
+| automated corpus | directory `.source.yaml` | `files:` mapping of relative path → `sha256:<hex>` |
+
+The body-scoped hash exists because a Markdown file cannot contain a hash of itself. Frontmatter (tags, review notes, provenance) may be extended without changing the evidence identity; any change to the body is detected. `field_aliases` lets a capture tool's existing metadata satisfy a canonical field without duplication (the bundled template maps `origin` to a top-level `source`, which Obsidian Web Clipper already writes).
+
+`sha256-tree` is reproducible with coreutils from inside the directory:
+
+```bash
+find . -type f ! -path ./.source.yaml -printf '%P\0' | LC_ALL=C sort -z | xargs -0 sha256sum | sha256sum
+```
+
+**Containers are not batches.** A directory that has no `.source.yaml` is an organizational container (for example `collected/clippings/`, `collected/transcripts/`, `collected/upstream/`) at any depth; each descendant object carries its own provenance. A directory with a manifest is one acquisition object and its contents are covered by that manifest. `.gitkeep` is ignored; symlinked source objects and orphan sidecars are rejected.
+
+Identity is established at admission and is immutable afterwards. The bundled `provenance.py stamp` helper adds the body-scoped `content_hash` to Markdown captures that carry provenance but no hash yet. It never replaces an existing hash (that would launder a mutation) and never invents the other provenance fields — a capture template supplies those automatically.
 
 Raw/reference evidence survives distillation and is never rewritten into cleaner prose. Agent-authored synthesis belongs in `knowledge.durable`; deliverables belong in `output.artifact`.
+
+## Generated outputs, identity, state, assets, and archive (v3)
+
+### Generated outputs are bindings
+
+`generation_contract.outputs` declares every generated artifact and resolves its destination through a slot:
+
+```yaml
+generation_contract:
+  outputs:
+    context.router: {slot: context.router}
+    spec: {slot: system.documentation, file: SPEC.md}
+    paths: {slot: system.operations, file: paths.sh}
+    mkdirs: {slot: system.operations, file: mkdirs.sh}
+    host_index_adapter: {slot: system.operations, file: obsidian-excludes.txt}
+  human_authored: [workspace.schema, agent.instructions]
+  index_policy:
+    spec: disabled
+```
+
+- `file` is one safe filename segment inside a `system`/`control` directory binding; nothing defaults to the target root.
+- Generated helpers never infer the workspace root from their own directory. The generator encodes the relationship between the helper's binding and the root and the helper verifies the root by finding `WORKSPACE.yaml` there; a copied or misplaced helper fails closed instead of materializing directories in the wrong place.
+- Destinations are validated as text and after symlink resolution before any write.
+- The binding that contains a generated file never grants hand-edit authority over it (`invariants.generation`).
+- `workspace.schema` MUST stay bound to `WORKSPACE.yaml`: it is the only fixed bootstrap path. `agent.instructions` is resolved through its binding.
+
+### Workspace identity
+
+An optional top-level block makes the workspace's system identity machine-readable:
+
+```yaml
+identity:
+  endpoint: "brain://example"   # stable URI, never a filesystem path
+  owner: human                  # human | agent | shared
+```
+
+Generated routers/specifications render it from this block. It is system identity, not durable knowledge, and must not be duplicated into a knowledge note.
+
+### Operational state hotset
+
+`state.hotset` binds the general operational-state tree (default `_state/`): quick actions, dashboards, canvases, active bookmarks, reminders, current working references — useful **now**, not durable knowledge. More-specific state bindings nested inside it (`state.current`, `state.tasks`) keep their own policy. Agents may add and edit hotset material; removal is a human decision.
+
+### Operating documentation and system operations
+
+- `system.documentation` (default `_runtime/docs/`) holds repository-operating documentation: how-to guides, the operating model, verification records, and the generated specification. It explains the workspace; it is not durable knowledge.
+- `system.operations` (default `_runtime/operations/`) holds generated operational helpers; derived and regenerate-only.
+
+### Human/editor assets
+
+`asset.library` (default `_assets/`) holds human/editor-facing attachments, recordings, images, and media embedded in or used by human notes. `asset.templates` (default `_assets/templates/`) holds templates used by the human and their editor/plugins. They are distinct from `system.assets` and `system.templates`, which serve agents and system tooling. Agents read human assets and mutate them only where explicitly authorized. Template sources are never evaluated in place.
+
+### Archive: cold storage vs semantic retirement
+
+`lifecycle.archive` accepts ordinary human **cold storage** without ceremony: no manifest is required and none should be manufactured. **Formal semantic retirement** — an authorized operation that retires an existing canonical tree or boundary out of its semantic binding — MUST write the immutable `.archive.yaml` manifest preserving `source_key`, `semantic_role`, `boundary`, `boundary_class`, `original_binding`, `archived_at`, and `archived_by`. The audit validates every manifest that exists and never demands one for cold storage.
 
 ## Portable reference implementation
 
@@ -116,12 +185,17 @@ assets/hybrid-workspace/
 ├── schema.py
 ├── generate.py
 ├── audit.py
+├── provenance.py
 ├── requirements.txt
+├── profiles/
+│   └── v2/            # frozen v2 WORKSPACE.yaml + AGENTS.md (compatibility fixture)
 └── tests/
     ├── test_freeze.py
     ├── test_targeting.py
     ├── test_adversarial_targeting.py
-    └── test_reference_admission.py
+    ├── test_reference_admission.py
+    ├── test_cca_contract_version.py
+    └── test_v3_profile.py
 ```
 
 Repository-global files are never runtime dependencies of this profile.
@@ -148,7 +222,7 @@ python <cca-skill>/assets/hybrid-workspace/audit.py --target <workspace> --self-
 
 Do not copy the Python implementation into the target merely to run it. The installed skill is the portable capability package; the target is the durable workspace it operates on.
 
-## Frozen baseline and v2 extension contract
+## Frozen baseline and extension contracts
 
 The bundled schema preserves all reviewed frozen-v1 semantics. In particular:
 
@@ -165,7 +239,7 @@ The bundled schema preserves all reviewed frozen-v1 semantics. In particular:
 - `context.router` remains derived and its concrete filename is its current binding, not the literal string `CONTEXT.md`;
 - generated helpers remain derived target artifacts and never semantic identities.
 
-V2 adds only the admission-provenance classification contract described above. It deliberately reuses existing `immutable`, `append`, `human`, `shared`, `read-only`, and `write` vocabulary values; no new policy axis or generic write primitive was invented.
+V2 added only the admission classification contract; v3 adds the extensions described above. Both deliberately reuse existing `immutable`, `append`, `human`, `shared`, `read-only`, and `write` vocabulary values; no new policy axis or generic write primitive was invented.
 
 Do not change a frozen semantic key, policy meaning, authority meaning, axis, or vocabulary value as a binding customization. Such changes require the profile's declared schema-version treatment.
 
@@ -181,27 +255,30 @@ Consumers MUST use the target's actual boundary/role/authority semantics rather 
 
 A consumer that knows the profile but does not have the CCA skill installed MUST be able to start from durable target files.
 
-For current v2:
+For current v3:
 
-1. `WORKSPACE.yaml` at the target root is the machine-readable profile bootstrap and semantic binding/policy contract.
-2. `AGENTS.md` is the human/agent control surface and identifies `workspace-contract:v2`.
+1. `WORKSPACE.yaml` at the target root is the machine-readable profile bootstrap and semantic binding/policy contract. It is the only path a consumer may assume without resolving it.
+2. The `agent.instructions` binding (default `AGENTS.md`) is the human/agent control surface and identifies `workspace-contract:v3` (`workspace-contract:v2` for v2 targets).
 3. Semantic resolution starts from the applicable boundary and declared slots; `slots[*].binding` gives the concrete target-local implementation.
 4. `classification_roles` declares when a classification composes with another semantic role instead of replacing it.
-5. `reference_contract` declares the admission/provenance, routing, integrity, and no-loose-parent-source rules.
-6. The value of a default binding is never the semantic identity. `context.router` remains the semantic generated-router role even when the binding is `CONTEXT.md`, `ROUTER.md`, or another valid profile binding.
-7. An implementation MUST validate binding text and symlink-resolved containment before reading/writing generated/profile-controlled destinations.
-8. For nested bindings, filesystem policy resolves from the most-specific matching binding; semantic composition remains separately visible.
-9. Derived artifacts are rebuildable views/adapters. They MUST NOT become competing authority over `WORKSPACE.yaml`, human-authored control files, source evidence, or canonical workspace content.
+5. `reference_contract` declares the curation/provenance, routing, integrity, and no-loose-parent-source rules.
+6. `generation_contract.outputs` declares where every generated artifact lives; `identity`, when present, declares the workspace's system identity.
+7. The value of a default binding is never the semantic identity. `context.router` remains the semantic generated-router role even when the binding is `CONTEXT.md`, `ROUTER.md`, or another valid profile binding.
+8. An implementation MUST validate binding text and symlink-resolved containment before reading/writing generated/profile-controlled destinations.
+9. For nested bindings, filesystem policy resolves from the most-specific matching binding; semantic composition remains separately visible.
+10. Derived artifacts are rebuildable views/adapters. They MUST NOT become competing authority over `WORKSPACE.yaml`, human-authored control files, source evidence, or canonical workspace content.
 
 ### Generated artifact semantics
 
 The profile distinguishes semantic outputs from reference-implementation filenames:
 
-- **`context.router`** — semantic output role. It MUST be generated/validated at the slot's current binding. The generation contract still carries the historical/default literal `CONTEXT.md` for compatibility with the bundled implementation; **consumers MUST interpret that entry as the `context.router` role**, **not as a fixed filename requirement**.
-- **`SPEC.md`** — derived human-readable rendering of the target profile contract; non-authoritative.
-- **`paths.sh`** — derived shell binding adapter used by the reference implementation; non-authoritative.
-- **`mkdirs.sh`** — derived reference helper for materializing declared directories/files; non-authoritative.
-- **`obsidian-excludes.txt`** — derived editor/indexing adapter; non-authoritative.
+- **`context.router`** — semantic output role. It MUST be generated/validated at the slot's current binding. The v2 generation contract still carries the historical/default literal `CONTEXT.md` for compatibility with the bundled implementation; **consumers MUST interpret that entry as the `context.router` role**, **not as a fixed filename requirement**. V3 names the role directly (`outputs.context.router: {slot: context.router}`).
+- **`spec`** (`SPEC.md`) — derived human-readable rendering of the target profile contract; non-authoritative.
+- **`paths`** (`paths.sh`) — derived shell binding adapter used by the reference implementation; non-authoritative.
+- **`mkdirs`** (`mkdirs.sh`) — derived reference helper for materializing declared directories/files; non-authoritative.
+- **`host_index_adapter`** (`obsidian-excludes.txt`) — derived editor/indexing adapter; non-authoritative.
+
+In v2 these helper filenames live at the target root and helpers infer the root from their own directory. In v3 each lives at its declared output destination and resolves the root independently.
 
 An alternative implementation does not need byte-for-byte Python output to implement CCA core. To claim current Hybrid Workspace **profile conformance**, however, it must preserve the semantic content and safety guarantees promised by each profile-required derived artifact. The bundled `generate.py --check` performs byte-for-byte drift checking only for artifacts generated by this reference implementation; that check is a **reference-implementation regression mechanism**, not a language monopoly.
 
@@ -209,7 +286,7 @@ This distinction lets a Rust/Go/other implementation reproduce the profile from 
 
 ## Detection
 
-Treat a workspace as the current profile when its local `WORKSPACE.yaml` matches the bundled v2 baseline/extension contract and the required human-authored control surface identifies `workspace-contract:v2`. Do not classify arbitrary YAML manifests as this profile.
+Treat a workspace as this profile when its local `WORKSPACE.yaml` matches the bundled v3 contract (or the supported v2 contract) and the required human-authored control surface identifies the matching `workspace-contract:v3` / `workspace-contract:v2` marker. Do not classify arbitrary YAML manifests as this profile.
 
 A profile workspace is:
 
@@ -223,9 +300,9 @@ A profile workspace is:
 - `architect` selects/composes the profile and chooses bindings/authority boundaries.
 - `scaffold` initializes the approved profile on an explicit target with `generate.py --target <workspace> --init`.
 - `sync` reconciles derived artifacts after authorized schema/binding changes with `generate.py --target <workspace>`; `--check` is report-only.
-- `lint` runs `audit.py --target <workspace>` and `generate.py --target <workspace> --check` and validates reference admission/provenance where applicable.
-- `ingest` resolves source admission: unknown incoming material starts at `context.capture`; human admission goes to `reference.curated`; automated preserved evidence may be deposited into `reference.collected` with required provenance.
-- `query` resolves both reference classifications as `knowledge.reference` and treats their admission/review metadata separately from epistemic truth.
+- `lint` runs `audit.py --target <workspace>` and `generate.py --target <workspace> --check` and validates reference curation/provenance where applicable.
+- `ingest` resolves source placement: unknown incoming material starts at `context.capture`; preserved raw/reference material — whoever acquired it — is deposited into `reference.collected` with required provenance (v3; `provenance.py stamp` completes Markdown identity at admission); explicit human-authorized curation goes to `reference.curated`. Under v2, the v2 rule applies: human admission goes to curated, automated acquisition to collected.
+- `query` resolves both reference classifications as `knowledge.reference` and treats curation/review metadata separately from epistemic truth.
 - `advise` may recommend a different profile or upstream method when it better serves the user's intent.
 
 ## Routing and scale
@@ -240,19 +317,33 @@ Derived local indexes, embeddings, search databases, or graph projections remain
 
 Before describing a target as profile-conformant:
 
-1. the frozen-v1 baseline plus current v2 extension audit passes;
+1. the frozen-v1 baseline plus the declared v2 or v3 extension audit passes;
 2. the adversarial mutation/self-test passes when release-grade verification is requested;
-3. `reference.curated` and `reference.collected` both resolve to `knowledge.reference` while retaining distinct admission policies;
+3. `reference.curated` and `reference.collected` both resolve to `knowledge.reference` while retaining distinct curation policies;
 4. no loose source object exists directly under the parent `knowledge.reference` binding;
-5. collected source objects satisfy required provenance/content-identity checks;
+5. source objects satisfy required provenance/content-identity checks (v3: every object in both classes, through containers at any depth; v2: first-level collected objects);
 6. existing collected and curated evidence remains immutable to normal agent operation;
 7. required generated semantic outputs are present and consistent with the target contract;
 8. reference-implementation artifacts pass canonical-render drift checks when the bundled Python implementation produced/owns them;
-9. `AGENTS.md` satisfies the v2 profile control contract;
+9. the `agent.instructions` binding satisfies the declared profile control contract;
 10. changing a non-breaking binding causes every generated consumer to follow the new binding;
 11. changing `context.router` changes the generated router path without requiring a fixed `CONTEXT.md` identity;
 12. no generated artifact leaks obsolete `_state/`, `_runtime/`, `20-sources/`, or other default paths after those bindings move;
 13. all generated destinations remain beneath the explicit target after symlink resolution;
 14. generation/audit operate on the explicit target and leave the installed skill package untouched;
 15. applicable upstream-native boundaries still pass their own upstream acceptance surface;
-16. a fresh human or agent can orient from durable files without relying on prior chat state.
+16. a fresh human or agent can orient from durable files without relying on prior chat state;
+17. (v3) no generated artifact is required at the target root; generated helpers resolve the actual workspace root from their declared destination;
+18. (v3) every `.archive.yaml` present is a valid retirement record, and cold storage carries none.
+
+## Schema v2 (supported)
+
+A target declaring `schema_version: 2` keeps the v2 contract exactly:
+
+- `reference.curated` — raw/reference evidence explicitly admitted by a human; agents read only.
+- `reference.collected` — raw/reference evidence automatically acquired by an agent, crawler, API, integration, workflow, or equivalent tool; agents may deposit new children; a collected source remains collected after human review.
+- Collected provenance uses `<source>.source.yaml` sidecars for first-level files and `.source.yaml` inside first-level directories, requiring `acquired_by`, `acquisition_method`, `origin`, `acquired_at`, and SHA-256 `content_hash` for files (`content_hash` or `content_identity` for directories).
+- `generation_contract.derived` lists `paths.sh`, `mkdirs.sh`, `obsidian-excludes.txt`, `CONTEXT.md` (the `context.router` role), and `SPEC.md`; helpers are generated at the target root.
+- Whole-tree retirement creates `.archive.yaml`.
+
+The frozen v2 template is bundled at `assets/hybrid-workspace/profiles/v2/` and its regression tests remain part of the release suite. Moving a v2 target to v3 is an explicit, human-authorized schema change: declare `schema_version: 3`, adopt the v3 blocks, regenerate, and resolve any new audit findings (for example, provenance for objects inside containers).

@@ -9,6 +9,9 @@ import tempfile
 import unittest
 
 PACKAGE = Path(__file__).resolve().parents[1]
+
+# Frozen v2 fixture: these regression tests pin v2 behavior byte-for-meaning.
+V2 = PACKAGE / "profiles" / "v2"
 PROFILE = PACKAGE.parents[1] / "references" / "architect" / "hybrid-workspace.md"
 
 
@@ -24,8 +27,8 @@ def run(*args: str, cwd: Path | None = None) -> subprocess.CompletedProcess[str]
 
 def make_target() -> Path:
     target = Path(tempfile.mkdtemp(prefix="cca-hybrid-adversarial-"))
-    shutil.copy2(PACKAGE / "WORKSPACE.yaml", target / "WORKSPACE.yaml")
-    shutil.copy2(PACKAGE / "AGENTS.md", target / "AGENTS.md")
+    shutil.copy2(V2 / "WORKSPACE.yaml", target / "WORKSPACE.yaml")
+    shutil.copy2(V2 / "AGENTS.md", target / "AGENTS.md")
     return target
 
 

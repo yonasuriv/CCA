@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import shlex
 import shutil
@@ -14,7 +14,7 @@ from typing import Any
 
 import yaml
 
-from schema import compact_ops, effective_agent_operations, load_schema, semantic_role_for_slot
+from schema import compact_ops, effective_agent_operations, generated_outputs, load_schema, semantic_role_for_slot
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
 TEMPLATE_SCHEMA = PACKAGE_ROOT / "WORKSPACE.yaml"
@@ -52,7 +52,32 @@ def slots_by_key(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {slot["key"]: slot for slot in data["slots"]}
 
 
-def gen_paths(data: dict[str, Any]) -> str:
+def is_v3(data: dict[str, Any]) -> bool:
+    return data.get("schema_version") == 3
+
+
+def _root_hops(destination: str) -> str:
+    """Relative hop from a generated helper's directory back to the workspace root."""
+    depth = len(PurePosixPath(destination).parent.parts)
+    return "/".join([".."] * depth)
+
+
+def _root_resolution(helper: str, destination: str, self_var: str, root_var: str, *, sourced: bool) -> list[str]:
+    hops = _root_hops(destination)
+    suffix = f"/{hops}" if hops else ""
+    failure = "return 1 2>/dev/null || exit 1" if sourced else "exit 1"
+    return [
+        f"# Workspace root = this helper's binding ({destination}) walked back {len(PurePosixPath(destination).parent.parts)} level(s),",
+        "# verified by the bootstrap anchor. The helper's own directory is never assumed to be the root.",
+        f'{root_var}="$(cd -- "$(dirname -- "{self_var}"){suffix}" 2>/dev/null && pwd -P)"',
+        f'if [ -z "${{{root_var}}}" ] || [ ! -f "${{{root_var}}}/WORKSPACE.yaml" ]; then',
+        f'  echo "{helper}: workspace root not found (expected WORKSPACE.yaml at ${{{root_var}:-?}}); run the helper from its generated location" >&2',
+        f"  {failure}",
+        "fi",
+    ]
+
+
+def gen_paths(data: dict[str, Any], destination: str | None = None) -> str:
     lines = [
         "# GENERATED from WORKSPACE.yaml — do not edit. Source this file (bash or zsh).",
         "# WS_BINDING contains canonical relative bindings; WS contains absolute paths.",
@@ -63,10 +88,15 @@ def gen_paths(data: dict[str, Any]) -> str:
         "else",
         '  _ws_self="$0"',
         "fi",
-        'WS_ROOT="$(cd -- "$(dirname -- "$_ws_self")" && pwd)"',
+    ]
+    if destination is None:
+        lines.append('WS_ROOT="$(cd -- "$(dirname -- "$_ws_self")" && pwd)"')
+    else:
+        lines.extend(_root_resolution("paths.sh", destination, "$_ws_self", "WS_ROOT", sourced=True))
+    lines.extend([
         "unset _ws_self",
         "declare -Ar WS_BINDING=(",
-    ]
+    ])
     for slot in data["slots"]:
         lines.append(f"  [{shlex.quote(slot['key'])}]={shlex.quote(slot['binding'])}")
     lines.append(")")
@@ -81,7 +111,7 @@ def gen_paths(data: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def gen_mkdirs(data: dict[str, Any]) -> str:
+def gen_mkdirs(data: dict[str, Any], destination: str | None = None) -> str:
     required_dirs = sorted({
         slot["binding"].rstrip("/")
         for slot in data["slots"]
@@ -102,7 +132,8 @@ def gen_mkdirs(data: dict[str, Any]) -> str:
         "# GENERATED from WORKSPACE.yaml — idempotent, workspace-root anchored.",
         "# Default: minimum viable required directories. Use --all to materialize optional/conditional slots.",
         "set -euo pipefail",
-        'ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"',
+        *(['ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"'] if destination is None
+          else _root_resolution("mkdirs.sh", destination, "${BASH_SOURCE[0]}", "ROOT", sourced=False)),
         'case "${1:-}" in',
         '  ""|--required) MODE=required ;;',
         '  --all) MODE=all ;;',
@@ -124,7 +155,11 @@ def gen_mkdirs(data: dict[str, Any]) -> str:
 def gen_excludes(data: dict[str, Any]) -> str:
     excluded = {s["binding"] for s in data["slots"] if s["indexed"] == "excluded"}
     disabled = {s["binding"] for s in data["slots"] if s["indexed"] == "disabled"}
-    for path, policy in data.get("generation_contract", {}).get("index_policy", {}).items():
+    index_policy = dict(data.get("generation_contract", {}).get("index_policy", {}))
+    if is_v3(data):
+        outputs = generated_outputs(data)
+        index_policy = {outputs[name]: policy for name, policy in index_policy.items()}
+    for path, policy in index_policy.items():
         if policy == "excluded":
             excluded.add(path)
         elif policy == "disabled":
@@ -145,7 +180,64 @@ def gen_excludes(data: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _reference_curation_lines_v3(data: dict[str, Any]) -> list[str]:
+    by = slots_by_key(data)
+    curated = by["reference.curated"]
+    collected = by["reference.collected"]
+    prov = data["reference_contract"]["provenance"]
+    reps = prov["representations"]
+    return [
+        "## Reference curation", "",
+        "`knowledge.reference` defines **what** the material is: preserved source/evidence. The two classifications record its **curation state** — whether it was explicitly curated — not what it is and not who acquired it.", "",
+        "```text",
+        f"{collected['binding']}clip.md",
+        "  classification = reference.collected   (not explicitly curated; any acquirer)",
+        "  semantic.role = knowledge.reference",
+        "",
+        f"{curated['binding']}paper.pdf",
+        "  classification = reference.curated     (explicitly human-curated)",
+        "  semantic.role = knowledge.reference",
+        "```", "",
+        f"- `reference.collected` (`{collected['binding']}`): preserved raw/reference material not explicitly promoted. Any actor (human, agent, crawler, tool, integration, workflow) may deposit new objects; existing objects remain unchanged. Collected is a legitimate permanent home.",
+        f"- `reference.curated` (`{curated['binding']}`): deliberately human-admitted, maintained reference, entered by explicit human-authorized promotion or direct human admission; agents read only.",
+        "- Acquisition (who/how/when/origin/identity) and curation state are orthogonal. Review alone never promotes; promotion adds a curation record (" + ", ".join(f"`{f}`" for f in data["reference_contract"]["curation"]["record_fields"]) + ").",
+        "- Presence in either class means preserved evidence, not truth, correctness, quality, or endorsement.",
+        "- Every object answers " + ", ".join(f"`{f}`" for f in prov["required_fields"]) + " and a verifiable content identity:",
+        f"  - Markdown capture: frontmatter `{reps['markdown_frontmatter']['key']}:` mapping; `content_hash` = sha256 of the body after the frontmatter (`content_hash_scope: body`).",
+        f"  - Other file: `<file>{reps['file_sidecar']['suffix']}` sidecar; `content_hash` = sha256 of the file bytes.",
+        f"  - Acquisition batch or corpus: directory `{reps['directory_manifest']['name']}`; per-file `files:` hashes or `content_identity: sha256-tree:<hex>`.",
+        "  - A directory without a manifest is an organizational container; its descendants carry their own provenance.",
+        "- `acquired_at` is never invented: when the original time is unknown, record custody time with `acquired_at_basis: import` and `original_acquisition_time: unknown`.",
+        "- Agent-authored conclusions/synthesis route to `knowledge.durable`; deliberate external deliverables route to `output.artifact`.",
+        "- Research is an activity/workflow. A finite research effort routes to `work.project`, not a new semantic role.",
+        "",
+    ]
+
+
+def _identity_lines(data: dict[str, Any]) -> list[str]:
+    identity = data.get("identity")
+    if not isinstance(identity, dict):
+        return ["## Workspace identity", "", "No external identity is declared (`identity` is absent from `WORKSPACE.yaml`).", ""]
+    lines = ["## Workspace identity", "", "Canonical source: the `identity` block of `WORKSPACE.yaml`. It is system identity, not durable knowledge.", ""]
+    lines.append(f"- endpoint: `{identity['endpoint']}`")
+    lines.append(f"- owner authority: `{identity['owner']}`")
+    if identity.get("description"):
+        lines.append(f"- {' '.join(str(identity['description']).split())}")
+    lines.append("")
+    return lines
+
+
+def _archive_lines_v3(data: dict[str, Any]) -> list[str]:
+    archive = data["archive_contract"]
+    return [
+        f"Ordinary human cold storage in the archive binding needs no manifest. Formal semantic retirement of an existing canonical tree/boundary writes an immutable `{archive['manifest']}` at the retired root preserving: "
+        + ", ".join(f"`{field}`" for field in archive["required_fields"]) + ". Never manufacture a manifest for cold storage.",
+    ]
+
+
 def _reference_admission_lines(data: dict[str, Any]) -> list[str]:
+    if is_v3(data):
+        return _reference_curation_lines_v3(data)
     by = slots_by_key(data)
     contract = data["reference_contract"]
     curated = by["reference.curated"]
@@ -193,13 +285,18 @@ def gen_context(data: dict[str, Any]) -> str:
         ops = compact_ops(effective_agent_operations(slot, data))
         role = semantic_role_for_slot(slot, data)
         lines.append(f"| `{slot['key']}` | `{slot['binding']}` | `{role}` | {short} | {ops} |")
+    if is_v3(data):
+        lines.extend(["", *_identity_lines(data)[:-1]])
     lines.extend(["", *_reference_admission_lines(data), "## Hard rules", ""])
     for key, value in data["invariants"].items():
         lines.append(f"- **{key}** — {' '.join(value.split())}")
+    archive_text = _archive_lines_v3(data) if is_v3(data) else [
+        f"Whole-tree retirement uses `{data['archive_contract']['manifest']}` and preserves: "
+        + ", ".join(f"`{field}`" for field in data["archive_contract"]["required_fields"]) + "."
+    ]
     lines.extend([
         "", "## Archive identity", "",
-        f"Whole-tree retirement uses `{data['archive_contract']['manifest']}` and preserves: "
-        + ", ".join(f"`{field}`" for field in data["archive_contract"]["required_fields"]) + ".",
+        *archive_text,
         "", "## Boundary trust", "",
     ])
     for key, trust in data["boundary_trust"].items():
@@ -231,8 +328,19 @@ def _crosswalk_rows(data: dict[str, Any]) -> list[str]:
 
 def resolved_derived_names(data: dict[str, Any]) -> tuple[str, ...]:
     """Resolve historical/default generated names through semantic bindings."""
+    if is_v3(data):
+        return tuple(generated_outputs(data).values())
     router = slots_by_key(data)["context.router"]["binding"].rstrip("/")
     return tuple(router if name == "CONTEXT.md" else name for name in data.get("generation_contract", {}).get("derived", []))
+
+
+def _spec_intro_v3(data: dict[str, Any]) -> list[str]:
+    outputs = generated_outputs(data)
+    return [
+        "`WORKSPACE.yaml` at the target root is the **only** fixed bootstrap path. Every generated artifact resolves its destination through a declared slot binding in `generation_contract.outputs`: " + ", ".join(f"`{name}` → `{path}`" for name, path in outputs.items()) + ". Generated helpers locate the workspace root from that encoded relationship and verify it by finding `WORKSPACE.yaml`; they never assume their own directory is the root.", "",
+        "Schema v3 preserves the complete frozen-v1 semantic/policy baseline and the v2 reference classification keys, and adds: relocatable generated outputs, an optional machine-readable workspace `identity`, the `state.hotset` operational hotset, `system.operations` and `system.documentation`, the human/editor-facing `asset.*` bindings with the `asset` category, actor-independent curation semantics with representation-aware provenance, and scoped archive manifests. Schema v2 workspaces continue to validate under the unchanged v2 rules.", "",
+        *_identity_lines(data),
+    ]
 
 
 def gen_spec(data: dict[str, Any]) -> str:
@@ -243,8 +351,9 @@ def gen_spec(data: dict[str, Any]) -> str:
         "# Workspace Schema — Specification", "",
         "> **Generated from `WORKSPACE.yaml`. Do not hand-edit.** Edit the YAML and regenerate.", "",
         "Within the CCA Hybrid Workspace Profile, `WORKSPACE.yaml` is the canonical machine-readable bootstrap anchor. Stable keys carry declared meaning; bindings are workspace-local implementations and may move without changing that meaning.", "",
+        *(_spec_intro_v3(data) if is_v3(data) else [
         f"The generated context router is the `context.router` binding (`{router_binding}`), not a hardcoded filename. Helper artifacts such as `paths.sh`, `mkdirs.sh`, `SPEC.md`, and host adapters are derived tooling. `AGENTS.md` remains human-authored and is validated, not regenerated.", "",
-        "Schema v2 preserves the complete frozen-v1 semantic/policy baseline and adds only the two reference-admission classification keys required by the v1 evolution contract. No new knowledge role, axis, authority vocabulary, or mutability vocabulary was introduced.", "",
+        "Schema v2 preserves the complete frozen-v1 semantic/policy baseline and adds only the two reference-admission classification keys required by the v1 evolution contract. No new knowledge role, axis, authority vocabulary, or mutability vocabulary was introduced.", ""]),
         "Upstream crosswalks are non-owning mappings. Native ICM, LLM Wiki, PARA, CODE/BASB, and other upstream methods remain governed by their own authority; this profile composes useful semantics without claiming to redefine them.", "",
         "## Identifier and the five axes", "",
         f"`id` is **{data['identifier']['id']}**. `key` is the **{data['identifier']['key']}**.", "",
@@ -280,7 +389,8 @@ def gen_spec(data: dict[str, Any]) -> str:
 
     lines.extend([
         "", "## Archive identity contract", "",
-        f"Whole-tree retirement creates `{data['archive_contract']['manifest']}` at the archived root. The manifest is immutable once written and MUST contain: " + ", ".join(f"`{field}`" for field in data["archive_contract"]["required_fields"]) + ". Individual entities normally retire via status metadata and remain in place. `boundary_class` may be null for non-project boundaries.", "",
+        *((_archive_lines_v3(data) + [" ".join(f"`{scope}` — {meaning}." for scope, meaning in data["archive_contract"]["scope_semantics"].items()), "The manifest is immutable once written. Individual entities normally retire via status metadata and remain in place. `boundary_class` may be null for non-project boundaries.", ""]) if is_v3(data) else [
+        f"Whole-tree retirement creates `{data['archive_contract']['manifest']}` at the archived root. The manifest is immutable once written and MUST contain: " + ", ".join(f"`{field}`" for field in data["archive_contract"]["required_fields"]) + ". Individual entities normally retire via status metadata and remain in place. `boundary_class` may be null for non-project boundaries.", ""]),
         "| manifest field | meaning |", "|---|---|",
         *[f"| `{field}` | {meaning} |" for field, meaning in data["archive_contract"]["field_semantics"].items()],
         "", "## Boundary trust", "", "| boundary class | trust |", "|---|---|",
@@ -308,11 +418,26 @@ def gen_spec(data: dict[str, Any]) -> str:
     lines.extend(["", "## Minimum viable workspace", "", ", ".join(f"`{key}`" for key in required) + ".", "", "## Evolution contract", "", "| change | treatment |", "|---|---|"])
     for change, treatment in data["evolution_contract"].items():
         lines.append(f"| `{change}` | `{treatment}` |")
-    lines.extend(["", "## System crosswalk", "", "> Adaptation/inspiration only; mappings are not semantic equivalence and do not redefine or claim conformance with upstream methods.", "", "| source | concept | mapping |", "|---|---|---|", *_crosswalk_rows(data), "", "## Generation contract", "", "Resolved derived outputs: " + ", ".join(f"`{name}`" for name in resolved_derived_names(data)) + ".", "", "Human-authored: " + ", ".join(f"`{name}`" for name in data["generation_contract"]["human_authored"]) + ".", "", "## Generation pipeline", "", "```text", "WORKSPACE.yaml  (canonical profile bootstrap; human-authored)", "      │", "      ├── generate ──► SPEC.md", "      ├── generate ──► paths.sh", f"      ├── generate ──► {router_binding}  (context.router)", "      ├── generate ──► mkdirs.sh", "      ├── generate ──► host visibility adapter", "      └── validate ──► AGENTS.md (human-authored)", "```", ""])
+    lines.extend(["", "## System crosswalk", "", "> Adaptation/inspiration only; mappings are not semantic equivalence and do not redefine or claim conformance with upstream methods.", "", "| source | concept | mapping |", "|---|---|---|", *_crosswalk_rows(data), "", "## Generation contract", "", "Resolved derived outputs: " + ", ".join(f"`{name}`" for name in resolved_derived_names(data)) + ".", "", "Human-authored: " + ", ".join(f"`{name}`" for name in data["generation_contract"]["human_authored"]) + ".", "", "## Generation pipeline", "", "```text", "WORKSPACE.yaml  (canonical profile bootstrap; human-authored)", "      │"])
+    if is_v3(data):
+        outputs = generated_outputs(data)
+        lines.extend(f"      ├── generate ──► {path}  ({name})" for name, path in outputs.items())
+        lines.extend([f"      └── validate ──► {b['agent.instructions']} (agent.instructions; human-authored)", "```", ""])
+    else:
+        lines.extend(["      ├── generate ──► SPEC.md", "      ├── generate ──► paths.sh", f"      ├── generate ──► {router_binding}  (context.router)", "      ├── generate ──► mkdirs.sh", "      ├── generate ──► host visibility adapter", "      └── validate ──► AGENTS.md (human-authored)", "```", ""])
     return "\n".join(lines)
 
 
 def render_all(data: dict[str, Any]) -> dict[str, str]:
+    if is_v3(data):
+        outputs = generated_outputs(data)
+        return {
+            outputs["paths"]: gen_paths(data, outputs["paths"]),
+            outputs["mkdirs"]: gen_mkdirs(data, outputs["mkdirs"]),
+            outputs["host_index_adapter"]: gen_excludes(data),
+            outputs["context.router"]: gen_context(data),
+            outputs["spec"]: gen_spec(data),
+        }
     router = slots_by_key(data)["context.router"]["binding"].rstrip("/")
     rendered = {
         "paths.sh": gen_paths(data),
@@ -328,9 +453,10 @@ def render_all(data: dict[str, Any]) -> dict[str, str]:
 
 
 def validate_agents(data: dict[str, Any], target: Path) -> list[str]:
-    path = target / "AGENTS.md"
+    name = slots_by_key(data)["agent.instructions"]["binding"] if is_v3(data) else "AGENTS.md"
+    path = target / name
     if not path.exists():
-        return ["AGENTS.md missing — required human-authored control file"]
+        return [f"{name} missing — required human-authored control file"]
     text = path.read_text(encoding="utf-8")
     if not text.strip():
         return ["AGENTS.md is empty — required control content cannot be blank"]
@@ -341,7 +467,10 @@ def validate_agents(data: dict[str, Any], target: Path) -> list[str]:
     known = {slot["key"] for slot in data["slots"]}
     for match in re.findall(r"`([a-z]+\.[a-z.]+)`", text):
         prefix = match.split(".")[0]
-        if prefix in {"agent","context","state","system","knowledge","work","responsibility","project","output","lifecycle","workspace","reference"} and match not in known:
+        prefixes = {"agent","context","state","system","knowledge","work","responsibility","project","output","lifecycle","workspace","reference"}
+        if is_v3(data):
+            prefixes = prefixes | {"asset"}
+        if prefix in prefixes and match not in known:
             problems.append(f"AGENTS.md references unknown semantic/classification key `{match}`")
     for term in ("WORKSPACE.yaml", "project.upstream", "knowledge.reference", "reference.curated", "reference.collected", "generated artifacts"):
         if term not in text:

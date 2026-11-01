@@ -27,9 +27,9 @@ Expected architecture decisions:
 - preserve ordinary code repositories as ordinary repositories unless they independently adopt another profile;
 - use upstream-native ICM only where the work should actually be an ICM workspace;
 - use selected ICM-derived contracts/progressive disclosure only where they improve the workflow;
-- consider the optional CCA Hybrid Workspace Profile when its current v2 contract fits the requested hybrid; v2 preserves the frozen-v1 baseline and adds only source-admission classifications beneath `knowledge.reference`;
-- when the Hybrid profile is selected, distinguish human-admitted `reference.curated` from automatically acquired `reference.collected` without treating them as different knowledge roles;
-- keep automatically collected evidence provenance-preserving and append/deposit-only; human review changes review metadata, not original admission classification;
+- consider the optional CCA Hybrid Workspace Profile when its current v3 contract fits the requested hybrid; v3 preserves the frozen-v1 baseline and the v2 source classifications beneath `knowledge.reference`;
+- when the Hybrid profile is selected, distinguish explicitly curated `reference.curated` from not-yet-promoted `reference.collected` — whoever acquired the source — without treating them as different knowledge roles;
+- keep collected evidence provenance-preserving and append/deposit-only; review changes review metadata, and only explicit human-authorized promotion changes classification;
 - route synthesis from either source class into `knowledge.durable`, deliberate deliverables into `output.artifact`, and finite research work into `work.project`;
 - otherwise add the smallest custom CCA-compatible routing/semantic layer instead of forcing the profile;
 - route large collections through boundary-local routers/catalogs/indexes before broad filesystem search;

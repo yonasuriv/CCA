@@ -27,7 +27,7 @@ Keep these questions independent:
 |---|---|---|
 | **Organization** | Where does this kind of thing live for the human/workflow? | PARA, Zettelkasten, GTD, BASB/CODE, custom domains |
 | **Epistemic role** | What kind of information is this? | capture, preserved evidence, human note, maintained synthesis, operational state |
-| **Admission/provenance classification** | How did preserved evidence enter this corpus? | human-admitted, automatically collected |
+| **Curation/provenance classification** | Has preserved evidence been explicitly curated, and how was it acquired? | collected (any acquirer), curated (explicitly human-admitted) |
 | **Navigation** | How does a consumer discover the relevant boundary/context? | native upstream router, existing index, scoped AGENTS.md, ICM-derived contract, profile-defined router, ordinary filesystem structure |
 
 A human method does not determine epistemic authority. A navigation pattern does not determine the organizational shelf. Source admission provenance does not determine content authorship or create a new knowledge role.
@@ -134,9 +134,9 @@ Load this section when the user wants one filesystem-native environment containi
 
 Do not infer authority from the folder brand. Organizational shelves answer **where it lives**; epistemic roles answer **what it is**.
 
-### Hybrid v2 source admission
+### Hybrid source curation (v3)
 
-When the optional CCA Hybrid Workspace Profile is selected, preserved evidence has two **admission classifications**:
+When the optional CCA Hybrid Workspace Profile is selected, preserved evidence has two **curation classifications**:
 
 ```text
 reference.curated   ─┐
@@ -144,17 +144,17 @@ reference.curated   ─┐
 reference.collected ─┘
 ```
 
-- `reference.curated` = evidence explicitly admitted by a human; agents read only.
-- `reference.collected` = evidence automatically acquired by an agent/tool; new child objects may be deposited under append/additive semantics, while existing objects remain immutable to normal agent operation.
-- collected evidence requires acquisition provenance/content identity according to the profile contract.
-- human review does not reclassify collected evidence as curated; review is metadata.
+- `reference.collected` = preserved raw/reference material not explicitly promoted, acquired by any actor (human clip, saved transcript, agent, crawler, tool, integration); new child objects may be deposited under append/additive semantics, while existing objects remain immutable to normal agent operation. It is a legitimate permanent home, not a queue.
+- `reference.curated` = deliberately human-admitted maintained reference, entered by explicit human-authorized promotion or direct human admission; agents read only.
+- every source object carries provenance and verifiable content identity according to the profile contract.
+- review alone never promotes; promotion is explicit, human-authorized, and recorded. (Schema v2 targets keep the v2 actor-based rule.)
 - neither class implies correctness/endorsement.
 - agent-authored conclusions/synthesis belong to `knowledge.durable`, not `reference.collected`.
 
 The distinction is exactly:
 
 ```text
-source provenance/admission != content authorship != semantic role
+acquisition != curation state != content authorship != semantic role
 ```
 
 Research remains an activity/workflow across capture, references, synthesis, and output; it does not become another top-level knowledge category.
@@ -168,7 +168,7 @@ Research remains an activity/workflow across capture, references, synthesis, and
    - use upstream-native ICM for a workflow that should be ICM;
    - use specific ICM-derived patterns only when staged/local contracts improve the workflow;
    - do not apply ICM-shaped contracts to unrelated shelves by default.
-5. Consider the optional CCA Hybrid Workspace Profile when its current v2 contract matches the requested personal/team hybrid. V2 preserves the frozen-v1 baseline and adds only reference-admission classifications. If the profile does not fit, compose a smaller custom CCA-compatible target rather than mutating it into a new hidden standard.
+5. Consider the optional CCA Hybrid Workspace Profile when its current v3 contract matches the requested personal/team hybrid. V3 preserves the frozen-v1 baseline and the v2 reference classes, and adds relocatable generated outputs, workspace identity, the state hotset, operating-documentation and human-asset bindings, actor-independent curation, and scoped archive manifests. If the profile does not fit, compose a smaller custom CCA-compatible target rather than mutating it into a new hidden standard.
 6. If the Hybrid profile is selected, preserve `reference.curated`/`reference.collected` as classifications composing with `knowledge.reference`; do not turn them into separate semantic roles.
 7. Give large collections bounded local navigation when scale requires it. Prefer boundary-local routers/catalogs/indexes over one giant root manifest.
 8. Keep derived indexes rebuildable and non-authoritative.

@@ -126,7 +126,7 @@ Report optional hardening separately from conformance errors.
 
 ## 8. CCA Hybrid Workspace Profile
 
-Load `../architect/hybrid-workspace.md` when the target matches the current bundled **v2** profile. V2 preserves all frozen-v1 semantics and adds only two admission classifications beneath `knowledge.reference`.
+Load `../architect/hybrid-workspace.md` when the target matches the bundled **v3** profile or the supported **v2** profile. Audit each target under the schema version it declares; never upgrade a v2 target implicitly.
 
 Use the skill-local reference implementation on an **explicit target**:
 
@@ -143,12 +143,12 @@ python <cca-skill>/assets/hybrid-workspace/audit.py --target <workspace> --self-
 
 Profile checks include:
 
-1. frozen-v1 semantic-key/policy/authority baseline plus the v2 extension contract passes;
+1. frozen-v1 semantic-key/policy/authority baseline plus the declared v2 or v3 extension contract passes;
 2. unsafe/escaping bindings and generated destinations are rejected after symlink resolution;
 3. effective permissions remain intersections rather than a single-axis grant;
 4. archive identity/trust/promotion invariants pass;
 5. required generated **semantic outputs** agree with current bindings and profile semantics;
-6. `AGENTS.md` satisfies the human-authored `workspace-contract:v2` control contract;
+6. the `agent.instructions` binding satisfies the human-authored `workspace-contract:v<schema>` control contract;
 7. non-breaking binding moves propagate to generated consumers;
 8. `context.router` generation follows its current binding rather than treating literal `CONTEXT.md` as identity;
 9. moving `_state/`, `_runtime/`, `20-sources/`, or another default does not leak obsolete default paths into generated artifacts;
@@ -157,10 +157,12 @@ Profile checks include:
 12. `reference.curated` and `reference.collected` both compose with semantic role `knowledge.reference`;
 13. filesystem mutation policy resolves from the most-specific source-class binding so parent permissions cannot widen/narrow the wrong child;
 14. no loose source object exists directly under the parent `knowledge.reference` binding;
-15. collected source objects preserve required acquisition provenance and content identity/hash;
-16. collected sources remain collected after review; review metadata never rewrites admission provenance;
+15. source objects preserve required acquisition provenance and verifiable content identity (v3: in both classes, through organizational containers at any depth, with the representation the contract assigns to the object type);
+16. review never promotes: collected sources leave collected only through explicit human-authorized promotion (v3) and remain collected after review (v2);
 17. existing curated and collected sources are immutable to normal agent operation;
-18. agent-generated synthesis routes to `knowledge.durable`, external deliverables remain `output.artifact`, and finite research work remains `work.project`.
+18. agent-generated synthesis routes to `knowledge.durable`, external deliverables remain `output.artifact`, and finite research work remains `work.project`;
+19. (v3) no generated artifact is required at the target root and generated helpers resolve the actual workspace root;
+20. (v3) every `.archive.yaml` present is a valid semantic-retirement record; cold storage needs none.
 
 When the bundled Python reference implementation owns an artifact, `generate.py --check` additionally performs its canonical byte-for-byte drift check. Do not treat Python rendering details as the only possible implementation of the profile; an independent implementation must satisfy the normative semantic/artifact contract in `../architect/hybrid-workspace.md`.
 

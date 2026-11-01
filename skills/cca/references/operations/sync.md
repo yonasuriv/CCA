@@ -36,7 +36,7 @@ Do not create missing CCA-preferred catalogs merely because sync knows about the
 
 ## CCA Hybrid Workspace Profile
 
-Load `../architect/hybrid-workspace.md` when the target matches the current bundled **v2** profile. V2 preserves the frozen-v1 baseline and adds only the two `knowledge.reference` admission classifications.
+Load `../architect/hybrid-workspace.md` when the target matches the bundled **v3** profile or the supported **v2** profile.
 
 After an authorized edit to `WORKSPACE.yaml`, reconcile derived artifacts with the installed skill's bundled implementation:
 
@@ -55,11 +55,11 @@ Rules:
 - the command MUST receive an explicit target;
 - never invoke generation against `skills/cca/` or `assets/hybrid-workspace/` itself;
 - `binding_change` remains non-breaking, so all generated consumers MUST follow the new binding;
-- `context.router` MUST be generated at its current binding, not hardcoded as `CONTEXT.md`;
+- `context.router` MUST be generated at its current binding, not hardcoded as `CONTEXT.md`; under v3 every other generated artifact MUST be generated at its declared `generation_contract.outputs` destination, never at an assumed root filename;
 - if `_state/`, `_runtime/`, `20-sources/`, or any other default binding is moved, obsolete defaults MUST NOT remain in regenerated routing/spec/path artifacts;
 - `reference.curated` and `reference.collected` bindings move as children of the current `knowledge.reference` binding; their semantic role remains `knowledge.reference`;
-- a binding move MUST NOT change admission provenance, effective child policy, or review state;
-- `sync` never moves a reviewed collected source into curated merely because review status changed;
+- a binding move MUST NOT change provenance, curation state, effective child policy, or review state;
+- `sync` never moves a reviewed collected source into curated; promotion is an explicit human-authorized operation;
 - `sync` does not silently change frozen semantic keys/policies/authorities to make a binding move easier.
 
 ## Production rules

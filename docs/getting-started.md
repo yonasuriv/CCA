@@ -94,7 +94,7 @@ If ICM-style stage contracts are borrowed without satisfying the full upstream I
 
 When the desired environment combines projects, raw/preserved sources, human notes/research, maintained knowledge/wiki, tasks/state, reusable capabilities, and human + agent operation, `architect` may select the optional **CCA Hybrid Workspace Profile**.
 
-The current bundled profile schema is **v2**. It preserves the full frozen-v1 semantic/policy baseline and adds only two source-admission classifications beneath `knowledge.reference`:
+The current bundled profile schema is **v3** (v2 remains supported). It preserves the full frozen-v1 semantic/policy baseline and keeps two source classifications beneath `knowledge.reference`:
 
 ```text
 20-sources/
@@ -105,17 +105,17 @@ The current bundled profile schema is **v2**. It preserves the full frozen-v1 se
 The distinction is deliberately narrow:
 
 ```text
-source provenance/admission != content authorship != semantic role
+acquisition != curation state != content authorship != semantic role
 ```
 
 - `knowledge.reference` means **preserved source/evidence**.
-- `reference.curated` means the source was explicitly admitted by a human. Agents read but do not add or mutate it.
-- `reference.collected` means the source was automatically acquired by an agent/tool. Agents may deposit new children under append/additive semantics; existing objects remain unchanged and provenance/content identity is required.
-- Review does not move a collected source into curated; the classification records original admission provenance.
+- `reference.collected` means preserved raw/reference material not explicitly promoted, whoever acquired it (human clip, saved transcript, agent, crawler, tool). New children may be deposited under append/additive semantics; existing objects remain unchanged and provenance/content identity is required.
+- `reference.curated` means deliberately human-admitted, maintained reference. Agents read but do not add or mutate it.
+- Review does not move a collected source into curated; only explicit human-authorized promotion does.
 - Presence in either class is evidence, not truth or endorsement.
 - Agent-authored conclusions belong to `knowledge.durable`; deliberate external deliverables to `output.artifact`; finite research work to `work.project`.
 
-The version bump is intentional: frozen v1 already declared that adding keys requires a schema-version bump. V2 does not silently rewrite the v1 contract.
+The version bumps are intentional: the evolution contract requires a schema-version bump for key additions and meaning/policy changes. Neither v2 nor v3 silently rewrites an earlier contract. V3 also makes every generated artifact a declared binding (default `_runtime/operations/` and `_runtime/docs/`), so `WORKSPACE.yaml` is the only file the profile assumes at the root.
 
 The profile is defined and implemented completely inside the installable skill:
 
@@ -234,7 +234,7 @@ Use `lint` against the claims the target actually makes:
 - ICM-derived → only borrowed constructs;
 - LLM Wiki → implementation/core maintained-knowledge behavior;
 - CCA-conformant → intentionally adopted CCA semantics;
-- Hybrid Workspace Profile → frozen-v1 baseline + current v2 extension audit, reference admission/provenance checks, and generated-artifact drift check;
+- Hybrid Workspace Profile → frozen-v1 baseline + declared v2/v3 extension audit, reference curation/provenance checks, and generated-artifact drift check;
 - method overlays → preservation findings, not invented certification.
 
 Then use the CCA fresh-agent walk test where applicable. It supplements stricter upstream/profile validation; it never replaces it.

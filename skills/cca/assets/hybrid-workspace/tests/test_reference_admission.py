@@ -12,6 +12,9 @@ import unittest
 import yaml
 
 PACKAGE = Path(__file__).resolve().parents[1]
+
+# Frozen v2 fixture: these regression tests pin v2 behavior byte-for-meaning.
+V2 = PACKAGE / "profiles" / "v2"
 sys.path.insert(0, str(PACKAGE))
 
 import schema as schema_module  # noqa: E402
@@ -30,7 +33,7 @@ def run(*args: str, cwd: Path | None = None) -> subprocess.CompletedProcess[str]
 def make_target() -> Path:
     target = Path(tempfile.mkdtemp(prefix="cca-reference-admission-"))
     for name in ("WORKSPACE.yaml", "AGENTS.md"):
-        shutil.copy2(PACKAGE / name, target / name)
+        shutil.copy2(V2 / name, target / name)
     return target
 
 
@@ -70,7 +73,7 @@ def write_collected_file(target: Path, name: str = "paper.pdf", content: bytes =
 
 class ReferenceAdmissionContractTests(unittest.TestCase):
     def test_v2_extends_without_mutating_frozen_v1_reference_role(self) -> None:
-        data = yaml.safe_load((PACKAGE / "WORKSPACE.yaml").read_text(encoding="utf-8"))
+        data = yaml.safe_load((V2 / "WORKSPACE.yaml").read_text(encoding="utf-8"))
         by = slot_map(data)
         self.assertEqual(data.get("schema_version"), 2)
         self.assertIn("reference.curated", by)
@@ -84,7 +87,7 @@ class ReferenceAdmissionContractTests(unittest.TestCase):
         self.assertEqual(parent["link_target"], "referenceable")
 
     def test_both_admission_classes_compose_to_knowledge_reference(self) -> None:
-        data = yaml.safe_load((PACKAGE / "WORKSPACE.yaml").read_text(encoding="utf-8"))
+        data = yaml.safe_load((V2 / "WORKSPACE.yaml").read_text(encoding="utf-8"))
         composition = data.get("classification_roles", {})
         self.assertEqual(composition.get("reference.curated"), "knowledge.reference")
         self.assertEqual(composition.get("reference.collected"), "knowledge.reference")
@@ -92,7 +95,7 @@ class ReferenceAdmissionContractTests(unittest.TestCase):
         self.assertFalse(any(slot["key"].startswith("research.") for slot in data["slots"]))
 
     def test_curated_is_agent_read_only_and_collected_is_add_child_only(self) -> None:
-        data = schema_module.load_schema(PACKAGE / "WORKSPACE.yaml")
+        data = schema_module.load_schema(V2 / "WORKSPACE.yaml")
         by = slot_map(data)
         self.assertIn("reference.curated", by)
         self.assertIn("reference.collected", by)
@@ -110,7 +113,7 @@ class ReferenceAdmissionContractTests(unittest.TestCase):
             hasattr(schema_module, "resolve_slot_for_path"),
             "schema must expose most-specific binding resolution for policy checks",
         )
-        data = schema_module.load_schema(PACKAGE / "WORKSPACE.yaml")
+        data = schema_module.load_schema(V2 / "WORKSPACE.yaml")
         resolver = getattr(schema_module, "resolve_slot_for_path")
         curated = resolver("20-sources/curated/paper.pdf", data)
         collected = resolver("20-sources/collected/paper.pdf", data)
@@ -203,7 +206,7 @@ class ReferenceAdmissionContractTests(unittest.TestCase):
         self.assertNotIn("20-sources/collected/", combined)
 
     def test_routing_meanings_remain_distinct(self) -> None:
-        data = yaml.safe_load((PACKAGE / "WORKSPACE.yaml").read_text(encoding="utf-8"))
+        data = yaml.safe_load((V2 / "WORKSPACE.yaml").read_text(encoding="utf-8"))
         contract = data.get("reference_contract", {})
         routing = contract.get("routing", {})
         self.assertEqual(routing.get("unclassified_incoming"), "context.capture")

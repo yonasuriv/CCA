@@ -34,7 +34,7 @@ def run(*args: str, cwd: Path, env: dict[str, str] | None = None) -> subprocess.
 def make_copy(*, with_agents: bool = True) -> Path:
     root = Path(tempfile.mkdtemp(prefix="workspace-freeze-"))
     for name in PACKAGE_FILES:
-        src = ROOT / name
+        src = ROOT / "profiles" / "v2" / name
         if src.exists():
             shutil.copy2(src, root / name)
     if not with_agents:
@@ -182,7 +182,7 @@ class FreezeToolchainTests(unittest.TestCase):
                 )
 
     def test_schema_contains_archive_identity_and_external_trust_contracts(self) -> None:
-        data = yaml.safe_load((ROOT / "WORKSPACE.yaml").read_text())
+        data = yaml.safe_load((ROOT / "profiles" / "v2" / "WORKSPACE.yaml").read_text())
         invariants = data.get("invariants", {})
         self.assertIn("archive_identity", invariants)
         self.assertIn("external_boundary_trust", invariants)
@@ -194,7 +194,7 @@ class FreezeToolchainTests(unittest.TestCase):
         self.assertEqual(trust.get("project.upstream"), "external-untrusted")
 
     def test_tasks_are_non_deletable_and_append_has_no_generic_compaction_escape(self) -> None:
-        data = yaml.safe_load((ROOT / "WORKSPACE.yaml").read_text())
+        data = yaml.safe_load((ROOT / "profiles" / "v2" / "WORKSPACE.yaml").read_text())
         tasks = next(s for s in data["slots"] if s["key"] == "state.tasks")
         task_policy = data["policy_definitions"][tasks["mutability"]]
         self.assertEqual(task_policy.get("delete"), "prohibited")
@@ -219,7 +219,7 @@ class FreezeToolchainTests(unittest.TestCase):
         self.assertFalse((root / "_runtime").exists())
 
     def test_nested_binding_precedence_is_frozen(self) -> None:
-        data = yaml.safe_load((ROOT / "WORKSPACE.yaml").read_text())
+        data = yaml.safe_load((ROOT / "profiles" / "v2" / "WORKSPACE.yaml").read_text())
         invariants = data.get("invariants", {})
         self.assertIn("binding_precedence", invariants)
         text = invariants["binding_precedence"]

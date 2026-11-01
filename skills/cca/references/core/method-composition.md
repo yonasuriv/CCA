@@ -41,7 +41,7 @@ reference.curated   -> knowledge.reference
 reference.collected -> knowledge.reference
 ```
 
-`knowledge.reference` remains the semantic role: preserved source/evidence. `reference.curated` and `reference.collected` classify how evidence entered that profile's reference corpus. They MUST NOT be interpreted as separate knowledge roles, content authorship, review state, truth, or endorsement.
+`knowledge.reference` remains the semantic role: preserved source/evidence. `reference.curated` and `reference.collected` classify the curation state of evidence in that profile's reference corpus (under the supported v2 schema: how it was admitted). They MUST NOT be interpreted as separate knowledge roles, content authorship, acquisition actor, truth, or endorsement.
 
 Similarly, finite research work remains project/workflow activity rather than a new knowledge category: capture, preserved references, maintained synthesis, and outputs retain their own semantic roles as research traverses them.
 
@@ -86,7 +86,7 @@ Explicit metadata is appropriate when:
 
 PARA directories, Zettelkasten folders, ICM stages, wiki folders, projects, areas, resources, archives, and skill collections do not require CCA metadata solely to announce their path names.
 
-A profile MAY require provenance metadata for evidence when the distinction is security/authority relevant. The Hybrid v2 collected-source contract is such a case: acquisition actor/method/origin/time and content identity are not safely inferable merely because a file lives under `collected/`.
+A profile MAY require provenance metadata for evidence when the distinction is security/authority relevant. The Hybrid source contract is such a case: acquisition actor/method/origin/time and content identity are not safely inferable merely because a file lives under `collected/` or `curated/`. Hybrid v3 lets the representation fit the object (Markdown frontmatter with a body-scoped hash, file sidecars, directory/corpus manifests) without weakening those guarantees.
 
 ## 5. CCA skill package and modes
 

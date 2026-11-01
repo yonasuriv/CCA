@@ -106,15 +106,15 @@ It is an optional CCA-owned profile for a recurring personal/team environment co
 
 It is not a new mode, not native ICM, and not a universal CCA tree.
 
-The current bundled schema is **v2**. V2 preserves the frozen-v1 semantic/policy baseline and adds only two admission classifications beneath `knowledge.reference` so human-admitted and automatically collected evidence are distinguishable without creating new knowledge roles.
+The current bundled schema is **v3**; v2 remains supported unchanged. Both preserve the frozen-v1 semantic/policy baseline. V2 added two classifications beneath `knowledge.reference`; v3 defines them as curation state independent of who acquired the source, makes every generated artifact a declared binding so `WORKSPACE.yaml` is the only fixed root file, and adds optional workspace identity, a state hotset, operating documentation, human/editor asset bindings, and scoped archive manifests.
 
 The complete profile specification/tooling/tests live inside `skills/cca/` so installation remains portable.
 
 ## Why are there `curated/` and `collected/` source directories?
 
-To make **source admission provenance** obvious from the filesystem without changing what a reference is.
+To make **curation state** obvious from the filesystem without changing what a reference is.
 
-Default Hybrid v2 bindings are:
+Default Hybrid bindings are:
 
 ```text
 20-sources/
@@ -131,14 +131,14 @@ semantic.role = knowledge.reference
 The distinction is:
 
 ```text
-source provenance/admission != content authorship != semantic role
+acquisition != curation state != content authorship != semantic role
 ```
 
-- `reference.curated` means a human explicitly admitted the source. Agents may read but not add or mutate it.
-- `reference.collected` means an agent/tool automatically acquired the source. Agents may deposit **new** children under append/additive semantics, but may not edit, replace, rename, relocate, or delete existing collected source objects.
-- Automatically collected sources require acquisition provenance and content identity/hash according to the profile contract.
-- A collected source remains collected after human review because the class records **how it entered the corpus**. Review/approval is metadata.
-- Neither class implies truth, correctness, quality, or endorsement.
+- `reference.collected` means preserved raw/reference material that has not been explicitly promoted. Any actor may acquire it — a human clipping an article or saving a transcript, an agent, crawler, tool, or integration. New children may be deposited under append/additive semantics; existing collected source objects may not be edited, replaced, renamed, relocated, or deleted. Collected is a legitimate permanent home, not a queue.
+- `reference.curated` means deliberately human-admitted, maintained reference, entered by explicit human-authorized promotion or direct human admission. Agents may read but not add or mutate it.
+- Every source object carries provenance and verifiable content identity. Markdown captures may keep it in frontmatter with a hash of the body; other files use a `.source.yaml` sidecar; a batch or corpus uses a directory manifest. Folders without a manifest are just containers.
+- Review alone never promotes a collected source. Promotion is explicit, human-authorized, and recorded.
+- Neither class implies truth, correctness, quality, or endorsement. (Schema v2 targets keep the v2 meaning: curated = human-admitted, collected = automatically acquired.)
 
 An agent downloading an arXiv PDF therefore creates preserved evidence under `reference.collected`; the conclusions the agent writes from it belong to `knowledge.durable`.
 
@@ -148,7 +148,7 @@ Because it answers a different question.
 
 `knowledge.reference` answers **what the material is**: preserved source/evidence.
 
-`reference.curated` / `reference.collected` answers **how it entered the workspace**.
+`reference.curated` / `reference.collected` answers **whether it has been explicitly curated**.
 
 `knowledge.durable` answers what the workspace learned/synthesized from evidence.
 
@@ -158,7 +158,7 @@ Research itself is an activity/workflow, normally bounded by `work.project` and 
 
 ## Can source files live directly under `20-sources/`?
 
-Not in Hybrid v2.
+Not in the Hybrid profile (v2 or v3).
 
 The parent `knowledge.reference` binding is a semantic/source-corpus root. Raw/reference source objects must resolve through `reference.curated` or `reference.collected`. The profile audit rejects loose/unknown source objects directly under the parent binding.
 
@@ -182,11 +182,13 @@ Because that optional profile needs a machine-readable bootstrap for stable sema
 
 CCA core does not require every workspace to have `WORKSPACE.yaml`. The manifest is a profile-specific mechanism, not a universal CCA rule.
 
-## Why did the Hybrid schema become v2?
+## Why did the Hybrid schema become v2, then v3?
 
 Because frozen v1 explicitly declared that adding/removing/renaming keys requires a schema-version bump.
 
 Adding `reference.curated` and `reference.collected` while pretending the schema was still v1 would violate the profile's own evolution contract. V2 preserves all 22 original v1 slot semantics and existing policy vocabulary, then adds only the two admission classifications and their provenance/routing contract.
+
+V3 is a further bump for the same reason: it adds keys and a category, changes the meaning of the two reference classes from acquisition actor to curation state, and changes generation/provenance/archive policy. Redefining v2 in place would silently change the meaning of existing v2 workspaces, so v2 stays supported and v3 is opt-in.
 
 ## How is the Hybrid Profile created?
 
@@ -293,7 +295,7 @@ For claim validity, use `lint` against the claims the boundary actually makes:
 - ICM-derived → borrowed constructs only;
 - LLM Wiki → its maintained-knowledge behavior;
 - CCA-conformant → adopted CCA semantics;
-- Hybrid Profile → frozen-v1 baseline + current v2 admission/provenance audit plus generated-artifact check;
+- Hybrid Profile → frozen-v1 baseline + declared v2/v3 extension audit (curation/provenance) plus generated-artifact check;
 - human methods → preservation findings, not invented certification.
 
 For broader context-architecture health, use Architect Audit mode from the requested workspace root. Then use the CCA fresh-agent walk test where applicable. The walk test supplements stricter upstream/profile validation; it never replaces it.

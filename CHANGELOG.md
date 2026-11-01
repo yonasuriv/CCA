@@ -4,7 +4,27 @@ This changelog records released CCA milestones and pending user-visible changes.
 
 ## Unreleased
 
+No unreleased changes.
+
+## 1.3.0 - 2026-11-01
+
+Minor: adds Hybrid Workspace Profile **schema v3** as an opt-in contract. Schema v2 targets keep validating under the unchanged v2 rules and generate byte-identical artifacts; the frozen v2 template is bundled at `assets/hybrid-workspace/profiles/v2/` with its full regression suite.
+
+### Added
+
+- `generation_contract.outputs` (v3): every generated artifact resolves its destination through a declared slot binding (defaults `_runtime/operations/` for helpers and `_runtime/docs/` for the specification). `WORKSPACE.yaml` is now the only fixed bootstrap path; generated `paths.sh`/`mkdirs.sh` resolve the workspace root from their encoded binding relationship and verify it by finding `WORKSPACE.yaml`, instead of assuming their own directory is the root. Copied or misplaced helpers fail closed.
+- Optional machine-readable workspace `identity` (`endpoint`, `owner`) rendered into the generated router and specification.
+- Slots `state.hotset`, `system.operations`, `system.documentation`, `asset.library`, `asset.templates`, and the `asset` category.
+- Representation-aware provenance: Markdown frontmatter with a body-scoped SHA-256, file sidecars, directory manifests with a coreutils-reproducible `sha256-tree` identity or a per-file `files` map; honest `acquired_at_basis` / `original_acquisition_time`; organizational containers are walked at any depth instead of being treated as acquisition batches.
+- `assets/hybrid-workspace/provenance.py`: shared identity primitives plus an admission-time `stamp` helper that adds missing body hashes and never overwrites an existing one.
+- Scoped archive manifests: required for formal semantic retirement, never for ordinary cold storage; every manifest present is validated.
+- `tests/test_v3_profile.py` covering relocation, root resolution, symlink/path containment, identity, curation/provenance, hotset/asset resolution, archive scope, and v2 compatibility; v3 audit self-test mutations.
+
 ### Changed
+
+- v3 redefines `reference.collected` / `reference.curated` as actor-independent curation state: collected is preserved raw/reference material not explicitly promoted (any acquirer, legitimate permanent home); curated is deliberately human-admitted maintained reference entered by explicit human-authorized promotion or direct admission, with a curation record. Review never promotes.
+- The generator validates the `agent.instructions` binding instead of a hardcoded `AGENTS.md` for v3 targets.
+- Normative profile, operation, and method references describe v3 and keep the v2 contract documented as supported.
 
 - `compatibility.md §4.1`: updated the ICM semantic-authority description to acknowledge that icm-architect's skill references (`references/core.md`, `references/forms.md`, `references/system-map.md`, `references/reference-integrity.md`) are the effective operational spec for Build, Restructure, and System Map behavior; `_core/CONVENTIONS.md` remains the canonical pattern-level authority. Where the two sources diverge on operational detail, icm-architect's field-tested references take precedence.
 - `compatibility.md §4.1 item 11`: extended restructure move-safety to include workspace-root durability confirmation (confirm root is tracked or backed up before reorganizing) as the first gate, ahead of referrer discovery. This reflects the requirement added in icm-architect `references/reference-integrity.md` (2026-08-25).

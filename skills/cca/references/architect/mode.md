@@ -32,7 +32,7 @@ Before changing structure, identify the current boundary, upstream-native claims
 - **CCA-compatible**: CCA can resolve the target without structural migration or semantic replacement.
 - **CCA-conformant**: preserve the normative CCA semantics the target intentionally adopted.
 - **Profile-conformant**: preserve the named CCA-owned profile contract independently from other claims.
-- **CCA Hybrid Workspace Profile**: optional CCA-owned profile; not a new mode and not native ICM. The current bundled schema is v2, preserving the frozen-v1 baseline and adding only `reference.curated`/`reference.collected` admission classifications. Stable semantic roles remain identity; bindings remain configurable where the current profile permits them.
+- **CCA Hybrid Workspace Profile**: optional CCA-owned profile; not a new mode and not native ICM. The current bundled schema is v3 (v2 remains supported), preserving the frozen-v1 baseline and the `reference.curated`/`reference.collected` classifications as actor-independent curation state, with every generated artifact placed by a declared binding. Stable semantic roles remain identity; bindings remain configurable where the current profile permits them.
 - **Method overlays**: PARA, Zettelkasten, BASB/CODE, delivery methods, and similar systems remain their own authorities unless an explicit machine-facing contract says otherwise.
 
 Compatibility is interoperability, not ownership and not an architecture-quality certification. Do not label an upstream workspace CCA-conformant merely because CCA can resolve it.
@@ -57,7 +57,7 @@ reference.curated   ─┐
 reference.collected ─┘
 ```
 
-`reference.*` records how preserved evidence entered the corpus; it does not create a second reference ontology.
+`reference.*` records whether preserved evidence has been explicitly curated (v3; v2: how it was admitted); it does not create a second reference ontology.
 
 ## Audit mode
 

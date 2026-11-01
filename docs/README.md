@@ -75,7 +75,7 @@ skills/cca/
 
 Architect and advisor references are deliberately separate domains. Architect owns workspace structure and composition; advisor owns engineering/process judgment. Architect may consult advisor references lazily, but does not absorb or duplicate them.
 
-The Hybrid Workspace Profile is optional and CCA-owned. Its current bundled schema is v2; the complete reference implementation and adversarial tests travel inside `skills/cca/assets/hybrid-workspace/` so the installed skill remains self-contained.
+The Hybrid Workspace Profile is optional and CCA-owned. Its current bundled schema is v3 (v2 remains supported); the complete reference implementation and adversarial tests travel inside `skills/cca/assets/hybrid-workspace/` so the installed skill remains self-contained.
 
 ## Repository layout
 

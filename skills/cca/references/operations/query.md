@@ -16,7 +16,7 @@ Query maintained synthesis first; use source evidence when the answer requires v
 2. **Read the smallest sufficient set of pages.** Follow relevant links rather than loading the whole knowledge base.
 3. **Respect authority boundaries.** Do not treat human-authored Zettelkasten/PARA material or human-admitted source evidence as writable synthesis unless the workspace explicitly permits it.
 4. **Escalate to evidence when needed.** Inspect cited/source material for exact wording, numbers, dates, disputed claims, or confidence judgments.
-5. **Preserve admission metadata separately from epistemic judgment.** In the Hybrid Workspace Profile, both `reference.curated` and `reference.collected` resolve to `knowledge.reference`; curated/collected says how the source entered the corpus, not whether the source is true or endorsed.
+5. **Preserve admission metadata separately from epistemic judgment.** In the Hybrid Workspace Profile, both `reference.curated` and `reference.collected` resolve to `knowledge.reference`; curated/collected says whether the source has been explicitly curated (v2: how it was admitted), not whether the source is true or endorsed and not who acquired it.
 6. **Answer with traceability.** Distinguish maintained synthesis, direct evidence, source admission/review state where relevant, unresolved contradictions, and your inference.
 7. **Expose gaps.** If the workspace does not contain enough evidence, say what is missing rather than filling the gap from unstated assumptions.
 8. **Persist only when appropriate.** Write the result back only when the user requests it or the workspace explicitly defines query-to-knowledge maintenance as normal behavior. Follow the workspace's existing page/index/history conventions.
