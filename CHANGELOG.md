@@ -12,8 +12,8 @@ Minor: adds Hybrid Workspace Profile **schema v3** as an opt-in contract for exi
 
 ### Added
 
-- `generation_contract.outputs` (v3): every generated artifact resolves its destination through a declared slot binding (defaults `_runtime/operations/` for helpers and `_runtime/docs/` for the specification), so `WORKSPACE.yaml` is the only fixed bootstrap path. Outputs may only target agent-writable derived/shared system or control bindings that govern the destination and are not nested in content bindings; collisions are checked case-insensitively; the generator refuses to overwrite non-generated files.
-- Relocatable shell helpers: generated `paths.sh`/`mkdirs.sh` canonicalise their own path, walk back from their declared destination, and accept the root only when `WORKSPACE.yaml` is there and the declared destination is the helper itself. Copied helpers fail closed; symlinked helpers resolve their own workspace; a failed `source` leaves `WS_ROOT` unset.
+- `generation_contract.outputs` (v3): every generated artifact resolves its destination through a declared slot binding (defaults `_runtime/operations/` for helpers and `_runtime/docs/` for the specification), so `WORKSPACE.yaml` is the only fixed bootstrap path. Outputs may only target agent-writable derived/shared system or control bindings that govern the destination and are not nested in content bindings; collisions are checked case-insensitively; the generator replaces an existing file only when it carries that artifact's exact generated header.
+- Relocatable shell helpers: generated `paths.sh`/`mkdirs.sh` canonicalise their own path, walk back from their declared destination, and accept the root only when `WORKSPACE.yaml` is there and the declared destination is the helper itself. Helpers embed the SHA-256 of the `WORKSPACE.yaml` they were generated from, so copied or stale helpers fail closed until regenerated; symlinked helpers resolve their own workspace; a failed `source` leaves `WS_ROOT` unset.
 - Optional machine-readable workspace `identity` (`endpoint`, `owner`) rendered into the generated router and specification.
 - Slots `state.hotset` (indexed for human search), `system.operations`, `system.documentation`, `asset.library`, `asset.templates`, and the `asset` category.
 - Representation-aware provenance: Markdown frontmatter (nested `provenance:` mapping or top-level fields) with a body-scoped SHA-256, file sidecars, directory manifests with a coreutils-reproducible `sha256-tree` identity or a per-file `files` map; honest `acquired_at_basis` and `original_acquisition_time` (timestamp, date, or unknown); organizational containers walked at any depth instead of being treated as acquisition batches; optional `field_aliases`.
@@ -34,7 +34,7 @@ Minor: adds Hybrid Workspace Profile **schema v3** as an opt-in contract for exi
 
 ### Fixed
 
-- Binding text validation now inspects raw path segments, rejecting `./`, `a/./b`, and empty segments that `PurePosixPath` previously normalised away (this also applies to v2 targets; such bindings could alias the workspace root).
+- Binding text validation now inspects raw path segments, rejecting `./`, `a/./b`, and empty segments (`a//b`) that `PurePosixPath` previously normalised away. This intentionally also applies to v2 targets, whose behaviour is otherwise unchanged: such bindings could alias the workspace root or another binding.
 
 ## 1.2.1 - 2026-09-08
 

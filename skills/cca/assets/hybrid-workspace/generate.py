@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import hashlib
 from pathlib import Path, PurePosixPath
 import re
 import shlex
@@ -22,7 +23,10 @@ TEMPLATE_AGENTS = PACKAGE_ROOT / "AGENTS.md"
 
 
 def schema(target: Path) -> dict[str, Any]:
-    return load_schema(target / "WORKSPACE.yaml")
+    data = load_schema(target / "WORKSPACE.yaml")
+    # Internal (never rendered as schema content): lets v3 helpers bind to the exact schema they derive from.
+    data["_schema_digest"] = hashlib.sha256((target / "WORKSPACE.yaml").read_bytes()).hexdigest()
+    return data
 
 
 def resolve_target(raw: str, *, init: bool) -> Path:
@@ -62,7 +66,7 @@ def _root_hops(destination: str) -> str:
     return "/".join([".."] * depth)
 
 
-def _root_resolution(helper: str, destination: str, self_var: str, root_var: str, *, sourced: bool) -> list[str]:
+def _root_resolution(helper: str, destination: str, self_var: str, root_var: str, *, sourced: bool, schema_digest: str) -> list[str]:
     """Shell lines that resolve and verify the workspace root for a relocated helper.
 
     The helper canonicalises its own path (following symlinks), walks back from
@@ -90,7 +94,14 @@ def _root_resolution(helper: str, destination: str, self_var: str, root_var: str
         f'  echo "{helper}: workspace root not found; expected this helper at <workspace>/{destination} next to WORKSPACE.yaml. Run it from its generated location." >&2',
         f"  {failure}",
         "fi",
-        "unset _ws_link _ws_here",
+        "# The helper was generated from one exact WORKSPACE.yaml; a helper copied into another",
+        "# workspace, or left stale after a schema edit, fails closed until regenerated.",
+        f'_ws_digest="$( (sha256sum -- "${{{root_var}}}/WORKSPACE.yaml" 2>/dev/null || shasum -a 256 "${{{root_var}}}/WORKSPACE.yaml" 2>/dev/null) | cut -d" " -f1)"',
+        f'if [ "$_ws_digest" != "{schema_digest}" ]; then',
+        f'  echo "{helper}: WORKSPACE.yaml at ${{{root_var}}} differs from the one this helper was generated from; regenerate the derived artifacts" >&2',
+        f"  unset _ws_digest; {failure}",
+        "fi",
+        "unset _ws_link _ws_here _ws_digest",
     ]
 
 
@@ -109,7 +120,7 @@ def gen_paths(data: dict[str, Any], destination: str | None = None) -> str:
     if destination is None:
         lines.append('WS_ROOT="$(cd -- "$(dirname -- "$_ws_self")" && pwd)"')
     else:
-        lines.extend(_root_resolution("paths.sh", destination, "$_ws_self", "WS_ROOT", sourced=True))
+        lines.extend(_root_resolution("paths.sh", destination, "$_ws_self", "WS_ROOT", sourced=True, schema_digest=data["_schema_digest"]))
     lines.extend([
         "unset _ws_self",
         "declare -Ar WS_BINDING=(",
@@ -150,7 +161,7 @@ def gen_mkdirs(data: dict[str, Any], destination: str | None = None) -> str:
         "# Default: minimum viable required directories. Use --all to materialize optional/conditional slots.",
         "set -euo pipefail",
         *(['ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"'] if destination is None
-          else _root_resolution("mkdirs.sh", destination, "${BASH_SOURCE[0]}", "ROOT", sourced=False)),
+          else _root_resolution("mkdirs.sh", destination, "${BASH_SOURCE[0]}", "ROOT", sourced=False, schema_digest=data["_schema_digest"])),
         'case "${1:-}" in',
         '  ""|--required) MODE=required ;;',
         '  --all) MODE=all ;;',
@@ -523,19 +534,24 @@ def artifact_drift(rendered: dict[str, str], target: Path) -> list[str]:
     return problems
 
 
-GENERATED_MARKER = re.compile(r"(?i)generated from `?WORKSPACE\.yaml")
+def _header(text: str, lines: int = 3) -> str:
+    return "".join(text.splitlines(keepends=True)[:lines])
 
 
 def foreign_destinations(rendered: dict[str, str], target: Path) -> list[str]:
-    """Existing destinations that are neither generated artifacts nor already identical."""
+    """Existing destinations that are not this generator's artifact.
+
+    An existing file may be replaced only when it already starts with the exact
+    header this generator writes for that artifact (its first three lines).
+    """
     foreign: list[str] = []
     for name, expected in rendered.items():
         path = target / name
         if path.is_dir():
             foreign.append(name)
         elif path.is_file():
-            head = path.read_text(encoding="utf-8", errors="replace")[:400]
-            if path.read_text(encoding="utf-8", errors="replace") != expected and not GENERATED_MARKER.search(head):
+            current = path.read_text(encoding="utf-8", errors="replace")
+            if current != expected and _header(current) != _header(expected):
                 foreign.append(name)
     return foreign
 

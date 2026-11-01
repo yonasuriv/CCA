@@ -617,5 +617,65 @@ class ReviewRegressionTests(unittest.TestCase):
         self.assertIn("_state/tasks/", excludes)
 
 
+class ReReviewRegressionTests(unittest.TestCase):
+    """Regressions for the independent re-review of the v3 fixes."""
+
+    def test_stamp_refuses_whole_collected_class(self) -> None:
+        target = make_target()
+        collected = target / "20-sources" / "collected"
+        collected.mkdir(parents=True)
+        (collected / "x.md").write_text("---\nprovenance:\n  origin: o\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n---\nTAMPERED\n", encoding="utf-8")
+        result = run(sys.executable, str(PACKAGE / "provenance.py"), "--target", str(target), "stamp", "20-sources/collected")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("content_hash", (collected / "x.md").read_text(encoding="utf-8"))
+
+    def test_helper_copied_to_the_same_path_in_another_workspace_fails(self) -> None:
+        source = make_target()
+        self.assertEqual(generate(source).returncode, 0)
+        other = make_target()
+        data = load(other)
+        data["identity"] = {"endpoint": "brain://other", "owner": "human"}
+        save(other, data)
+        (other / "_runtime" / "operations").mkdir(parents=True)
+        shutil.copy2(source / "_runtime/operations/mkdirs.sh", other / "_runtime/operations/mkdirs.sh")
+        result = run("bash", str(other / "_runtime/operations/mkdirs.sh"), "--all")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("regenerate", result.stderr)
+        self.assertFalse((other / "00-wiki").exists())
+
+    def test_stale_helper_after_schema_edit_fails_until_regenerated(self) -> None:
+        target = make_target()
+        self.assertEqual(generate(target).returncode, 0)
+        with (target / "WORKSPACE.yaml").open("a", encoding="utf-8") as handle:
+            handle.write("\n# owner edit\n")
+        stale = run("bash", "-c", f'source "{target}/_runtime/operations/paths.sh"; echo "rc=$?"')
+        self.assertIn("rc=1", stale.stdout)
+        self.assertNotEqual(generate(target, "--check").returncode, 0)
+        self.assertEqual(generate(target).returncode, 0)
+        fresh = run("bash", "-c", f'source "{target}/_runtime/operations/paths.sh" && echo "$WS_ROOT"')
+        self.assertEqual(Path(fresh.stdout.strip()), target.resolve())
+
+    def test_overwrite_guard_requires_exact_generated_header(self) -> None:
+        target = make_target()
+        docs = target / "_runtime" / "docs"
+        docs.mkdir(parents=True)
+        human = "# My notes\n\nThis was generated from WORKSPACE.yaml by hand.\n"
+        (docs / "SPEC.md").write_text(human, encoding="utf-8")
+        self.assertNotEqual(generate(target).returncode, 0)
+        self.assertEqual((docs / "SPEC.md").read_text(encoding="utf-8"), human)
+        (docs / "SPEC.md").unlink()
+        self.assertEqual(generate(target).returncode, 0)
+        with (docs / "SPEC.md").open("a", encoding="utf-8") as handle:
+            handle.write("\nstale tail\n")
+        self.assertEqual(generate(target).returncode, 0, "a drifted generated artifact is still regenerable")
+
+    def test_impossible_calendar_dates_are_rejected(self) -> None:
+        target = make_target()
+        collected = target / "20-sources" / "collected"
+        collected.mkdir(parents=True)
+        (collected / "d.md").write_text(clip(original_acquisition_time="2024-13-45"), encoding="utf-8")
+        self.assertNotEqual(audit(target).returncode, 0)
+
+
 if __name__ == "__main__":
     unittest.main()

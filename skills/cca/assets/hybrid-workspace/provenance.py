@@ -183,6 +183,16 @@ def _valid_timestamp(value: Any) -> bool:
     return parsed.tzinfo is not None
 
 
+def _valid_date(value: Any) -> bool:
+    if not isinstance(value, str) or not DATE_RE.fullmatch(value.strip()):
+        return False
+    try:
+        date.fromisoformat(value.strip())
+    except ValueError:
+        return False
+    return True
+
+
 def markdown_provenance(front: dict[str, Any], rep: dict[str, Any]) -> dict[str, Any] | None:
     """Collect canonical provenance fields from a capture's frontmatter.
 
@@ -239,7 +249,7 @@ def validate_object(obj: SourceObject, contract: dict[str, Any], *, curated: boo
     if basis is not None and basis not in contract.get("acquired_at_basis", []):
         problems.append(f"acquired_at_basis must be one of {contract.get('acquired_at_basis')}, got {basis!r}")
     original = prov.get("original_acquisition_time")
-    if original is not None and original != "unknown" and not _valid_timestamp(original) and not (isinstance(original, str) and DATE_RE.fullmatch(original)):
+    if original is not None and original != "unknown" and not _valid_timestamp(original) and not _valid_date(original):
         problems.append("original_acquisition_time must be an RFC3339 timestamp with timezone, an ISO calendar date, or 'unknown'")
     if curated:
         for name in curation.get("record_fields", []):
@@ -419,6 +429,9 @@ def main(argv: list[str] | None = None) -> int:
         if base != collected and collected not in base.parents:
             print(f"refusing {raw_path}: stamping is limited to reference.collected (curated sources are never stamped)", file=sys.stderr)
             return 2
+        if base == collected:
+            print(f"refusing {raw_path}: name the new deposit (a file or its batch folder), not the whole reference.collected class", file=sys.stderr)
+            return 2
         if not base.exists():
             print(f"refusing {raw_path}: does not exist", file=sys.stderr)
             return 2
@@ -435,6 +448,8 @@ def main(argv: list[str] | None = None) -> int:
                     status = "already-stamped" if prov and "content_hash" in prov else "would-stamp" if prov else "no-provenance"
                 else:
                     status = stamp_markdown(obj.path, rep)
+                    if status == "stamped":
+                        print(f"  stamped {rel}")
             except (StampError, yaml.YAMLError, UnicodeError) as exc:
                 status = "refused"
                 failed = True
