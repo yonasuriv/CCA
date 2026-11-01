@@ -235,6 +235,9 @@ class V3SourceModelTests(unittest.TestCase):
 
     def test_web_clipper_source_alias_satisfies_origin(self) -> None:
         target = make_target()
+        data = load(target)
+        data["reference_contract"]["provenance"]["representations"]["markdown_frontmatter"]["field_aliases"] = {"origin": "source"}
+        save(target, data)
         body = "Body.\n"
         prov = {"acquired_by": "human:owner", "acquisition_method": "obsidian-web-clipper", "acquired_at": "2026-10-30T12:00:00Z", "content_hash": body_hash(body)}
         front = yaml.safe_dump({"title": "T", "source": "https://example.com/x", "provenance": prov}, sort_keys=False)
@@ -334,18 +337,18 @@ class V3SourceModelTests(unittest.TestCase):
     def test_stamp_adds_body_hash_once_and_never_overwrites(self) -> None:
         target = make_target()
         body = "Clipped text with <% tp.date.now() %> literal.\n"
-        front = yaml.safe_dump({"title": "T", "source": "https://e.x/a", "provenance": {"acquired_by": "human:owner", "acquisition_method": "obsidian-web-clipper", "acquired_at": "2026-10-30T12:00:00+01:00"}}, sort_keys=False)
+        front = yaml.safe_dump({"title": "T", "provenance": {"origin": "https://e.x/a", "acquired_by": "human:owner", "acquisition_method": "obsidian-web-clipper", "acquired_at": "2026-10-30T12:00:00+01:00"}}, sort_keys=False)
         note = self.collected(target) / "clippings" / "a.md"
         note.parent.mkdir()
         note.write_text(f"---\n{front}---\n{body}", encoding="utf-8")
         self.assertNotEqual(audit(target).returncode, 0)
-        stamped = run(sys.executable, str(PACKAGE / "provenance.py"), "--target", str(target), "stamp")
+        stamped = run(sys.executable, str(PACKAGE / "provenance.py"), "--target", str(target), "stamp", "20-sources/collected/clippings")
         self.assertEqual(stamped.returncode, 0, failures(stamped))
         self.assertIn("stamped: 1", stamped.stdout)
         self.assertTrue(note.read_text(encoding="utf-8").endswith(body))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
         note.write_text(note.read_text(encoding="utf-8").replace("literal", "edited"), encoding="utf-8")
-        again = run(sys.executable, str(PACKAGE / "provenance.py"), "--target", str(target), "stamp")
+        again = run(sys.executable, str(PACKAGE / "provenance.py"), "--target", str(target), "stamp", "20-sources/collected/clippings")
         self.assertIn("already-stamped: 1", again.stdout)
         self.assertNotEqual(audit(target).returncode, 0, "stamping must never launder a body mutation")
 
@@ -434,6 +437,184 @@ class V2CompatibilityTests(unittest.TestCase):
         data["schema_version"] = 4
         save(target, data)
         self.assertIn("schema_version must be 2 or 3", failures(audit(target)))
+
+
+class ReviewRegressionTests(unittest.TestCase):
+    """Regressions for the independent review of the first v3 cut."""
+
+    def collected(self, target: Path) -> Path:
+        path = target / "20-sources" / "collected"
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
+    def stamp(self, target: Path, *paths: str) -> subprocess.CompletedProcess[str]:
+        return run(sys.executable, str(PACKAGE / "provenance.py"), "--target", str(target), "stamp", *paths)
+
+    def test_stamp_requires_explicit_paths_and_never_touches_curated(self) -> None:
+        target = make_target()
+        curated = target / "20-sources" / "curated"
+        curated.mkdir(parents=True)
+        text = "---\nprovenance:\n  origin: o\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n---\nbody\n"
+        (curated / "c.md").write_text(text, encoding="utf-8")
+        self.assertNotEqual(self.stamp(target).returncode, 0)
+        refused = self.stamp(target, "20-sources/curated")
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertEqual((curated / "c.md").read_text(encoding="utf-8"), text)
+
+    def test_stamp_flat_fields_from_capture_tool(self) -> None:
+        target = make_target()
+        body = "Body.\n"
+        note = self.collected(target) / "flat.md"
+        note.write_text("---\ntitle: T\norigin: https://e.x/a\nacquired_by: human:owner\nacquisition_method: obsidian-web-clipper\nacquired_at: 2026-10-30T12:00:00+01:00\ntags:\n  - clippings\n---\n" + body, encoding="utf-8")
+        self.assertEqual(self.stamp(target, "20-sources/collected/flat.md").returncode, 0)
+        self.assertTrue(note.read_text(encoding="utf-8").endswith(body))
+        self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
+
+    def test_stamp_handles_nested_mappings_and_refuses_unsafe_layouts(self) -> None:
+        target = make_target()
+        nested = self.collected(target) / "nested.md"
+        nested.write_text("---\nprovenance:\n  origin: o\n  extra:\n    sub: 1\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n---\nbody\n", encoding="utf-8")
+        self.assertEqual(self.stamp(target, "20-sources/collected/nested.md").returncode, 0)
+        self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
+        for label, front in (("flow", "provenance: {origin: o, acquired_by: a, acquisition_method: m, acquired_at: '2026-01-01T00:00:00Z'}"),
+                             ("comment", "provenance:  # note\n  origin: o\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'"),
+                             ("incomplete", "provenance:\n  origin: o")):
+            with self.subTest(label):
+                note = self.collected(target) / f"{label}.md"
+                original = f"---\n{front}\n---\nbody\n"
+                note.write_text(original, encoding="utf-8")
+                result = self.stamp(target, f"20-sources/collected/{label}.md")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(note.read_text(encoding="utf-8"), original)
+
+    def test_stamp_refuses_collected_binding_that_escapes(self) -> None:
+        target = make_target()
+        outside = Path(tempfile.mkdtemp(prefix="cca-outside-"))
+        (outside / "x.md").write_text("---\nprovenance:\n  origin: o\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n---\nb\n", encoding="utf-8")
+        (target / "20-sources").mkdir()
+        os.symlink(outside, target / "20-sources" / "collected")
+        self.assertNotEqual(self.stamp(target, "20-sources/collected/x.md").returncode, 0)
+        self.assertNotIn("content_hash", (outside / "x.md").read_text(encoding="utf-8"))
+
+    def test_outputs_cannot_target_human_bindings_or_overwrite_human_files(self) -> None:
+        for slot in ("system.templates", "system.workflows", "agent.skills", "asset.templates"):
+            with self.subTest(slot):
+                target = make_target()
+                data = load(target)
+                data["generation_contract"]["outputs"]["spec"] = {"slot": slot, "file": "SPEC.md"}
+                save(target, data)
+                self.assertNotEqual(audit(target).returncode, 0)
+        target = make_target()
+        data = load(target)
+        data["generation_contract"]["outputs"]["spec"] = {"slot": "system.documentation", "file": "HOW-TO.md"}
+        save(target, data)
+        (target / "_runtime" / "docs").mkdir(parents=True)
+        (target / "_runtime" / "docs" / "HOW-TO.md").write_text("# Human guide\n", encoding="utf-8")
+        result = generate(target)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual((target / "_runtime" / "docs" / "HOW-TO.md").read_text(encoding="utf-8"), "# Human guide\n")
+
+    def test_output_must_be_governed_by_its_declared_slot_and_not_collide(self) -> None:
+        cases = {
+            "nested under durable": lambda d: next(s for s in d["slots"] if s["key"] == "system.operations").__setitem__("binding", "00-wiki/ops/"),
+            "case-fold collision": lambda d: d["generation_contract"]["outputs"].__setitem__("mkdirs", {"slot": "system.operations", "file": "PATHS.sh"}),
+        }
+        for label, mutate in cases.items():
+            with self.subTest(label):
+                target = make_target()
+                data = load(target)
+                mutate(data)
+                save(target, data)
+                self.assertNotEqual(audit(target).returncode, 0)
+
+    def test_dot_segment_bindings_are_rejected(self) -> None:
+        for binding in ("./", "_runtime/./operations/", "a//b/"):
+            with self.subTest(binding):
+                self.assertIsNotNone(schema_module.validate_binding_text(binding))
+                target = make_target()
+                set_binding(target, "system.operations", binding)
+                self.assertNotEqual(audit(target).returncode, 0)
+
+    def test_helper_copied_into_another_anchored_workspace_fails_closed(self) -> None:
+        target = make_target()
+        self.assertEqual(generate(target).returncode, 0)
+        victim = make_target()
+        (victim / "x" / "y").mkdir(parents=True)
+        shutil.copy2(target / "_runtime/operations/mkdirs.sh", victim / "x" / "y" / "mkdirs.sh")
+        # victim/x/y/../.. is victim, which has a WORKSPACE.yaml but not this helper.
+        result = run("bash", str(victim / "x" / "y" / "mkdirs.sh"), "--all")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((victim / "00-wiki").exists())
+
+    def test_symlinked_helper_resolves_its_own_workspace(self) -> None:
+        inner = make_target()
+        self.assertEqual(generate(inner).returncode, 0)
+        outer = make_target()
+        (outer / "projects" / "inner").mkdir(parents=True)
+        os.symlink(inner / "_runtime/operations/paths.sh", outer / "projects" / "inner" / "paths.sh")
+        result = run("bash", "-c", f'source "{outer}/projects/inner/paths.sh" && echo "$WS_ROOT"')
+        self.assertEqual(result.returncode, 0, failures(result))
+        self.assertEqual(Path(result.stdout.strip()), inner.resolve())
+
+    def test_failed_source_leaves_no_wrong_root(self) -> None:
+        target = make_target()
+        self.assertEqual(generate(target).returncode, 0)
+        stray = Path(tempfile.mkdtemp(prefix="cca-stray-")) / "a" / "b"
+        stray.mkdir(parents=True)
+        shutil.copy2(target / "_runtime/operations/paths.sh", stray / "paths.sh")
+        result = run("bash", "-c", f'source "{stray}/paths.sh"; echo "rc=$? root=${{WS_ROOT:-unset}}"')
+        self.assertIn("rc=1 root=unset", result.stdout)
+
+    def test_paths_with_spaces(self) -> None:
+        base = Path(tempfile.mkdtemp(prefix="cca space "))
+        target = base / "my workspace"
+        target.mkdir()
+        for name in ("WORKSPACE.yaml", "AGENTS.md"):
+            shutil.copy2(PACKAGE / name, target / name)
+        self.assertEqual(generate(target).returncode, 0)
+        result = run("bash", "-c", f'source "{target}/_runtime/operations/paths.sh" && echo "$WS_ROOT"')
+        self.assertEqual(Path(result.stdout.strip()), target.resolve())
+
+    def test_manifest_named_directory_and_os_noise(self) -> None:
+        target = make_target()
+        corpus = self.collected(target) / "c"
+        (corpus / ".source.yaml").mkdir(parents=True)
+        (corpus / ".source.yaml" / "hidden.md").write_text("x\n", encoding="utf-8")
+        self.assertNotEqual(audit(target).returncode, 0)
+        shutil.rmtree(corpus)
+        (self.collected(target) / ".DS_Store").write_bytes(b"\x00")
+        self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
+
+    def test_original_time_precision_and_bare_date_acquired_at(self) -> None:
+        target = make_target()
+        (self.collected(target) / "d.md").write_text(clip(original_acquisition_time="2025-07-05"), encoding="utf-8")
+        self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
+        (self.collected(target) / "d.md").write_text(clip(acquired_at="2025-07-05"), encoding="utf-8")
+        self.assertIn("a bare date is not a timestamp", failures(audit(target)))
+
+    def test_curated_migration_basis_is_honest_and_validated(self) -> None:
+        target = make_target()
+        curated = target / "20-sources" / "curated"
+        curated.mkdir(parents=True)
+        (curated / "r.md").write_text(clip(curated_by="human:owner", curated_at="2026-11-01T10:00:00+01:00", curated_at_basis="migration"), encoding="utf-8")
+        self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
+        (curated / "r.md").write_text(clip(curated_by="human:owner", curated_at="2026-11-01T10:00:00+01:00", curated_at_basis="guess"), encoding="utf-8")
+        self.assertNotEqual(audit(target).returncode, 0)
+
+    def test_v3_requires_cca_1_3_0(self) -> None:
+        target = make_target()
+        data = load(target)
+        data["cca"]["specification"] = "1.0.0"
+        save(target, data)
+        self.assertIn("requires cca.specification >= 1.3.0", failures(audit(target)))
+
+    def test_hotset_is_in_the_human_search_surface(self) -> None:
+        target = make_target()
+        self.assertEqual(generate(target).returncode, 0)
+        excludes = (target / "_runtime/operations/obsidian-excludes.txt").read_text(encoding="utf-8").splitlines()
+        self.assertNotIn("_state/", excludes)
+        self.assertIn("_state/NOW.md", excludes)
+        self.assertIn("_state/tasks/", excludes)
 
 
 if __name__ == "__main__":

@@ -65,8 +65,11 @@ def validate_binding_text(binding: str) -> str | None:
     p = PurePosixPath(binding.rstrip("/"))
     if p.is_absolute():
         return "binding must be workspace-relative"
-    if any(part in (".", "..") for part in p.parts):
-        return "binding may not contain . or .. path segments"
+    # Inspect the raw segments: PurePosixPath silently drops "." segments, which
+    # would let "./" or "a/./b" alias the workspace root or another binding.
+    raw_segments = binding.rstrip("/").split("/")
+    if any(part in ("", ".", "..") for part in raw_segments):
+        return "binding may not contain empty, . or .. path segments"
     return None
 
 

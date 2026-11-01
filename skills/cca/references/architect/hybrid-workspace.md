@@ -31,7 +31,7 @@ CCA core remains path-agnostic. The profile implements CCA semantics through:
 boundary + semantic role -> binding
 ```
 
-The semantic role identifies what material is. The binding is the concrete workspace-local representation and may move where the profile evolution contract permits it. Classification may add orthogonal meaning such as boundary class or source-admission provenance without replacing the semantic role.
+The semantic role identifies what material is. The binding is the concrete workspace-local representation and may move where the profile evolution contract permits it. Classification may add orthogonal meaning such as boundary class or source curation state without replacing the semantic role.
 
 Tools MUST resolve declared keys/bindings and MUST NOT infer identity from default names such as `_state/`, `_runtime/`, `00-wiki/`, `20-sources/`, or `CONTEXT.md`.
 
@@ -101,12 +101,13 @@ The contract supports one representation per object type:
 
 | object | representation | content identity |
 |---|---|---|
-| Markdown capture (`.md`) | `provenance:` mapping in the note's own frontmatter | `content_hash: sha256:<hex>` of the **body** — every byte after the closing frontmatter line — with `content_hash_scope: body` |
+| Markdown capture (`.md`) | the note's own frontmatter: a `provenance:` mapping, or the same canonical fields at the top level for capture tools that cannot write nested YAML | `content_hash: sha256:<hex>` of the **body** — every byte after the closing frontmatter line, exactly as stored — with `content_hash_scope: body` |
 | any other file | `<file>.source.yaml` sidecar | `content_hash: sha256:<hex>` of the file bytes |
-| acquisition batch / imported directory | directory `.source.yaml` | `content_identity: sha256-tree:<hex>` |
-| automated corpus | directory `.source.yaml` | `files:` mapping of relative path → `sha256:<hex>` |
+| acquisition batch, imported directory, or automated corpus | directory `.source.yaml` | either `content_identity: sha256-tree:<hex>` (one tree identity) or a `files:` mapping of relative path → `sha256:<hex>` (per-file identity, typical for generated corpus manifests) |
 
-The body-scoped hash exists because a Markdown file cannot contain a hash of itself. Frontmatter (tags, review notes, provenance) may be extended without changing the evidence identity; any change to the body is detected. `field_aliases` lets a capture tool's existing metadata satisfy a canonical field without duplication (the bundled template maps `origin` to a top-level `source`, which Obsidian Web Clipper already writes).
+The body-scoped hash exists because a Markdown file cannot contain a hash of itself. Frontmatter (tags, review notes, provenance) may be extended without changing the evidence identity, and is therefore **not** protected by the hash; any change to the body is detected. The body is hashed byte-for-byte, so newline conversion (for example Git `core.autocrlf`) changes identity — keep reference captures out of newline normalisation (for example a `-text` Git attribute). `field_aliases` lets a capture tool's existing metadata satisfy a canonical field without duplication; a workspace whose clipper already records the page URL as `source` can declare `field_aliases: {origin: source}`. The bundled template declares no aliases.
+
+`original_acquisition_time` records the original acquisition with honest precision: a timestamp with timezone, a calendar date, or `unknown`. `acquired_at` is always a full timestamp; a bare date is rejected rather than silently promoted to midnight.
 
 `sha256-tree` is reproducible with coreutils from inside the directory:
 
@@ -114,9 +115,9 @@ The body-scoped hash exists because a Markdown file cannot contain a hash of its
 find . -type f ! -path ./.source.yaml -printf '%P\0' | LC_ALL=C sort -z | xargs -0 sha256sum | sha256sum
 ```
 
-**Containers are not batches.** A directory that has no `.source.yaml` is an organizational container (for example `collected/clippings/`, `collected/transcripts/`, `collected/upstream/`) at any depth; each descendant object carries its own provenance. A directory with a manifest is one acquisition object and its contents are covered by that manifest. `.gitkeep` is ignored; symlinked source objects and orphan sidecars are rejected.
+**Containers are not batches** (`unmanifested_directories: container`). A directory that has no `.source.yaml` is an organizational container (for example `collected/clippings/`, `collected/transcripts/`, `collected/corpora/`) at any depth; each descendant object carries its own provenance. A directory with a manifest is one acquisition object and its contents are covered by that manifest. `.gitkeep` and common OS noise files (`.DS_Store`, `Thumbs.db`, `desktop.ini`) are ignored; symlinked source objects, orphan sidecars, and a `.source.yaml` that is not a regular file are rejected.
 
-Identity is established at admission and is immutable afterwards. The bundled `provenance.py stamp` helper adds the body-scoped `content_hash` to Markdown captures that carry provenance but no hash yet. It never replaces an existing hash (that would launder a mutation) and never invents the other provenance fields — a capture template supplies those automatically.
+Identity is established at admission and is immutable afterwards. The bundled `provenance.py stamp <paths…>` helper is a **deposit-time** tool: given explicit paths under `reference.collected` that are being admitted now, it adds the body-scoped `content_hash` to Markdown captures that already carry the other provenance fields. It never runs over a whole class by default, refuses anything outside `reference.collected` (curated sources are never stamped), refuses a collected binding that escapes the workspace, never replaces an existing hash (that would launder a mutation), never invents other fields, verifies its insertion by re-parsing, and restores the original bytes on any failure. It is not a retrofit tool: material that already sat in a class without identity must be re-admitted deliberately, with its content checked against an independent source before identity is recorded.
 
 Raw/reference evidence survives distillation and is never rewritten into cleaner prose. Agent-authored synthesis belongs in `knowledge.durable`; deliverables belong in `output.artifact`.
 
@@ -139,9 +140,10 @@ generation_contract:
     spec: disabled
 ```
 
-- `file` is one safe filename segment inside a `system`/`control` directory binding; nothing defaults to the target root.
-- Generated helpers never infer the workspace root from their own directory. The generator encodes the relationship between the helper's binding and the root and the helper verifies the root by finding `WORKSPACE.yaml` there; a copied or misplaced helper fails closed instead of materializing directories in the wrong place.
-- Destinations are validated as text and after symlink resolution before any write.
+- `file` is one safe filename segment inside an agent-writable `derived` or `shared` `system`/`control` directory binding that is not nested inside a content binding; the destination's most-specific binding must be that declared slot; destinations may not collide (case-insensitively) with each other or with any declared binding; nothing defaults to the target root.
+- Generated helpers never assume their own directory is the root. Each helper canonicalises its own path (following symlinks), walks back from its declared destination to the candidate root, and accepts it only if `WORKSPACE.yaml` is there **and** the declared destination under that root is the helper itself. A helper reached through a symlink therefore resolves its own workspace; a copied or misplaced helper fails closed (a failed `source` leaves `WS_ROOT` unset).
+- Destinations are validated as text and after symlink resolution before any write, and the generator refuses to overwrite an existing file that is not a generated artifact.
+- Relocating `system.operations` or `system.documentation` leaves the previous outputs in place; remove them deliberately (`--check` validates declared destinations, not orphans).
 - The binding that contains a generated file never grants hand-edit authority over it (`invariants.generation`).
 - `workspace.schema` MUST stay bound to `WORKSPACE.yaml`: it is the only fixed bootstrap path. `agent.instructions` is resolved through its binding.
 
@@ -159,7 +161,7 @@ Generated routers/specifications render it from this block. It is system identit
 
 ### Operational state hotset
 
-`state.hotset` binds the general operational-state tree (default `_state/`): quick actions, dashboards, canvases, active bookmarks, reminders, current working references — useful **now**, not durable knowledge. More-specific state bindings nested inside it (`state.current`, `state.tasks`) keep their own policy. Agents may add and edit hotset material; removal is a human decision.
+`state.hotset` binds the general operational-state tree (default `_state/`): quick actions, dashboards, canvases, active bookmarks, reminders, current working references — useful **now**, not durable knowledge. It is indexed `included` because the human needs it in search and quick switching; more-specific state bindings nested inside it (`state.current`, `state.tasks`) keep their own policy and indexing. Agents may add and edit hotset material; removal is a human decision.
 
 ### Operating documentation and system operations
 
@@ -239,7 +241,7 @@ The bundled schema preserves all reviewed frozen-v1 semantics. In particular:
 - `context.router` remains derived and its concrete filename is its current binding, not the literal string `CONTEXT.md`;
 - generated helpers remain derived target artifacts and never semantic identities.
 
-V2 added only the admission classification contract; v3 adds the extensions described above. Both deliberately reuse existing `immutable`, `append`, `human`, `shared`, `read-only`, and `write` vocabulary values; no new policy axis or generic write primitive was invented.
+V2 added only the admission classification contract and reused the existing vocabulary. V3 deliberately adds the `asset` category and the contract vocabulary its extensions need (`curation_state`, `acquisition_actor`, `entry`, `top_level_fields`, `field_aliases`, `unmanifested_directories`, `record_basis`, `scope_semantics`, generation `outputs`) — which is why it is a schema-version bump. Neither version introduces a new policy axis or a generic write primitive; every slot policy still uses the frozen `immutable`, `append`, `mutable`, `curated`, `replace`, and `regenerate` definitions.
 
 Do not change a frozen semantic key, policy meaning, authority meaning, axis, or vocabulary value as a binding customization. Such changes require the profile's declared schema-version treatment.
 
@@ -247,7 +249,7 @@ Do not change a frozen semantic key, policy meaning, authority meaning, axis, or
 
 The `crosswalk` material records provenance/influence for humans and tools. It is **not** a second semantic-key namespace and MUST NOT be interpreted as one-to-one equivalence.
 
-PARA `Resources`, for example, is broader than `knowledge.reference`. A Resource may contain preserved evidence, a human-authored note, maintained synthesis, a dataset, or a nested workspace. The new `reference.*` classifications do not alter that mapping; they classify admission provenance inside the preserved-evidence role.
+PARA `Resources`, for example, is broader than `knowledge.reference`. A Resource may contain preserved evidence, a human-authored note, maintained synthesis, a dataset, or a nested workspace. The `reference.*` classifications do not alter that mapping; they classify curation state (v2: admission) inside the preserved-evidence role.
 
 Consumers MUST use the target's actual boundary/role/authority semantics rather than infer epistemic type solely from a crosswalk label.
 
@@ -346,4 +348,15 @@ A target declaring `schema_version: 2` keeps the v2 contract exactly:
 - `generation_contract.derived` lists `paths.sh`, `mkdirs.sh`, `obsidian-excludes.txt`, `CONTEXT.md` (the `context.router` role), and `SPEC.md`; helpers are generated at the target root.
 - Whole-tree retirement creates `.archive.yaml`.
 
-The frozen v2 template is bundled at `assets/hybrid-workspace/profiles/v2/` and its regression tests remain part of the release suite. Moving a v2 target to v3 is an explicit, human-authorized schema change: declare `schema_version: 3`, adopt the v3 blocks, regenerate, and resolve any new audit findings (for example, provenance for objects inside containers).
+The frozen v2 template is bundled at `assets/hybrid-workspace/profiles/v2/` and its regression tests remain part of the release suite. `generate.py --init` seeds the current v3 template; to start a new v2 target deliberately, copy the v2 template files from `profiles/v2/` instead.
+
+### Migrating a v2 target to v3
+
+Moving a v2 target to v3 is an explicit, human-authorized schema change. It never happens implicitly.
+
+1. Snapshot the target (tracked and untracked content) outside the workspace.
+2. Edit `WORKSPACE.yaml`: declare `schema_version: 3` and `cca.specification` ≥ `1.3.0`; adopt the v3 `generation_contract.outputs`, `reference_contract`, `archive_contract`, and `privileged_operations` blocks and the v3 slots; add `identity` if the workspace has an endpoint. Update the `agent.instructions` file to `workspace-contract:v3`.
+3. Run `generate.py --target <workspace>`; delete the old root `paths.sh`, `mkdirs.sh`, `obsidian-excludes.txt`, and `SPEC.md` after the new outputs exist, and update every consumer that called them by their old path.
+4. Bring reference objects under the v3 provenance contract. Existing v2 sidecars and directory manifests remain valid where their identity still verifies. Objects inside organizational containers need their own provenance. Never re-stamp or re-hash existing evidence to make the audit pass: if content no longer matches its recorded identity, investigate and re-admit it deliberately with an honest `acquired_at_basis`.
+5. Give existing curated objects their curation record with `curated_at_basis: migration` (the time the record is written), never an invented original admission time.
+6. Run `audit.py --target` and `generate.py --check`; review every finding before accepting the migration.

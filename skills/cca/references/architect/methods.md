@@ -30,7 +30,7 @@ Keep these questions independent:
 | **Curation/provenance classification** | Has preserved evidence been explicitly curated, and how was it acquired? | collected (any acquirer), curated (explicitly human-admitted) |
 | **Navigation** | How does a consumer discover the relevant boundary/context? | native upstream router, existing index, scoped AGENTS.md, ICM-derived contract, profile-defined router, ordinary filesystem structure |
 
-A human method does not determine epistemic authority. A navigation pattern does not determine the organizational shelf. Source admission provenance does not determine content authorship or create a new knowledge role.
+A human method does not determine epistemic authority. A navigation pattern does not determine the organizational shelf. Source curation state and acquisition provenance do not determine content authorship or create a new knowledge role.
 
 For navigation:
 

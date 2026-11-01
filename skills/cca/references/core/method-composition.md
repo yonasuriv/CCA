@@ -23,18 +23,18 @@ Examples:
 
 CCA may describe a workspace as PARA-organized, Zettelkasten-style, BASB-guided, or otherwise overlay-shaped, but those labels are not additional CCA compatibility states.
 
-### Organization, epistemic role, admission provenance, and navigation
+### Organization, epistemic role, curation/provenance classification, and navigation
 
 These are separate concerns:
 
 - an organizational shelf answers **where material lives**;
 - an epistemic/semantic role answers **what kind of information it is** and often implies different authority/lifecycle expectations;
-- an admission/provenance classification may answer **how a source entered a particular corpus** without replacing the source's semantic role;
+- a curation/provenance classification may answer **whether a source has been explicitly curated, or how it entered a particular corpus**, without replacing the source's semantic role;
 - a navigation contract answers **how a consumer discovers the relevant boundary and context**.
 
 Therefore PARA `Resources` is not semantically equivalent to CCA `knowledge.reference`. A Resource may contain external evidence, a human note, maintained synthesis, a dataset, or a nested workspace. Crosswalks MUST describe partial/composed relationships where one-to-one equivalence is false.
 
-The current CCA Hybrid Workspace Profile demonstrates admission classification without ontology replacement:
+The CCA Hybrid Workspace Profile demonstrates such a classification without ontology replacement:
 
 ```text
 reference.curated   -> knowledge.reference

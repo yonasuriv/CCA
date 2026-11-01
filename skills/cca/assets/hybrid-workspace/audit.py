@@ -21,7 +21,7 @@ from typing import Any
 
 import yaml
 
-from schema import load_schema, resolves_within, validate_binding_text, validate_key
+from schema import load_schema, resolve_slot_for_path, resolves_within, validate_binding_text, validate_key
 import provenance as provenance_lib
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
@@ -172,7 +172,7 @@ SUPPORTED_SCHEMA_VERSIONS = (2, 3)
 
 # ── v3 extension (opt-in) ─────────────────────────────────────────────────────
 FROZEN_V3_EXTENSION: dict[str, dict[str, Any]] = {
-    "state.hotset": dict(category="state", arity="dir", mutability="curated", indexed="excluded", authority="shared", agent_access="write", link_target="none", requirement="optional"),
+    "state.hotset": dict(category="state", arity="dir", mutability="curated", indexed="included", authority="shared", agent_access="write", link_target="none", requirement="optional"),
     "system.operations": dict(category="system", arity="dir", mutability="regenerate", indexed="disabled", authority="derived", agent_access="write", link_target="none", requirement="conditional"),
     "system.documentation": dict(category="system", arity="dir", mutability="mutable", indexed="excluded", authority="shared", agent_access="write", link_target="none", requirement="optional"),
     "asset.library": dict(category="asset", arity="dir", mutability="mutable", indexed="excluded", authority="human", agent_access="read-only", link_target="none", requirement="optional"),
@@ -198,6 +198,7 @@ V3_ALLOWED_NESTED = V2_ALLOWED_NESTED | {
 V3_OUTPUTS = {"context.router", "spec", "paths", "mkdirs", "host_index_adapter"}
 V3_HUMAN_AUTHORED = ["workspace.schema", "agent.instructions"]
 V3_OUTPUT_SLOT_CATEGORIES = {"system", "control"}
+V3_OUTPUT_SLOT_AUTHORITIES = {"derived", "shared"}
 FILE_SEGMENT_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 ENDPOINT_RE = re.compile(r"^[a-z][a-z0-9+.-]*://[A-Za-z0-9._~-]+(?:/[A-Za-z0-9._~/-]*)?$")
 IDENTITY_OWNERS = {"human", "agent", "shared"}
@@ -208,13 +209,22 @@ V3_PROVENANCE = {
     "required_fields": ["origin", "acquired_by", "acquisition_method", "acquired_at"],
     "optional_fields": ["acquired_at_basis", "original_acquisition_time"],
     "acquired_at_basis": ["acquisition", "import"],
+    "original_acquisition_time": ["timestamp", "date", "unknown"],
     "hash_algorithm": "sha256",
     "representations": {
-        "markdown_frontmatter": {"applies_to": ".md", "key": "provenance", "identity": "content_hash", "hash_scope": "body"},
+        "markdown_frontmatter": {"applies_to": ".md", "key": "provenance", "top_level_fields": "allowed", "identity": "content_hash", "hash_scope": "body"},
         "file_sidecar": {"suffix": ".source.yaml", "identity": "content_hash", "hash_scope": "bytes"},
         "directory_manifest": {"name": ".source.yaml", "identity": ["files", "content_identity"], "content_identity_scheme": "sha256-tree"},
     },
-    "containers": "implicit",
+    "unmanifested_directories": "container",
+}
+V3_IGNORABLE_NAMES = {".gitkeep", ".DS_Store", "Thumbs.db", "desktop.ini"}
+V3_CURATION = {
+    "orthogonal_to_acquisition": True,
+    "review_promotes": False,
+    "promotion": "human-authorized",
+    "record_fields": ["curated_by", "curated_at"],
+    "record_basis": ["promotion", "direct-admission", "migration"],
 }
 
 
@@ -439,6 +449,15 @@ def _validate_generation_v3(data: dict[str, Any], by_key: dict[str, dict[str, An
             fail("generation", f"output {name} slot {spec['slot']} must be a directory binding")
         if slot.get("category") not in V3_OUTPUT_SLOT_CATEGORIES:
             fail("generation", f"output {name} may only target system/control bindings, not {slot.get('category')!r} ({spec['slot']})")
+        if slot.get("authority") not in V3_OUTPUT_SLOT_AUTHORITIES or slot.get("agent_access") != "write":
+            fail("generation", f"output {name} may only target an agent-writable derived/shared binding; {spec['slot']} is {slot.get('authority')}/{slot.get('agent_access')}")
+        slot_path = slot["binding"].rstrip("/")
+        for other_key, other in by_key.items():
+            other_binding = other.get("binding")
+            if other_key == spec["slot"] or not isinstance(other_binding, str) or other.get("arity") != "dir":
+                continue
+            if (slot_path + "/").startswith(other_binding.rstrip("/") + "/") and other.get("category") not in V3_OUTPUT_SLOT_CATEGORIES:
+                fail("generation", f"output {name} binding {slot['binding']!r} is nested inside {other_key} ({other.get('category')}); generated tooling must not live inside content bindings")
         file_name = spec.get("file")
         if not isinstance(file_name, str) or not FILE_SEGMENT_RE.fullmatch(file_name):
             fail("generation", f"output {name} file must be a single safe filename segment, got {file_name!r}")
@@ -447,12 +466,25 @@ def _validate_generation_v3(data: dict[str, Any], by_key: dict[str, dict[str, An
         error = validate_binding_text(destination)
         if error or not resolves_within(root, destination):
             fail("generation", f"output {name} destination {destination!r} is invalid or escapes the workspace")
-        if destination == "WORKSPACE.yaml" or destination in destinations.values():
+            continue
+        try:
+            owner = resolve_slot_for_path(destination, data)
+        except (KeyError, ValueError):
+            owner = None
+        if owner is None or owner.get("key") != spec["slot"]:
+            fail("generation", f"output {name} destination {destination!r} is governed by {owner.get('key') if owner else None}, not its declared slot {spec['slot']}")
+        folded = destination.casefold()
+        if folded == "workspace.yaml" or folded in {d.casefold() for d in destinations.values()}:
             fail("generation", f"output {name} destination {destination!r} collides with another declared file")
         destinations[name] = destination
     for key, slot in by_key.items():
-        if slot.get("arity") == "file" and slot.get("binding") in destinations.values():
-            fail("generation", f"generated output collides with file binding of {key}")
+        binding = slot.get("binding")
+        if not isinstance(binding, str):
+            continue
+        bound = binding.rstrip("/").casefold()
+        for name, destination in destinations.items():
+            if key != "context.router" and bound == destination.casefold():
+                fail("generation", f"generated output {name} collides with the binding of {key}")
     policy = contract.get("index_policy")
     if not isinstance(policy, dict) or policy.get("spec") != "disabled" or set(policy) - V3_OUTPUTS:
         fail("generation", "generation_contract.index_policy must keep the generated spec disabled and name only declared outputs")
@@ -540,7 +572,7 @@ def _validate_reference_contract_v3(data: dict[str, Any], by_key: dict[str, dict
             if "admission" in cls or "review_changes_classification" in cls:
                 fail("reference", f"{name}: v2 actor-coupled admission fields are not v3 semantics")
     curation = contract.get("curation")
-    if curation != {"orthogonal_to_acquisition": True, "review_promotes": False, "promotion": "human-authorized", "record_fields": ["curated_by", "curated_at"]}:
+    if curation != V3_CURATION:
         fail("reference", f"curation must be orthogonal to acquisition, never promoted by review, human-authorized, recorded: {curation}")
     if data.get("privileged_operations", {}).get("reference.collected", {}).get("promotion") != "human-authorized":
         fail("policy", "promotion out of reference.collected must be a human-authorized privileged operation")
@@ -563,8 +595,8 @@ def _validate_reference_contract_v3(data: dict[str, Any], by_key: dict[str, dict
             elif actual != expected:
                 fail("reference", f"provenance {field} differs from v3 contract: {actual!r}")
         ignored = prov.get("ignored_names", [])
-        if not isinstance(ignored, list) or any(name not in {".gitkeep"} for name in ignored):
-            fail("reference", "provenance.ignored_names may only contain .gitkeep")
+        if not isinstance(ignored, list) or any(name not in V3_IGNORABLE_NAMES for name in ignored):
+            fail("reference", f"provenance.ignored_names may only contain {sorted(V3_IGNORABLE_NAMES)}")
     if contract.get("routing") != EXPECTED_REFERENCE_ROUTING:
         fail("reference", f"reference routing differs from contract: {contract.get('routing')}")
     statement = contract.get("epistemic_statement")
@@ -596,12 +628,12 @@ def _validate_reference_filesystem_v3(data: dict[str, Any], by_key: dict[str, di
                 fail("reference", f"loose/unknown source entry {child.relative_to(root)} is prohibited; raw/reference objects must resolve through reference.curated or reference.collected")
             elif child.name not in prov.get("ignored_names", []) and not child.is_dir():
                 fail("reference", f"reference class binding {child.relative_to(root)} must be a directory")
-    record_fields = (contract.get("curation") or {}).get("record_fields", ["curated_by", "curated_at"])
+    curation = contract.get("curation") if isinstance(contract.get("curation"), dict) else V3_CURATION
     for key, path in class_paths.items():
-        if not path.is_dir():
+        if not path.is_dir() or path.is_symlink():
             continue
         for obj in provenance_lib.iter_source_objects(path, prov):
-            for problem in provenance_lib.validate_object(obj, prov, curated=(key == "reference.curated"), record_fields=record_fields):
+            for problem in provenance_lib.validate_object(obj, prov, curated=(key == "reference.curated"), curation=curation):
                 fail("provenance", f"{obj.path.relative_to(root)}: {problem}")
 
 
@@ -818,6 +850,9 @@ def validate_schema(data: dict[str, Any], root: Path = PACKAGE_ROOT) -> tuple[li
         fail("composition", "classification/semantic-role composition rule is required")
 
     if v3:
+        declared_cca = (data.get("cca") or {}).get("specification") if isinstance(data.get("cca"), dict) else None
+        if not isinstance(declared_cca, str) or not CCA_SEMVER_RE.fullmatch(declared_cca) or cca_semver_tuple(declared_cca) < (1, 3, 0):
+            fail("cca-version", "schema v3 requires cca.specification >= 1.3.0, the first CCA contract that defines it")
         schema_slot = by_key.get("workspace.schema")
         if schema_slot and schema_slot.get("binding") != "WORKSPACE.yaml":
             fail("bootstrap", "workspace.schema binding must stay WORKSPACE.yaml at the target root: it is the only fixed bootstrap path")
@@ -920,7 +955,15 @@ def run_self_test(good: dict[str, Any], root: Path) -> tuple[list[str], int]:
     must_fail("v3: drop required provenance field", lambda d: prov(d)["required_fields"].remove("origin"))
     must_fail("v3: hash whole self-referential markdown", lambda d: prov(d)["representations"]["markdown_frontmatter"].__setitem__("hash_scope", "bytes"))
     must_fail("v3: weaken directory identity", lambda d: prov(d)["representations"]["directory_manifest"].__setitem__("identity", ["description"]))
-    must_fail("v3: containers become batches", lambda d: prov(d).__setitem__("containers", "batch"))
+    must_fail("v3: containers become batches", lambda d: prov(d).__setitem__("unmanifested_directories", "batch"))
+    must_fail("v3: helper into human-owned binding", lambda d: outputs(d).__setitem__("paths", {"slot": "system.templates", "file": "paths.sh"}))
+    def output_on_directory_binding(d: dict[str, Any]) -> None:
+        outputs(d)["spec"] = {"slot": "system.documentation", "file": "x"}
+        slot(d, "state.memory")["binding"] = "_runtime/docs/x/"
+    must_fail("v3: output collides with a directory binding", output_on_directory_binding)
+    must_fail("v3: dot-segment binding aliases root", lambda d: slot(d, "system.operations").__setitem__("binding", "./"))
+    must_fail("v3: declare a pre-v3 CCA contract", lambda d: d["cca"].__setitem__("specification", "1.2.1"))
+    must_fail("v3: honest curation basis removed", lambda d: d["reference_contract"]["curation"].__setitem__("record_basis", ["promotion"]))
     must_fail("v3: ignore arbitrary files", lambda d: prov(d).__setitem__("ignored_names", [".gitkeep", "*.md"]))
     must_fail("v3: generated helper escapes", lambda d: outputs(d).__setitem__("paths", {"slot": "system.operations", "file": "../paths.sh"}))
     must_fail("v3: generated helper into durable knowledge", lambda d: outputs(d).__setitem__("paths", {"slot": "knowledge.durable", "file": "paths.sh"}))

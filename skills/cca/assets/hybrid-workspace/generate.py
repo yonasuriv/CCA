@@ -63,17 +63,34 @@ def _root_hops(destination: str) -> str:
 
 
 def _root_resolution(helper: str, destination: str, self_var: str, root_var: str, *, sourced: bool) -> list[str]:
+    """Shell lines that resolve and verify the workspace root for a relocated helper.
+
+    The helper canonicalises its own path (following symlinks), walks back from
+    its declared destination to the candidate root, and accepts the root only if
+    WORKSPACE.yaml is there AND the declared destination under that root is this
+    very file. A copied helper, or one reached through an unrelated tree, fails
+    closed instead of operating on whatever workspace happens to be nearby.
+    """
     hops = _root_hops(destination)
     suffix = f"/{hops}" if hops else ""
-    failure = "return 1 2>/dev/null || exit 1" if sourced else "exit 1"
+    failure = f"unset {root_var} _ws_link _ws_here; return 1 2>/dev/null || exit 1" if sourced else "exit 1"
+    quoted_dest = shlex.quote(destination)
     return [
-        f"# Workspace root = this helper's binding ({destination}) walked back {len(PurePosixPath(destination).parent.parts)} level(s),",
-        "# verified by the bootstrap anchor. The helper's own directory is never assumed to be the root.",
-        f'{root_var}="$(cd -- "$(dirname -- "{self_var}"){suffix}" 2>/dev/null && pwd -P)"',
-        f'if [ -z "${{{root_var}}}" ] || [ ! -f "${{{root_var}}}/WORKSPACE.yaml" ]; then',
-        f'  echo "{helper}: workspace root not found (expected WORKSPACE.yaml at ${{{root_var}:-?}}); run the helper from its generated location" >&2',
+        f"# Workspace root = this helper's declared destination ({destination}) walked back",
+        f"# {len(PurePosixPath(destination).parent.parts)} level(s) from its canonical (symlink-resolved) location, then",
+        "# verified: WORKSPACE.yaml must exist there and the declared destination must be",
+        "# this very file. The helper's directory is never assumed to be the root.",
+        f'_ws_here="{self_var}"',
+        'while [ -L "$_ws_here" ]; do',
+        '  _ws_link="$(readlink -- "$_ws_here")"',
+        '  case "$_ws_link" in /*) _ws_here="$_ws_link" ;; *) _ws_here="$(dirname -- "$_ws_here")/$_ws_link" ;; esac',
+        "done",
+        f'{root_var}="$(cd -P -- "$(dirname -- "$_ws_here"){suffix}" 2>/dev/null && pwd -P)"',
+        f'if [ -z "${{{root_var}}}" ] || [ ! -f "${{{root_var}}}/WORKSPACE.yaml" ] || [ ! "${{{root_var}}}/"{quoted_dest} -ef "$_ws_here" ]; then',
+        f'  echo "{helper}: workspace root not found; expected this helper at <workspace>/{destination} next to WORKSPACE.yaml. Run it from its generated location." >&2',
         f"  {failure}",
         "fi",
+        "unset _ws_link _ws_here",
     ]
 
 
@@ -203,7 +220,7 @@ def _reference_curation_lines_v3(data: dict[str, Any]) -> list[str]:
         "- Acquisition (who/how/when/origin/identity) and curation state are orthogonal. Review alone never promotes; promotion adds a curation record (" + ", ".join(f"`{f}`" for f in data["reference_contract"]["curation"]["record_fields"]) + ").",
         "- Presence in either class means preserved evidence, not truth, correctness, quality, or endorsement.",
         "- Every object answers " + ", ".join(f"`{f}`" for f in prov["required_fields"]) + " and a verifiable content identity:",
-        f"  - Markdown capture: frontmatter `{reps['markdown_frontmatter']['key']}:` mapping; `content_hash` = sha256 of the body after the frontmatter (`content_hash_scope: body`).",
+        f"  - Markdown capture: frontmatter `{reps['markdown_frontmatter']['key']}:` mapping" + (" or top-level fields" if reps["markdown_frontmatter"].get("top_level_fields") == "allowed" else "") + "; `content_hash` = sha256 of the body after the frontmatter (`content_hash_scope: body`).",
         f"  - Other file: `<file>{reps['file_sidecar']['suffix']}` sidecar; `content_hash` = sha256 of the file bytes.",
         f"  - Acquisition batch or corpus: directory `{reps['directory_manifest']['name']}`; per-file `files:` hashes or `content_identity: sha256-tree:<hex>`.",
         "  - A directory without a manifest is an organizational container; its descendants carry their own provenance.",
@@ -506,6 +523,23 @@ def artifact_drift(rendered: dict[str, str], target: Path) -> list[str]:
     return problems
 
 
+GENERATED_MARKER = re.compile(r"(?i)generated from `?WORKSPACE\.yaml")
+
+
+def foreign_destinations(rendered: dict[str, str], target: Path) -> list[str]:
+    """Existing destinations that are neither generated artifacts nor already identical."""
+    foreign: list[str] = []
+    for name, expected in rendered.items():
+        path = target / name
+        if path.is_dir():
+            foreign.append(name)
+        elif path.is_file():
+            head = path.read_text(encoding="utf-8", errors="replace")[:400]
+            if path.read_text(encoding="utf-8", errors="replace") != expected and not GENERATED_MARKER.search(head):
+                foreign.append(name)
+    return foreign
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate or verify CCA Hybrid Workspace Profile artifacts on an explicit target workspace.")
     parser.add_argument("--target", required=True, help="Target workspace root. Never defaults to the installed skill/tool directory.")
@@ -541,6 +575,12 @@ def main(argv: list[str] | None = None) -> int:
         print("✓ all generated artifacts match canonical render")
         print("✓ AGENTS.md structural control contract passed")
         return 0
+    if is_v3(data):
+        foreign = foreign_destinations(rendered, target)
+        if foreign:
+            for name in foreign:
+                print(f"refusing to overwrite {name}: existing file is not a generated artifact", file=sys.stderr)
+            return 1
     for name, text in rendered.items():
         path = target / name
         path.parent.mkdir(parents=True, exist_ok=True)
