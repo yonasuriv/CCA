@@ -38,6 +38,15 @@ Do not create missing CCA-preferred catalogs merely because sync knows about the
 
 Load `../architect/hybrid-workspace.md` when the target matches the bundled **v3** profile or the supported **v2** profile.
 
+Consumers should resolve semantic keys, not maintain independent path tables. The shared CLI exposes a stable interface:
+
+```bash
+python <cca-skill>/assets/hybrid-workspace/resolve.py --target <workspace> --key knowledge.durable
+python <cca-skill>/assets/hybrid-workspace/resolve.py --target <workspace> --output paths --format relative
+```
+
+This resolves only the manifest, not the vault contents. An unrecognized key, unsafe binding, ambiguous manifest filename, or path escaping the workspace fails explicitly.
+
 After an authorized edit to the root workspace manifest (`workspace.yaml` on new v3 workspaces, `WORKSPACE.yaml` on existing workspaces), reconcile derived artifacts with the installed skill's bundled implementation:
 
 ```bash
@@ -85,3 +94,5 @@ After edits:
 4. no upstream-native rule or method boundary was replaced with a CCA preference;
 5. for the Hybrid Workspace Profile, `generate.py --target <workspace> --check` passes and no obsolete binding leaks remain;
 6. reference classification still resolves both curated and collected evidence to `knowledge.reference`, with collected provenance/integrity intact.
+
+For schema v3, generation uses the structural audit so routine edits do not scan the entire source corpus. Run `python <cca-skill>/assets/hybrid-workspace/audit.py --target <workspace>` to separately verify all preserved evidence, provenance, and archive records. Generated helpers validate a parsed-schema fingerprint; YAML comments, key ordering, and formatting do not invalidate them, but meaningful configuration changes do until regeneration. This check requires Python 3 and PyYAML on the shell host.
