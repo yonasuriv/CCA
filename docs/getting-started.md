@@ -115,7 +115,7 @@ acquisition != curation state != content authorship != semantic role
 - Presence in either class is evidence, not truth or endorsement.
 - Agent-authored conclusions belong to `knowledge.durable`; deliberate external deliverables to `output.artifact`; finite research work to `work.project`.
 
-The version bumps are intentional: the evolution contract requires a schema-version bump for key additions and meaning/policy changes. Neither v2 nor v3 silently rewrites an earlier contract. V3 also makes every generated artifact a declared binding (default `_runtime/operations/` and `_runtime/docs/`), so `WORKSPACE.yaml` is the only file the profile assumes at the root.
+The version bumps are intentional: the evolution contract requires a schema-version bump for key additions and meaning/policy changes. Neither v2 nor v3 silently rewrites an earlier contract. V3 also makes every generated artifact a declared binding (default `_runtime/operations/` and `_runtime/docs/`), so new v3 workspaces bootstrap from `workspace.yaml` (existing `WORKSPACE.yaml` remains supported).
 
 The profile is defined and implemented completely inside the installable skill:
 
@@ -127,6 +127,7 @@ skills/cca/
     ├── AGENTS.md
     ├── schema.py
     ├── generate.py
+    ├── resolve.py
     ├── audit.py
     ├── requirements.txt
     └── tests/
@@ -144,7 +145,7 @@ Resolve the installed `skills/cca/` root and run the bundled tool against the in
 python <cca-skill>/assets/hybrid-workspace/generate.py --target <workspace> --init
 ```
 
-The tool intentionally requires `--target` and refuses to build inside the installed hybrid tool package. `--init` seeds missing human-authored bootstrap files without overwriting existing ones.
+The tool intentionally requires `--target` and refuses to build inside the installed hybrid tool package. `--init` seeds new v3 workspaces with lowercase `workspace.yaml`; existing uppercase workspaces continue to work, and either bootstrap file is preserved without overwrite. Use `resolve.py --target <workspace> --key knowledge.durable` from scripts instead of hardcoding a path. Generation runs a fast structural audit; run `audit.py --target <workspace>` separately for full source/provenance checks.
 
 After authorized binding changes:
 
