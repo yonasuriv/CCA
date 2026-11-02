@@ -80,7 +80,8 @@ class TargetIsolationTests(unittest.TestCase):
             "--init",
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertTrue((target / "WORKSPACE.yaml").is_file())
+        self.assertTrue((target / "workspace.yaml").is_file())
+        self.assertFalse((target / "WORKSPACE.yaml").exists())
         self.assertTrue((target / "AGENTS.md").is_file())
         original = (target / "AGENTS.md").read_text(encoding="utf-8")
         (target / "AGENTS.md").write_text(original + "\nLOCAL EDIT\n", encoding="utf-8")
