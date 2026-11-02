@@ -119,6 +119,18 @@ class WorkspaceResolverTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             resolve(target, key="knowledge.durable")
 
+    def test_fast_structure_check_does_not_scan_sources(self) -> None:
+        target = make_target()
+        collected = resolve(target, key="reference.collected")[1]
+        collected.mkdir(parents=True)
+        (collected / "unadmitted.md").write_text("Unverified evidence\\n", encoding="utf-8")
+        fast = run(sys.executable, str(ROOT / "audit.py"), "--target", str(target), "--structure-only")
+        self.assertEqual(fast.returncode, 0, fast.stdout + fast.stderr)
+        full = run(sys.executable, str(ROOT / "audit.py"), "--target", str(target))
+        self.assertNotEqual(full.returncode, 0, full.stdout + full.stderr)
+        regenerated = run(sys.executable, str(ROOT / "generate.py"), "--target", str(target))
+        self.assertEqual(regenerated.returncode, 0, regenerated.stdout + regenerated.stderr)
+
     def test_init_new_v3_target_uses_lowercase_name(self) -> None:
         target = Path(tempfile.mkdtemp(prefix="cca-init-case-"))
         result = run(sys.executable, str(ROOT / "generate.py"), "--target", str(target), "--init")
