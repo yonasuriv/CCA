@@ -8,7 +8,6 @@ import hashlib
 from pathlib import Path, PurePosixPath
 import re
 import shlex
-import shutil
 import subprocess
 import sys
 from typing import Any
