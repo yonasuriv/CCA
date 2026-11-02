@@ -16,7 +16,7 @@ V3 is a schema-version bump under the profile's own evolution contract because i
 
 V3 preserves the complete frozen-v1 slot/policy/authority baseline and the v2 classification keys with their slot policies. It adds:
 
-- **relocatable generated outputs** — no generated artifact has a fixed root filename; `WORKSPACE.yaml` is the only fixed bootstrap path;
+- **relocatable generated outputs** — new v3 targets bootstrap from root `workspace.yaml`; existing v3/v2 targets using `WORKSPACE.yaml` remain valid, but both spellings together are rejected;
 - **workspace identity** — an optional machine-readable `identity` block in `WORKSPACE.yaml`;
 - **actor-independent curation** — collected vs curated records explicit curation state, orthogonal to who or what acquired the bytes;
 - **representation-aware provenance** — Markdown frontmatter, file sidecars, directory/corpus manifests, with organizational containers no longer mistaken for acquisition batches;
@@ -141,11 +141,11 @@ generation_contract:
 ```
 
 - `file` is one safe filename segment inside an agent-writable `derived` or `shared` `system`/`control` directory binding that is not nested inside a content binding; the destination's most-specific binding must be that declared slot; destinations may not collide (case-insensitively) with each other or with any declared binding; nothing defaults to the target root.
-- Generated helpers never assume their own directory is the root. Each helper canonicalises its own path (following symlinks), walks back from its declared destination to the candidate root, and accepts it only if `WORKSPACE.yaml` is there **and** the declared destination under that root is the helper itself. Each helper also embeds the SHA-256 of the exact `WORKSPACE.yaml` it was generated from and refuses to run when the root's schema differs. A helper reached through a symlink therefore resolves its own workspace; a copied, misplaced, or stale helper fails closed until regenerated (a failed `source` leaves `WS_ROOT` unset). Placing `system.operations` inside a human-owned system binding is permitted by the most-specific-binding rule, but keep generated tooling in its own binding where possible.
+- Generated helpers locate their root from their declared destination and verify the presence of the case-exact bootstrap manifest. They do **not** embed the manifest's byte-level SHA-256: whitespace-only edits are not semantic drift. A helper placed outside its declared destination fails closed; binding changes require `generate.py` and `generate.py --check` to refresh/check derived bindings before consuming helpers. Place generated tooling in its own binding where possible.
 - Destinations are validated as text and after symlink resolution before any write, and the generator refuses to overwrite an existing file unless it already starts with the exact header that artifact's generator writes.
 - Relocating `system.operations` or `system.documentation` leaves the previous outputs in place; remove them deliberately (`--check` validates declared destinations, not orphans).
 - The binding that contains a generated file never grants hand-edit authority over it (`invariants.generation`).
-- `workspace.schema` MUST stay bound to `WORKSPACE.yaml`: it is the only fixed bootstrap path. `agent.instructions` is resolved through its binding.
+- `workspace.schema` MUST point to exactly one root bootstrap file: `workspace.yaml` for new v3 targets, or `WORKSPACE.yaml` for existing v2/v3 targets. Case variants cannot coexist. `agent.instructions` resolves through its binding.
 
 ### Workspace identity
 
@@ -202,15 +202,27 @@ assets/hybrid-workspace/
 
 Repository-global files are never runtime dependencies of this profile.
 
-`WORKSPACE.yaml` and `AGENTS.md` are templates for the **target workspace**. The Python files remain reference tooling in the installed CCA skill. Generated artifacts belong to the target workspace, never beside the installed scripts.
+The packaged `WORKSPACE.yaml` and `AGENTS.md` are templates for the **target workspace**; `--init` now writes `workspace.yaml` for new v3 workspaces. Existing uppercase workspaces are retained without implicit rename. Generated artifacts belong to the target workspace, never beside the installed scripts.
 
 The Python implementation is not the only possible implementation of the profile. An **alternative implementation** MAY be written in another language if it preserves the normative contract below.
+
+### Shared semantic binding resolution
+
+Consumers MUST use semantic keys rather than replicate physical paths in scripts or test constants. The reference resolver is `assets/hybrid-workspace/resolve.py`, which reads the sole root manifest on each invocation and never traverses note or evidence content.
+
+```bash
+python <cca-skill>/assets/hybrid-workspace/resolve.py --target <workspace> --key knowledge.durable
+python <cca-skill>/assets/hybrid-workspace/resolve.py --target <workspace> --key reference.collected --format relative
+python <cca-skill>/assets/hybrid-workspace/resolve.py --target <workspace> --output paths
+```
+
+Python consumers can import `resolve(root, key="knowledge.durable")` from the same module. Other languages can consume its CLI or a generated adapter. A binding change requires regeneration of affected artifacts, but no consumer-code path updates. `generate.py` now uses `audit.py --structure-only` for v3, which validates structural policies and destinations without scanning the reference/archive corpus. Run a full `audit.py --target` explicitly when validating evidence integrity, source admission, or archive records.
 
 ## Target rule
 
 Every workspace operation MUST resolve an explicit target root.
 
-The bundled generator requires `--target` and refuses to use the installed package directory or one of its descendants as the target. `--init` may create a target root and seed missing human-authored templates, but it never overwrites an existing `WORKSPACE.yaml` or `AGENTS.md`.
+The bundled generator requires `--target` and refuses to use the installed package directory or one of its descendants as the target. `--init` seeds missing human-authored bootstrap files but never overwrites an existing manifest (either spelling) or `AGENTS.md`.
 
 All generated destinations, including fixed helper names, MUST resolve beneath the target after symlink resolution. A generated destination that escapes the target through path traversal or an existing symlink is invalid and MUST be rejected before write.
 
@@ -259,7 +271,7 @@ A consumer that knows the profile but does not have the CCA skill installed MUST
 
 For current v3:
 
-1. `WORKSPACE.yaml` at the target root is the machine-readable profile bootstrap and semantic binding/policy contract. It is the only path a consumer may assume without resolving it.
+1. Discover the single case-exact root manifest (`workspace.yaml` for new v3 workspaces or existing `WORKSPACE.yaml` for legacy workspaces). Reject duplicates and a manifest whose declared `workspace.schema` binding does not match its actual filename. This manifest is the sole bootstrap authority for semantic bindings and policy.
 2. The `agent.instructions` binding (default `AGENTS.md`) is the human/agent control surface and identifies `workspace-contract:v3` (`workspace-contract:v2` for v2 targets).
 3. Semantic resolution starts from the applicable boundary and declared slots; `slots[*].binding` gives the concrete target-local implementation.
 4. `classification_roles` declares when a classification composes with another semantic role instead of replacing it.
@@ -268,7 +280,7 @@ For current v3:
 7. The value of a default binding is never the semantic identity. `context.router` remains the semantic generated-router role even when the binding is `CONTEXT.md`, `ROUTER.md`, or another valid profile binding.
 8. An implementation MUST validate binding text and symlink-resolved containment before reading/writing generated/profile-controlled destinations.
 9. For nested bindings, filesystem policy resolves from the most-specific matching binding; semantic composition remains separately visible.
-10. Derived artifacts are rebuildable views/adapters. They MUST NOT become competing authority over `WORKSPACE.yaml`, human-authored control files, source evidence, or canonical workspace content.
+10. Derived artifacts are rebuildable views/adapters. They MUST NOT become competing authority over the workspace manifest, human-authored control files, source evidence, or canonical workspace content.
 
 ### Generated artifact semantics
 
@@ -288,7 +300,7 @@ This distinction lets a Rust/Go/other implementation reproduce the profile from 
 
 ## Detection
 
-Treat a workspace as this profile when its local `WORKSPACE.yaml` matches the bundled v3 contract (or the supported v2 contract) and the required human-authored control surface identifies the matching `workspace-contract:v3` / `workspace-contract:v2` marker. Do not classify arbitrary YAML manifests as this profile.
+Treat a workspace as this profile when its one root manifest (`workspace.yaml` or `WORKSPACE.yaml`) matches the declared v3 contract (or the supported uppercase v2 contract) and the human-authored control surface identifies the matching `workspace-contract:v3` / `workspace-contract:v2` marker. Do not classify arbitrary YAML manifests as this profile.
 
 A profile workspace is:
 
@@ -355,7 +367,7 @@ The frozen v2 template is bundled at `assets/hybrid-workspace/profiles/v2/` and 
 Moving a v2 target to v3 is an explicit, human-authorized schema change. It never happens implicitly.
 
 1. Snapshot the target (tracked and untracked content) outside the workspace.
-2. Edit `WORKSPACE.yaml`: declare `schema_version: 3` and `cca.specification` ≥ `1.3.0`; adopt the v3 `generation_contract.outputs`, `reference_contract`, `archive_contract`, and `privileged_operations` blocks and the v3 slots; add `identity` if the workspace has an endpoint. Update the `agent.instructions` file to `workspace-contract:v3`.
+2. Edit the existing root manifest: declare `schema_version: 3` and `cca.specification` ≥ `1.3.0`; adopt the v3 `generation_contract.outputs`, `reference_contract`, `archive_contract`, and `privileged_operations` blocks and the v3 slots; add `identity` if the workspace has an endpoint. An explicit optional rename to lowercase `workspace.yaml` must also update the `workspace.schema` binding. Never leave both filenames present. Update `agent.instructions` to `workspace-contract:v3`.
 3. Run `generate.py --target <workspace>`; delete the old root `paths.sh`, `mkdirs.sh`, `obsidian-excludes.txt`, and `SPEC.md` after the new outputs exist, and update every consumer that called them by their old path.
 4. Bring reference objects under the v3 provenance contract. Existing v2 sidecars and directory manifests remain valid where their identity still verifies. Objects inside organizational containers need their own provenance. Never re-stamp or re-hash existing evidence to make the audit pass: if content no longer matches its recorded identity, investigate and re-admit it deliberately with an honest `acquired_at_basis`.
 5. Give existing curated objects their curation record with `curated_at_basis: migration` (the time the record is written), never an invented original admission time.
