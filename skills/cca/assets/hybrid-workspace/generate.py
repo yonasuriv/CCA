@@ -89,6 +89,11 @@ def initialize_target(target: Path) -> list[str]:
     data = load_schema(manifest)
     if manifest.name == "workspace.yaml" and data.get("schema_version") != 3:
         raise ValueError("lowercase workspace.yaml is supported only for schema v3")
+    if data.get("schema_version") == 3:
+        # Refuse unsafe or incoherent bindings before any human-control write.
+        rc, output = run_audit(target, structure_only=True)
+        if rc != 0:
+            raise ValueError(f"cannot initialize an invalid workspace manifest:\n{output}")
 
     # V2 preserves its original AGENTS.md target. V3 resolves the slot rather
     # than assuming the human-authored control file stays at the workspace root.
