@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import difflib
-import hashlib
 from pathlib import Path, PurePosixPath
 import re
 import shlex
@@ -15,7 +14,7 @@ from typing import Any
 
 import yaml
 
-from schema import compact_ops, effective_agent_operations, generated_outputs, load_schema, semantic_role_for_slot
+from schema import compact_ops, effective_agent_operations, generated_outputs, load_schema, semantic_role_for_slot, workspace_schema_path
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
 TEMPLATE_SCHEMA = PACKAGE_ROOT / "WORKSPACE.yaml"
@@ -23,9 +22,9 @@ TEMPLATE_AGENTS = PACKAGE_ROOT / "AGENTS.md"
 
 
 def schema(target: Path) -> dict[str, Any]:
-    data = load_schema(target / "WORKSPACE.yaml")
-    # Internal (never rendered as schema content): lets v3 helpers bind to the exact schema they derive from.
-    data["_schema_digest"] = hashlib.sha256((target / "WORKSPACE.yaml").read_bytes()).hexdigest()
+    manifest = workspace_schema_path(target)
+    data = load_schema(manifest)
+    data["_schema_name"] = manifest.name
     return data
 
 
@@ -42,13 +41,29 @@ def resolve_target(raw: str, *, init: bool) -> Path:
 
 
 def initialize_target(target: Path) -> list[str]:
+    """Seed a lowercase v3 manifest; preserve an existing case-exact bootstrap."""
     created: list[str] = []
-    for source in (TEMPLATE_SCHEMA, TEMPLATE_AGENTS):
-        destination = target / source.name
-        if destination.exists():
-            continue
-        shutil.copy2(source, destination)
-        created.append(source.name)
+    existing = [p for p in target.iterdir() if p.name.casefold() == "workspace.yaml"]
+    if len(existing) > 1 or (existing and existing[0].name not in {"workspace.yaml", "WORKSPACE.yaml"}):
+        raise ValueError("ambiguous workspace bootstrap filename")
+    if existing:
+        manifest = workspace_schema_path(target)
+    else:
+        template = load_schema(TEMPLATE_SCHEMA)
+        name = "workspace.yaml" if template.get("schema_version") == 3 else "WORKSPACE.yaml"
+        manifest = target / name
+        contents = TEMPLATE_SCHEMA.read_text(encoding="utf-8")
+        if name == "workspace.yaml":
+            contents = contents.replace("WORKSPACE.yaml", name)
+        manifest.write_text(contents, encoding="utf-8")
+        created.append(name)
+    agents_path = target / "AGENTS.md"
+    if not agents_path.exists():
+        agents_text = TEMPLATE_AGENTS.read_text(encoding="utf-8")
+        if manifest.name == "workspace.yaml":
+            agents_text = agents_text.replace("WORKSPACE.yaml", manifest.name)
+        agents_path.write_text(agents_text, encoding="utf-8")
+        created.append("AGENTS.md")
     return created
 
 
@@ -66,42 +81,30 @@ def _root_hops(destination: str) -> str:
     return "/".join([".."] * depth)
 
 
-def _root_resolution(helper: str, destination: str, self_var: str, root_var: str, *, sourced: bool, schema_digest: str) -> list[str]:
-    """Shell lines that resolve and verify the workspace root for a relocated helper.
+def _root_resolution(helper: str, destination: str, self_var: str, root_var: str, *, sourced: bool, schema_name: str) -> list[str]:
+    """Verify the helper's workspace structurally, without hash-pinning YAML bytes.
 
-    The helper canonicalises its own path (following symlinks), walks back from
-    its declared destination to the candidate root, and accepts the root only if
-    WORKSPACE.yaml is there AND the declared destination under that root is this
-    very file. A copied helper, or one reached through an unrelated tree, fails
-    closed instead of operating on whatever workspace happens to be nearby.
+    A harmless whitespace edit cannot invalidate the helper. Regeneration with
+    --check remains the explicit way to detect changed semantic bindings.
     """
     hops = _root_hops(destination)
     suffix = f"/{hops}" if hops else ""
     failure = f"unset {root_var} _ws_link _ws_here; return 1 2>/dev/null || exit 1" if sourced else "exit 1"
     quoted_dest = shlex.quote(destination)
     return [
-        f"# Workspace root = this helper's declared destination ({destination}) walked back",
-        f"# {len(PurePosixPath(destination).parent.parts)} level(s) from its canonical (symlink-resolved) location, then",
-        "# verified: WORKSPACE.yaml must exist there and the declared destination must be",
-        "# this very file. The helper's directory is never assumed to be the root.",
+        f"# Workspace root = generated helper location, {destination}",
+        f"# Verify its exact destination and the root bootstrap manifest ({schema_name}).",
         f'_ws_here="{self_var}"',
         'while [ -L "$_ws_here" ]; do',
         '  _ws_link="$(readlink -- "$_ws_here")"',
         '  case "$_ws_link" in /*) _ws_here="$_ws_link" ;; *) _ws_here="$(dirname -- "$_ws_here")/$_ws_link" ;; esac',
         "done",
         f'{root_var}="$(cd -P -- "$(dirname -- "$_ws_here"){suffix}" 2>/dev/null && pwd -P)"',
-        f'if [ -z "${{{root_var}}}" ] || [ ! -f "${{{root_var}}}/WORKSPACE.yaml" ] || [ ! "${{{root_var}}}/"{quoted_dest} -ef "$_ws_here" ]; then',
-        f'  echo "{helper}: workspace root not found; expected this helper at <workspace>/{destination} next to WORKSPACE.yaml. Run it from its generated location." >&2',
+        f'if [ -z "${{{root_var}}}" ] || [ ! -f "${{{root_var}}}/{schema_name}" ] || [ ! "${{{root_var}}}/"{quoted_dest} -ef "$_ws_here" ]; then',
+        f'  echo "{helper}: workspace root not found; expected <workspace>/{destination} and {schema_name}. Regenerate if relocated." >&2',
         f"  {failure}",
         "fi",
-        "# The helper was generated from one exact WORKSPACE.yaml; a helper copied into another",
-        "# workspace, or left stale after a schema edit, fails closed until regenerated.",
-        f'_ws_digest="$( (sha256sum -- "${{{root_var}}}/WORKSPACE.yaml" 2>/dev/null || shasum -a 256 "${{{root_var}}}/WORKSPACE.yaml" 2>/dev/null) | cut -d" " -f1)"',
-        f'if [ "$_ws_digest" != "{schema_digest}" ]; then',
-        f'  echo "{helper}: WORKSPACE.yaml at ${{{root_var}}} differs from the one this helper was generated from; regenerate the derived artifacts" >&2',
-        f"  unset _ws_digest; {failure}",
-        "fi",
-        "unset _ws_link _ws_here _ws_digest",
+        "unset _ws_link _ws_here",
     ]
 
 
@@ -120,7 +123,7 @@ def gen_paths(data: dict[str, Any], destination: str | None = None) -> str:
     if destination is None:
         lines.append('WS_ROOT="$(cd -- "$(dirname -- "$_ws_self")" && pwd)"')
     else:
-        lines.extend(_root_resolution("paths.sh", destination, "$_ws_self", "WS_ROOT", sourced=True, schema_digest=data["_schema_digest"]))
+        lines.extend(_root_resolution("paths.sh", destination, "$_ws_self", "WS_ROOT", sourced=True, schema_name=data["_schema_name"]))
     lines.extend([
         "unset _ws_self",
         "declare -Ar WS_BINDING=(",
@@ -161,7 +164,7 @@ def gen_mkdirs(data: dict[str, Any], destination: str | None = None) -> str:
         "# Default: minimum viable required directories. Use --all to materialize optional/conditional slots.",
         "set -euo pipefail",
         *(['ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"'] if destination is None
-          else _root_resolution("mkdirs.sh", destination, "${BASH_SOURCE[0]}", "ROOT", sourced=False, schema_digest=data["_schema_digest"])),
+          else _root_resolution("mkdirs.sh", destination, "${BASH_SOURCE[0]}", "ROOT", sourced=False, schema_name=data["_schema_name"])),
         'case "${1:-}" in',
         '  ""|--required) MODE=required ;;',
         '  --all) MODE=all ;;',
@@ -459,13 +462,18 @@ def gen_spec(data: dict[str, Any]) -> str:
 def render_all(data: dict[str, Any]) -> dict[str, str]:
     if is_v3(data):
         outputs = generated_outputs(data)
-        return {
+        rendered = {
             outputs["paths"]: gen_paths(data, outputs["paths"]),
             outputs["mkdirs"]: gen_mkdirs(data, outputs["mkdirs"]),
             outputs["host_index_adapter"]: gen_excludes(data),
             outputs["context.router"]: gen_context(data),
             outputs["spec"]: gen_spec(data),
         }
+        # Existing uppercase workspaces retain their previous generated text.
+        schema_name = data.get("_schema_name", "WORKSPACE.yaml")
+        if schema_name == "workspace.yaml":
+            rendered = {path: content.replace("WORKSPACE.yaml", schema_name) for path, content in rendered.items()}
+        return rendered
     router = slots_by_key(data)["context.router"]["binding"].rstrip("/")
     rendered = {
         "paths.sh": gen_paths(data),
@@ -500,7 +508,8 @@ def validate_agents(data: dict[str, Any], target: Path) -> list[str]:
             prefixes = prefixes | {"asset"}
         if prefix in prefixes and match not in known:
             problems.append(f"AGENTS.md references unknown semantic/classification key `{match}`")
-    for term in ("WORKSPACE.yaml", "project.upstream", "knowledge.reference", "reference.curated", "reference.collected", "generated artifacts"):
+    manifest_name = data.get("_schema_name", "WORKSPACE.yaml")
+    for term in (manifest_name, "project.upstream", "knowledge.reference", "reference.curated", "reference.collected", "generated artifacts"):
         if term not in text:
             problems.append(f"AGENTS.md missing required control term {term!r}")
     for stale in ("indexed=no", "indexed=yes", "excluded|no"):
@@ -559,7 +568,7 @@ def foreign_destinations(rendered: dict[str, str], target: Path) -> list[str]:
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate or verify CCA Hybrid Workspace Profile artifacts on an explicit target workspace.")
     parser.add_argument("--target", required=True, help="Target workspace root. Never defaults to the installed skill/tool directory.")
-    parser.add_argument("--init", action="store_true", help="Seed missing WORKSPACE.yaml and AGENTS.md from bundled templates before generation; never overwrite existing files.")
+    parser.add_argument("--init", action="store_true", help="Seed a missing workspace manifest and AGENTS.md; never overwrite existing files.")
     parser.add_argument("--check", action="store_true", help="Verify target artifacts without rewriting them.")
     return parser.parse_args(argv)
 
