@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import json
 import os
 import shutil
 import subprocess
@@ -65,7 +66,7 @@ class WorkspaceResolverTests(unittest.TestCase):
         checked = run(sys.executable, str(ROOT / "generate.py"), "--target", str(target), "--check")
         self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
         outputs = generated_outputs(load_schema(manifest))
-        mkdirs = run("bash", str(target / outputs["mkdirs"]), "--required")
+        mkdirs = run(sys.executable, str(target / outputs["mkdirs"]), "--required")
         self.assertEqual(mkdirs.returncode, 0, mkdirs.stdout + mkdirs.stderr)
 
     def test_relocation_updates_resolution_and_generated_artifacts(self) -> None:
@@ -160,9 +161,9 @@ class QAFindingRegressionTests(unittest.TestCase):
         path.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
         self.assertEqual(self._gen(target).returncode, 0)
         spec = (target / "_runtime/docs/SPEC.md").read_text(encoding="utf-8")
-        paths = (target / "_runtime/operations/paths.sh").read_text(encoding="utf-8")
+        paths = (target / "_runtime/operations/paths.py").read_text(encoding="utf-8")
         self.assertIn("WORKSPACE.yaml-archive", spec)
-        self.assertIn("[output.artifact]=WORKSPACE.yaml.d/", paths)
+        self.assertIn("'output.artifact': 'WORKSPACE.yaml.d/'", paths)
 
     def test_lowercase_manifest_requires_schema_v3_in_every_tool(self) -> None:
         target = Path(tempfile.mkdtemp(prefix="cca-qa-v2lower-"))
@@ -177,7 +178,7 @@ class QAFindingRegressionTests(unittest.TestCase):
         (target / "WORKSPACE.yaml").write_bytes((target / "workspace.yaml").read_bytes())
         if len([p for p in target.iterdir() if p.name.casefold() == "workspace.yaml"]) < 2:
             self.skipTest("case-insensitive filesystem")
-        result = subprocess.run(["bash", "-c", f'source "{target}/_runtime/operations/paths.sh"'], capture_output=True, text=True)
+        result = subprocess.run([sys.executable, str(target / "_runtime/operations/paths.py"), "--list"], capture_output=True, text=True)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("exactly one", result.stderr)
 
@@ -191,16 +192,87 @@ class QAFindingRegressionTests(unittest.TestCase):
             env = dict(os.environ, PYTHONHASHSEED=seed)
             check = subprocess.run([sys.executable, str(ROOT / "generate.py"), "--target", str(target), "--check"], capture_output=True, text=True, env=env)
             self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
-            src = subprocess.run(["bash", "-c", f'source "{target}/_runtime/operations/paths.sh"'], capture_output=True, text=True, env=env)
+            src = subprocess.run([sys.executable, str(target / "_runtime/operations/paths.py"), "--list"], capture_output=True, text=True, env=env)
             self.assertEqual(src.returncode, 0, src.stderr)
 
     def test_unparseable_manifest_is_reported_as_such(self) -> None:
         target = self._v3()
         with (target / "workspace.yaml").open("a", encoding="utf-8") as handle:
             handle.write("\nbroken: [unclosed\n")
-        result = subprocess.run(["bash", "-c", f'source "{target}/_runtime/operations/paths.sh"'], capture_output=True, text=True)
+        result = subprocess.run([sys.executable, str(target / "_runtime/operations/paths.py"), "--list"], capture_output=True, text=True)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("cannot read or parse", result.stderr)
+
+
+class PythonHelperTests(unittest.TestCase):
+    """The default v3 helpers are Python: same guarantees as the shell variant, on any OS."""
+
+    def setUp(self) -> None:
+        self.target = Path(tempfile.mkdtemp(prefix="cca-pyhelper-"))
+        made = subprocess.run([sys.executable, str(ROOT / "generate.py"), "--target", str(self.target), "--init"], capture_output=True, text=True)
+        self.assertEqual(made.returncode, 0, made.stdout + made.stderr)
+        self.paths = self.target / "_runtime/operations/paths.py"
+        self.mkdirs = self.target / "_runtime/operations/mkdirs.py"
+
+    def run_py(self, script: Path, *args: str, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
+        return subprocess.run([sys.executable, str(script), *args], capture_output=True, text=True, cwd=cwd or tempfile.gettempdir())
+
+    def test_defaults_are_python_and_resolve_from_any_cwd(self) -> None:
+        self.assertTrue(self.paths.is_file() and self.mkdirs.is_file())
+        self.assertFalse((self.target / "_runtime/operations/paths.sh").exists())
+        durable = self.run_py(self.paths, "knowledge.durable")
+        self.assertEqual(durable.returncode, 0, durable.stderr)
+        self.assertEqual(Path(durable.stdout.strip()), self.target.resolve() / "00-wiki")
+        mapping = json.loads(self.run_py(self.paths, "--json").stdout)
+        self.assertEqual(mapping["context.capture"], str(self.target.resolve() / "10-inbox"))
+        self.assertEqual(self.run_py(self.paths, "no.such.key").returncode, 2)
+        self.assertEqual(self.run_py(self.mkdirs, "--all").returncode, 0)
+        self.assertTrue((self.target / "40-projects" / "upstream").is_dir())
+        self.assertFalse((self.target / "_runtime" / "operations" / "00-wiki").exists())
+
+    def test_importable_module(self) -> None:
+        code = f"import importlib.util,sys; s=importlib.util.spec_from_file_location('p', {str(self.paths)!r}); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); print(m.ws()['knowledge.durable'])"
+        result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+        self.assertEqual(Path(result.stdout.strip()), self.target.resolve() / "00-wiki")
+
+    def test_whitespace_safe_semantic_change_fails_closed_until_regenerated(self) -> None:
+        manifest = self.target / "workspace.yaml"
+        manifest.write_text(manifest.read_text(encoding="utf-8") + "\n# owner comment\n\n", encoding="utf-8")
+        self.assertEqual(self.run_py(self.paths, "--list").returncode, 0)
+        manifest.write_text(manifest.read_text(encoding="utf-8").replace("binding: 50-outputs/", "binding: outputs/"), encoding="utf-8")
+        stale = self.run_py(self.paths, "--list")
+        self.assertEqual(stale.returncode, 1)
+        self.assertIn("regenerate", stale.stderr)
+        self.assertEqual(self.run_py(self.mkdirs, "--all").returncode, 1)
+        subprocess.run([sys.executable, str(ROOT / "generate.py"), "--target", str(self.target)], check=True, capture_output=True)
+        self.assertEqual(self.run_py(self.paths, "output.artifact").stdout.strip(), str(self.target.resolve() / "outputs"))
+
+    def test_copied_and_symlinked_helpers(self) -> None:
+        stray = Path(tempfile.mkdtemp(prefix="cca-stray-")) / "a" / "b"
+        stray.mkdir(parents=True)
+        shutil.copy2(self.paths, stray / "paths.py")
+        copied = self.run_py(stray / "paths.py", "--list")
+        self.assertEqual(copied.returncode, 1)
+        outer = Path(tempfile.mkdtemp(prefix="cca-outer-"))
+        os.symlink(self.paths, outer / "paths.py")
+        linked = self.run_py(outer / "paths.py", "workspace.schema")
+        self.assertEqual(Path(linked.stdout.strip()), self.target.resolve() / "workspace.yaml")
+
+    def test_helper_extension_must_be_supported(self) -> None:
+        manifest = self.target / "workspace.yaml"
+        manifest.write_text(manifest.read_text(encoding="utf-8").replace("file: paths.py}", "file: paths.rb}"), encoding="utf-8")
+        audit = subprocess.run([sys.executable, str(ROOT / "audit.py"), "--target", str(self.target)], capture_output=True, text=True)
+        self.assertNotEqual(audit.returncode, 0)
+        self.assertIn(".py (cross-platform) or .sh", audit.stdout)
+
+    def test_helper_names_and_locations_are_configurable(self) -> None:
+        manifest = self.target / "workspace.yaml"
+        text = manifest.read_text(encoding="utf-8").replace("file: paths.py}", "file: ws_paths.py}").replace("binding: _runtime/operations/", "binding: tools/generated/")
+        manifest.write_text(text, encoding="utf-8")
+        regenerated = subprocess.run([sys.executable, str(ROOT / "generate.py"), "--target", str(self.target)], capture_output=True, text=True)
+        self.assertEqual(regenerated.returncode, 0, regenerated.stdout + regenerated.stderr)
+        helper = self.target / "tools/generated/ws_paths.py"
+        self.assertEqual(Path(self.run_py(helper, "context.capture").stdout.strip()), self.target.resolve() / "10-inbox")
 
 
 if __name__ == "__main__":

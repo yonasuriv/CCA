@@ -462,6 +462,8 @@ def _validate_generation_v3(data: dict[str, Any], by_key: dict[str, dict[str, An
         if not isinstance(file_name, str) or not FILE_SEGMENT_RE.fullmatch(file_name):
             fail("generation", f"output {name} file must be a single safe filename segment, got {file_name!r}")
             continue
+        if name in {"paths", "mkdirs"} and PurePosixPath(file_name).suffix.lower() not in {".py", ".sh"}:
+            fail("generation", f"output {name} must be a .py (cross-platform) or .sh helper, got {file_name!r}")
         destination = slot["binding"].rstrip("/") + "/" + file_name
         error = validate_binding_text(destination)
         if error or not resolves_within(root, destination):

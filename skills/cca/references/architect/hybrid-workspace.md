@@ -132,8 +132,8 @@ generation_contract:
   outputs:
     context.router: {slot: context.router}
     spec: {slot: system.documentation, file: SPEC.md}
-    paths: {slot: system.operations, file: paths.sh}
-    mkdirs: {slot: system.operations, file: mkdirs.sh}
+    paths: {slot: system.operations, file: paths.py}
+    mkdirs: {slot: system.operations, file: mkdirs.py}
     host_index_adapter: {slot: system.operations, file: obsidian-excludes.txt}
   human_authored: [workspace.schema, agent.instructions]
   index_policy:
@@ -141,7 +141,7 @@ generation_contract:
 ```
 
 - `file` is one safe filename segment inside an agent-writable `derived` or `shared` `system`/`control` directory binding that is not nested inside a content binding; the destination's most-specific binding must be that declared slot; destinations may not collide (case-insensitively) with each other or with any declared binding; nothing defaults to the target root.
-- Generated helpers locate the root from their declared destination and verify the case-exact bootstrap manifest. They embed a fingerprint of the parsed schema semantics, **not** the hash of raw YAML bytes: comments and formatting cannot cause drift, but changed bindings or identity fail closed until regeneration. The v3 shell helpers require Python 3 and PyYAML at runtime for this semantic safety check. Keep generated tooling in its own binding where possible.
+- Generated helpers locate the root from their declared destination and verify the case-exact bootstrap manifest. They embed a fingerprint of the parsed schema semantics, **not** the hash of raw YAML bytes: comments and formatting cannot cause drift, but changed bindings or identity fail closed until regeneration. Both helper variants (the default Python helpers and the optional `.sh` helpers) need Python 3 with PyYAML at runtime for this semantic safety check; the Python helpers need nothing else and run unchanged on Windows, macOS, and Linux. Keep generated tooling in its own binding where possible.
 - Destinations are validated as text and after symlink resolution before any write, and the generator refuses to overwrite an existing file unless it already starts with the exact header that artifact's generator writes.
 - Relocating `system.operations` or `system.documentation` leaves the previous outputs in place; remove them deliberately (`--check` validates declared destinations, not orphans).
 - The binding that contains a generated file never grants hand-edit authority over it (`invariants.generation`).
@@ -288,8 +288,8 @@ The profile distinguishes semantic outputs from reference-implementation filenam
 
 - **`context.router`** — semantic output role. It MUST be generated/validated at the slot's current binding. The v2 generation contract still carries the historical/default literal `CONTEXT.md` for compatibility with the bundled implementation; **consumers MUST interpret that entry as the `context.router` role**, **not as a fixed filename requirement**. V3 names the role directly (`outputs.context.router: {slot: context.router}`).
 - **`spec`** (`SPEC.md`) — derived human-readable rendering of the target profile contract; non-authoritative.
-- **`paths`** (`paths.sh`) — derived shell binding adapter used by the reference implementation; non-authoritative.
-- **`mkdirs`** (`mkdirs.sh`) — derived reference helper for materializing declared directories/files; non-authoritative.
+- **`paths`** (default `paths.py`) — derived binding adapter used by the reference implementation; non-authoritative. A `.py` destination renders a cross-platform Python helper (importable as a module, or run as `python paths.py KEY | --json | --list`); a `.sh` destination renders the bash/zsh variant. The extension, file name, and location are all set in `generation_contract.outputs`.
+- **`mkdirs`** (default `mkdirs.py`) — derived reference helper for materializing declared directories/files (`--required` or `--all`); non-authoritative. Same `.py`/`.sh` choice as `paths`.
 - **`host_index_adapter`** (`obsidian-excludes.txt`) — derived editor/indexing adapter; non-authoritative.
 
 In v2 these helper filenames live at the target root and helpers infer the root from their own directory. In v3 each lives at its declared output destination and resolves the root independently.

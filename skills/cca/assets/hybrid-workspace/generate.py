@@ -508,12 +508,172 @@ def gen_spec(data: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+# ── Python helpers (cross-platform; default for v3) ──────────────────────────
+PYTHON_HELPER_EXTENSIONS = {".py"}
+SHELL_HELPER_EXTENSIONS = {".sh"}
+
+
+def _py_root_resolution(data: dict[str, Any], destination: str) -> list[str]:
+    """Python twin of _root_resolution: same verification, no shell required."""
+    depth = len(PurePosixPath(destination).parent.parts)
+    return [
+        "import hashlib",
+        "import json",
+        "import os",
+        "from pathlib import Path",
+        "import sys",
+        "",
+        f"MANIFEST = {manifest_name(data)!r}",
+        f"DESTINATION = {destination!r}",
+        f"FINGERPRINT = {data['_semantic_fingerprint']!r}",
+        "",
+        "",
+        "class WorkspaceRootError(RuntimeError):",
+        '    """The helper is not at its generated location, or the workspace changed."""',
+        "",
+        "",
+        *CANONICAL_SOURCE.rstrip("\n").split("\n"),
+        "",
+        "",
+        "def workspace_root() -> Path:",
+        '    """Resolve and verify the workspace root; never assumes this file\'s folder is the root."""',
+        "    here = Path(os.path.realpath(__file__))",
+        f"    root = here.parents[{depth}] if len(here.parents) > {depth} else here.parent",
+        "    manifests = [p for p in root.iterdir() if p.name.casefold() == 'workspace.yaml']",
+        "    if len(manifests) != 1:",
+        "        raise WorkspaceRootError(f'expected exactly one workspace.yaml/WORKSPACE.yaml in {root}')",
+        "    try:",
+        "        same = os.path.samefile(root / DESTINATION, here) and (root / MANIFEST).is_file()",
+        "    except OSError:",
+        "        same = False",
+        "    if not same:",
+        "        raise WorkspaceRootError(f'workspace root not found; expected <workspace>/{DESTINATION} and {MANIFEST}. Regenerate if relocated.')",
+        "    try:",
+        "        import yaml",
+        "    except ImportError as exc:",
+        "        raise WorkspaceRootError(f'verifying {MANIFEST} needs PyYAML') from exc",
+        "    try:",
+        "        data = yaml.safe_load((root / MANIFEST).read_text(encoding='utf-8'))",
+        "    except Exception as exc:",
+        "        raise WorkspaceRootError(f'cannot read or parse {MANIFEST}') from exc",
+        "    if fingerprint(data) != FINGERPRINT:",
+        "        raise WorkspaceRootError('workspace semantics changed; regenerate derived artifacts')",
+        "    return root",
+    ]
+
+
+def gen_paths_py(data: dict[str, Any], destination: str) -> str:
+    bindings = {slot["key"]: slot["binding"] for slot in data["slots"]}
+    lines = [
+        "#!/usr/bin/env python3",
+        f"# GENERATED from {manifest_name(data)} — do not edit. Cross-platform semantic binding map.",
+        "# Import WS_ROOT / WS_BINDING / WS, or run: python paths.py KEY | --json | --list",
+        "from __future__ import annotations",
+        "",
+        *_py_root_resolution(data, destination),
+        "",
+        "",
+        "WS_BINDING = {",
+        *(f"    {key!r}: {binding!r}," for key, binding in bindings.items()),
+        "}",
+        f"WS_SCHEMA_VERSION = {data['schema_version']!r}",
+        "",
+        "",
+        "def ws() -> dict[str, Path]:",
+        "    root = workspace_root()",
+        "    return {key: root / binding.rstrip('/') for key, binding in WS_BINDING.items()}",
+        "",
+        "",
+        "def main(argv: list[str]) -> int:",
+        "    try:",
+        "        paths = ws()",
+        "    except WorkspaceRootError as exc:",
+        "        print(f'paths: {exc}', file=sys.stderr)",
+        "        return 1",
+        "    if not argv or argv[0] == '--list':",
+        "        for key, path in paths.items():",
+        "            print(f'{key}\\t{path}')",
+        "        return 0",
+        "    if argv[0] == '--json':",
+        "        print(json.dumps({key: str(path) for key, path in paths.items()}, indent=2))",
+        "        return 0",
+        "    if argv[0] not in paths:",
+        "        print(f'paths: unknown semantic key {argv[0]!r}', file=sys.stderr)",
+        "        return 2",
+        "    print(paths[argv[0]])",
+        "    return 0",
+        "",
+        "",
+        "if __name__ == '__main__':",
+        "    raise SystemExit(main(sys.argv[1:]))",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def gen_mkdirs_py(data: dict[str, Any], destination: str) -> str:
+    required = sorted({s["binding"].rstrip("/") for s in data["slots"] if s["arity"] == "dir" and s["requirement"] == "required"})
+    every = sorted({s["binding"].rstrip("/") for s in data["slots"] if s["arity"] == "dir"})
+    state_files = [s["binding"] for s in data["slots"] if s["arity"] == "file" and s["category"] == "state" and s["authority"] == "agent" and s["agent_access"] == "write"]
+    lines = [
+        "#!/usr/bin/env python3",
+        f"# GENERATED from {manifest_name(data)} — idempotent, workspace-root anchored.",
+        "# Default: minimum viable required directories. Use --all to materialize optional/conditional slots.",
+        "from __future__ import annotations",
+        "",
+        *_py_root_resolution(data, destination),
+        "",
+        "",
+        f"REQUIRED_DIRS = {required!r}",
+        f"OPTIONAL_DIRS = {[d for d in every if d not in required]!r}",
+        f"STATE_FILES = {state_files!r}",
+        "",
+        "",
+        "def main(argv: list[str]) -> int:",
+        "    mode = argv[0] if argv else '--required'",
+        "    if mode in ('-h', '--help'):",
+        "        print('usage: mkdirs.py [--required|--all]')",
+        "        return 0",
+        "    if mode not in ('--required', '--all'):",
+        "        print(f'unknown option: {mode}', file=sys.stderr)",
+        "        return 2",
+        "    try:",
+        "        root = workspace_root()",
+        "    except WorkspaceRootError as exc:",
+        "        print(f'mkdirs: {exc}', file=sys.stderr)",
+        "        return 1",
+        "    for rel in REQUIRED_DIRS + (OPTIONAL_DIRS if mode == '--all' else []):",
+        "        (root / rel).mkdir(parents=True, exist_ok=True)",
+        "    if mode == '--all':",
+        "        for rel in STATE_FILES:",
+        "            path = root / rel",
+        "            if not path.exists():",
+        "                path.touch()",
+        "    return 0",
+        "",
+        "",
+        "if __name__ == '__main__':",
+        "    raise SystemExit(main(sys.argv[1:]))",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def render_helper(kind: str, data: dict[str, Any], destination: str) -> str:
+    suffix = PurePosixPath(destination).suffix.lower()
+    if suffix in PYTHON_HELPER_EXTENSIONS:
+        return gen_paths_py(data, destination) if kind == "paths" else gen_mkdirs_py(data, destination)
+    if suffix in SHELL_HELPER_EXTENSIONS:
+        return gen_paths(data, destination) if kind == "paths" else gen_mkdirs(data, destination)
+    raise ValueError(f"generated {kind} helper {destination!r} must end in .py or .sh")
+
+
 def render_all(data: dict[str, Any]) -> dict[str, str]:
     if is_v3(data):
         outputs = generated_outputs(data)
         rendered = {
-            outputs["paths"]: gen_paths(data, outputs["paths"]),
-            outputs["mkdirs"]: gen_mkdirs(data, outputs["mkdirs"]),
+            outputs["paths"]: render_helper("paths", data, outputs["paths"]),
+            outputs["mkdirs"]: render_helper("mkdirs", data, outputs["mkdirs"]),
             outputs["host_index_adapter"]: gen_excludes(data),
             outputs["context.router"]: gen_context(data),
             outputs["spec"]: gen_spec(data),
@@ -664,7 +824,8 @@ def main(argv: list[str] | None = None) -> int:
         path = target / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
-        if name.endswith(".sh"):
+        helpers = {generated_outputs(data)[k] for k in ("paths", "mkdirs")} if is_v3(data) else set()
+        if name.endswith(".sh") or name in helpers:
             path.chmod(0o755)
     if initialized:
         print("initialized:")

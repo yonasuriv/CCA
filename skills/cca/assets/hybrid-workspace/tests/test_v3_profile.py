@@ -32,10 +32,15 @@ def generate(target: Path, *extra: str) -> subprocess.CompletedProcess[str]:
     return run(sys.executable, str(PACKAGE / "generate.py"), "--target", str(target), *extra)
 
 
-def make_target(source: Path = PACKAGE) -> Path:
+def make_target(source: Path = PACKAGE, *, helpers: str = "sh") -> Path:
+    """These suites exercise the bash/zsh helper variant; Python helpers are covered in test_workspace_resolver."""
     target = Path(tempfile.mkdtemp(prefix="cca-hybrid-v3-"))
     for name in ("WORKSPACE.yaml", "AGENTS.md"):
         shutil.copy2(source / name, target / name)
+    if helpers == "sh":
+        text = (target / "WORKSPACE.yaml").read_text(encoding="utf-8")
+        text = text.replace("file: paths.py}", "file: paths.sh}").replace("file: mkdirs.py}", "file: mkdirs.sh}")
+        (target / "WORKSPACE.yaml").write_text(text, encoding="utf-8")
     return target
 
 
@@ -572,8 +577,9 @@ class ReviewRegressionTests(unittest.TestCase):
         for name in ("WORKSPACE.yaml", "AGENTS.md"):
             shutil.copy2(PACKAGE / name, target / name)
         self.assertEqual(generate(target).returncode, 0)
-        result = run("bash", "-c", f'source "{target}/_runtime/operations/paths.sh" && echo "$WS_ROOT"')
-        self.assertEqual(Path(result.stdout.strip()), target.resolve())
+        result = run(sys.executable, str(target / "_runtime/operations/paths.py"), "workspace.schema")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(Path(result.stdout.strip()), target.resolve() / "WORKSPACE.yaml")
 
     def test_manifest_named_directory_and_os_noise(self) -> None:
         target = make_target()

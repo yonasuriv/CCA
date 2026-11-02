@@ -147,13 +147,15 @@ invariants:
 # places the file inside that directory binding; `{slot: context.router}` uses the
 # router's own file binding. No generated artifact has a fixed root filename.
 # Generated helpers locate the workspace root from the encoded relationship to
-# their destination and verify it by finding WORKSPACE.yaml there.
+# their destination and verify it by finding WORKSPACE.yaml there. The helper
+# language follows the output file's extension: .py (default, cross-platform)
+# or .sh (bash/zsh). Names, extensions, and locations are all configurable here.
 generation_contract:
   outputs:
     context.router: {slot: context.router}
     spec: {slot: system.documentation, file: SPEC.md}
-    paths: {slot: system.operations, file: paths.sh}
-    mkdirs: {slot: system.operations, file: mkdirs.sh}
+    paths: {slot: system.operations, file: paths.py}
+    mkdirs: {slot: system.operations, file: mkdirs.py}
     host_index_adapter: {slot: system.operations, file: obsidian-excludes.txt}
   human_authored: [workspace.schema, agent.instructions]
   index_policy:
