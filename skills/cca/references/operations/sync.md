@@ -38,7 +38,7 @@ Do not create missing CCA-preferred catalogs merely because sync knows about the
 
 Load `../architect/hybrid-workspace.md` when the target matches the bundled **v3** profile or the supported **v2** profile.
 
-After an authorized edit to `WORKSPACE.yaml`, reconcile derived artifacts with the installed skill's bundled implementation:
+After an authorized edit to the root workspace manifest (`workspace.yaml` on new v3 workspaces, `WORKSPACE.yaml` on existing workspaces), reconcile derived artifacts with the installed skill's bundled implementation:
 
 ```bash
 python <cca-skill>/assets/hybrid-workspace/generate.py --target <workspace>
