@@ -21,7 +21,7 @@ from typing import Any
 
 import yaml
 
-from schema import load_schema, resolve_slot_for_path, resolves_within, validate_binding_text, validate_key
+from schema import load_schema, resolve_slot_for_path, resolves_within, validate_binding_text, validate_key, workspace_schema_path
 import provenance as provenance_lib
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
@@ -659,7 +659,7 @@ def validate_schema(data: dict[str, Any], root: Path = PACKAGE_ROOT) -> tuple[li
 
     cca_contract = data.get("cca")
     if cca_contract is None:
-        warn("cca-version", "workspace does not declare cca.specification; CCA contract-version compatibility cannot be checked (see references/core/versioning.md). Add `cca: {specification: \"<installed version>\"}` to WORKSPACE.yaml.")
+        warn("cca-version", "workspace does not declare cca.specification; CCA contract-version compatibility cannot be checked. Declare cca.specification in the root workspace manifest.")
     elif not isinstance(cca_contract, dict) or "specification" not in cca_contract:
         fail("cca-version", "cca.specification is required when a 'cca' block is present")
     else:
@@ -854,8 +854,10 @@ def validate_schema(data: dict[str, Any], root: Path = PACKAGE_ROOT) -> tuple[li
         if not isinstance(declared_cca, str) or not CCA_SEMVER_RE.fullmatch(declared_cca) or cca_semver_tuple(declared_cca) < (1, 3, 0):
             fail("cca-version", "schema v3 requires cca.specification >= 1.3.0, the first CCA contract that defines it")
         schema_slot = by_key.get("workspace.schema")
-        if schema_slot and schema_slot.get("binding") != "WORKSPACE.yaml":
-            fail("bootstrap", "workspace.schema binding must stay WORKSPACE.yaml at the target root: it is the only fixed bootstrap path")
+        if schema_slot:
+            expected_manifest = workspace_schema_path(root).name
+            if schema_slot.get("binding") != expected_manifest:
+                fail("bootstrap", f"workspace.schema binding must name the actual root bootstrap manifest ({expected_manifest})")
         _validate_identity_v3(data, fail)
         _validate_reference_contract_v3(data, by_key, fail)
         _validate_reference_filesystem_v3(data, by_key, root, fail)
@@ -1008,7 +1010,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(sys.argv[1:] if argv is None else argv)
     try:
         root = resolve_audit_root(args)
-        data = load_schema(root / "WORKSPACE.yaml")
+        data = load_schema(workspace_schema_path(root))
     except (yaml.YAMLError, ValueError, OSError) as exc:
         print("=" * 72)
         print("PROFILE AUDIT — SCHEMA LOAD FAILURE")
