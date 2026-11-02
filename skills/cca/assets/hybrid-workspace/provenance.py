@@ -15,7 +15,7 @@ from typing import Any, Iterator
 
 import yaml
 
-from schema import StrictSafeLoader, load_schema, resolves_within
+from schema import StrictSafeLoader, load_schema, resolves_within, workspace_schema_path
 
 HASH_RE = re.compile(r"^sha256:([0-9a-fA-F]{64})$")
 TREE_RE = re.compile(r"^sha256-tree:([0-9a-fA-F]{64})$")
@@ -385,7 +385,7 @@ def stamp_markdown(path: Path, rep: dict[str, Any]) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Hybrid Workspace v3 provenance helper (identity + admission stamping).")
-    parser.add_argument("--target", required=True, help="Target workspace root containing WORKSPACE.yaml.")
+    parser.add_argument("--target", required=True, help="Target workspace root containing its workspace manifest (workspace.yaml or WORKSPACE.yaml).")
     sub = parser.add_subparsers(dest="command", required=True)
     stamp = sub.add_parser(
         "stamp",
@@ -399,7 +399,11 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     root = Path(args.target).expanduser().resolve()
-    data = load_schema(root / "WORKSPACE.yaml")
+    try:
+        data = load_schema(workspace_schema_path(root))
+    except ValueError as exc:
+        print(f"provenance.py: {exc}", file=sys.stderr)
+        return 2
     if data.get("schema_version") != 3:
         print("provenance.py requires a schema v3 workspace", file=sys.stderr)
         return 2

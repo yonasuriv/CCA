@@ -4,7 +4,9 @@ This changelog records released CCA milestones and pending user-visible changes.
 
 ## Unreleased
 
-No unreleased changes.
+### Fixed
+
+- `provenance.py` discovers the workspace manifest through the shared bootstrap lookup, so `stamp` and `identity` work on v3 workspaces that use `workspace.yaml`, and a missing or duplicate manifest is reported instead of raising a traceback.
 
 ## 1.3.0 - 2026-11-01
 

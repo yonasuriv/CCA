@@ -189,6 +189,19 @@ class V3TemplateAndGenerationTests(unittest.TestCase):
         self.assertEqual(generate(target, "--check").returncode, 0)
 
 
+class ProvenanceManifestDiscoveryTests(unittest.TestCase):
+    def test_provenance_cli_discovers_lowercase_manifest(self) -> None:
+        target = make_target()
+        (target / "WORKSPACE.yaml").rename(target / "workspace.yaml")
+        run = subprocess.run([sys.executable, str(PACKAGE / "provenance.py"), "--target", str(target), "identity", "AGENTS.md"], capture_output=True, text=True)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("sha256", run.stdout)
+        (target / "workspace.yaml").unlink()
+        missing = subprocess.run([sys.executable, str(PACKAGE / "provenance.py"), "--target", str(target), "identity", "AGENTS.md"], capture_output=True, text=True)
+        self.assertEqual(missing.returncode, 2)
+        self.assertNotIn("Traceback", missing.stderr)
+
+
 class V3IdentityTests(unittest.TestCase):
     def test_identity_is_optional_and_rendered_from_schema(self) -> None:
         target = make_target()
