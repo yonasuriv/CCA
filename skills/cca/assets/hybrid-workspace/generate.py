@@ -518,9 +518,12 @@ def validate_agents(data: dict[str, Any], target: Path) -> list[str]:
     return problems
 
 
-def run_audit(target: Path) -> tuple[int, str]:
+def run_audit(target: Path, *, structure_only: bool = False) -> tuple[int, str]:
+    command = [sys.executable, str(PACKAGE_ROOT / "audit.py"), "--target", str(target)]
+    if structure_only:
+        command.append("--structure-only")
     result = subprocess.run(
-        [sys.executable, str(PACKAGE_ROOT / "audit.py"), "--target", str(target)],
+        command,
         cwd=target,
         text=True,
         capture_output=True,
@@ -582,7 +585,8 @@ def main(argv: list[str] | None = None) -> int:
     except (yaml.YAMLError, ValueError, OSError) as exc:
         print(f"workspace load failed: {exc}", file=sys.stderr)
         return 1
-    audit_rc, audit_output = run_audit(target)
+    # Generating v3 projections must not rehash the entire source corpus.
+    audit_rc, audit_output = run_audit(target, structure_only=is_v3(data))
     if audit_rc != 0:
         print(audit_output, end="")
         print("SCHEMA INVALID — generation aborted.", file=sys.stderr)
