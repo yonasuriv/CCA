@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import difflib
 import hashlib
+import json
 from pathlib import Path, PurePosixPath
 import re
 import shlex
@@ -26,7 +27,7 @@ def schema(target: Path) -> dict[str, Any]:
     data = load_schema(manifest)
     if data.get("schema_version") == 3:
         # Hash parsed semantics, not raw YAML bytes or comments.
-        canonical = yaml.safe_dump(data, sort_keys=True, allow_unicode=True).encode("utf-8")
+        canonical = json.dumps(data, sort_keys=True, separators=(",", ":"), ensure_ascii=True, default=str).encode("utf-8")
         data["_semantic_fingerprint"] = hashlib.sha256(canonical).hexdigest()
     data["_schema_name"] = manifest.name
     return data
@@ -96,9 +97,9 @@ def _root_resolution(helper: str, destination: str, self_var: str, root_var: str
     failure = f"unset {root_var} _ws_link _ws_here; return 1 2>/dev/null || exit 1" if sourced else "exit 1"
     quoted_dest = shlex.quote(destination)
     canonicalize = (
-        "import hashlib,sys,yaml; "
+        "import hashlib,json,sys,yaml; "
         "d=yaml.safe_load(open(sys.argv[1],encoding='utf-8')); "
-        "c=yaml.safe_dump(d,sort_keys=True,allow_unicode=True).encode('utf-8'); "
+        "c=json.dumps(d,sort_keys=True,separators=(',',':'),ensure_ascii=True,default=str).encode('utf-8'); "
         "print(hashlib.sha256(c).hexdigest())"
     )
     return [
