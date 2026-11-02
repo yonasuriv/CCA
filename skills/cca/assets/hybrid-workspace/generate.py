@@ -116,7 +116,7 @@ def _root_resolution(helper: str, destination: str, self_var: str, root_var: str
         f"  {failure}",
         "fi",
         "# A semantic fingerprint detects changed bindings without treating YAML whitespace as drift.",
-        f'_ws_fingerprint="$(python3 -c {shlex.quote(canonicalize)} "${{{root_var}}}/{schema_name}")" || {{ {failure}; }}',
+        f'_ws_fingerprint="$(python3 -c {shlex.quote(canonicalize)} "${{{root_var}}}/{schema_name}" 2>/dev/null)" || {{ echo "{helper}: verifying {schema_name} needs python3 with PyYAML" >&2; {failure}; }}',
         f'if [ "$_ws_fingerprint" != "{fingerprint}" ]; then',
         f'  echo "{helper}: workspace semantics changed; regenerate derived artifacts" >&2',
         f"  unset _ws_fingerprint; {failure}",
@@ -505,6 +505,9 @@ def render_all(data: dict[str, Any]) -> dict[str, str]:
     return rendered
 
 
+FILE_EXTENSIONS = {"yaml", "yml", "md", "json", "sh", "txt", "py", "toml"}
+
+
 def validate_agents(data: dict[str, Any], target: Path) -> list[str]:
     name = slots_by_key(data)["agent.instructions"]["binding"] if is_v3(data) else "AGENTS.md"
     path = target / name
@@ -519,6 +522,8 @@ def validate_agents(data: dict[str, Any], target: Path) -> list[str]:
         problems.append(f"AGENTS.md missing contract marker {marker!r}")
     known = {slot["key"] for slot in data["slots"]}
     for match in re.findall(r"`([a-z]+\.[a-z.]+)`", text):
+        if match.rsplit(".", 1)[-1] in FILE_EXTENSIONS:
+            continue  # a file name such as `workspace.yaml`, not a semantic key
         prefix = match.split(".")[0]
         prefixes = {"agent","context","state","system","knowledge","work","responsibility","project","output","lifecycle","workspace","reference"}
         if is_v3(data):

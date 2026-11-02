@@ -174,7 +174,7 @@ class V3TemplateAndGenerationTests(unittest.TestCase):
         set_binding(target, "workspace.schema", "_runtime/WORKSPACE.yaml")
         result = audit(target)
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("only fixed bootstrap path", failures(result))
+        self.assertIn("must name the actual root bootstrap manifest", failures(result))
 
     def test_agents_binding_is_resolved_not_hardcoded(self) -> None:
         target = make_target()
