@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import hashlib
 from pathlib import Path, PurePosixPath
 import re
 import shlex
@@ -24,6 +25,10 @@ TEMPLATE_AGENTS = PACKAGE_ROOT / "AGENTS.md"
 def schema(target: Path) -> dict[str, Any]:
     manifest = workspace_schema_path(target)
     data = load_schema(manifest)
+    if data.get("schema_version") == 3:
+        # Hash parsed semantics, not raw YAML bytes or comments.
+        canonical = yaml.safe_dump(data, sort_keys=True, allow_unicode=True).encode("utf-8")
+        data["_semantic_fingerprint"] = hashlib.sha256(canonical).hexdigest()
     data["_schema_name"] = manifest.name
     return data
 
@@ -81,16 +86,22 @@ def _root_hops(destination: str) -> str:
     return "/".join([".."] * depth)
 
 
-def _root_resolution(helper: str, destination: str, self_var: str, root_var: str, *, sourced: bool, schema_name: str) -> list[str]:
-    """Verify the helper's workspace structurally, without hash-pinning YAML bytes.
+def _root_resolution(helper: str, destination: str, self_var: str, root_var: str, *, sourced: bool, schema_name: str, fingerprint: str) -> list[str]:
+    """Check the helper destination and parsed workspace semantics, not YAML bytes.
 
-    A harmless whitespace edit cannot invalidate the helper. Regeneration with
-    --check remains the explicit way to detect changed semantic bindings.
+    Comments and YAML formatting cannot invalidate the generated helper.
+    Material changes must be regenerated; copied helpers fail on changed identity.
     """
     hops = _root_hops(destination)
     suffix = f"/{hops}" if hops else ""
     failure = f"unset {root_var} _ws_link _ws_here; return 1 2>/dev/null || exit 1" if sourced else "exit 1"
     quoted_dest = shlex.quote(destination)
+    canonicalize = (
+        "import hashlib,sys,yaml; "
+        "d=yaml.safe_load(open(sys.argv[1],encoding='utf-8')); "
+        "c=yaml.safe_dump(d,sort_keys=True,allow_unicode=True).encode('utf-8'); "
+        "print(hashlib.sha256(c).hexdigest())"
+    )
     return [
         f"# Workspace root = generated helper location, {destination}",
         f"# Verify its exact destination and the root bootstrap manifest ({schema_name}).",
@@ -104,7 +115,13 @@ def _root_resolution(helper: str, destination: str, self_var: str, root_var: str
         f'  echo "{helper}: workspace root not found; expected <workspace>/{destination} and {schema_name}. Regenerate if relocated." >&2',
         f"  {failure}",
         "fi",
-        "unset _ws_link _ws_here",
+        "# A semantic fingerprint detects changed bindings without treating YAML whitespace as drift.",
+        f'_ws_fingerprint="$(python3 -c {shlex.quote(canonicalize)} "${{{root_var}}}/{schema_name}")" || {{ {failure}; }}',
+        f'if [ "$_ws_fingerprint" != "{fingerprint}" ]; then',
+        f'  echo "{helper}: workspace semantics changed; regenerate derived artifacts" >&2',
+        f"  unset _ws_fingerprint; {failure}",
+        "fi",
+        "unset _ws_link _ws_here _ws_fingerprint",
     ]
 
 
@@ -123,7 +140,7 @@ def gen_paths(data: dict[str, Any], destination: str | None = None) -> str:
     if destination is None:
         lines.append('WS_ROOT="$(cd -- "$(dirname -- "$_ws_self")" && pwd)"')
     else:
-        lines.extend(_root_resolution("paths.sh", destination, "$_ws_self", "WS_ROOT", sourced=True, schema_name=data["_schema_name"]))
+        lines.extend(_root_resolution("paths.sh", destination, "$_ws_self", "WS_ROOT", sourced=True, schema_name=data["_schema_name"], fingerprint=data["_semantic_fingerprint"]))
     lines.extend([
         "unset _ws_self",
         "declare -Ar WS_BINDING=(",
@@ -164,7 +181,7 @@ def gen_mkdirs(data: dict[str, Any], destination: str | None = None) -> str:
         "# Default: minimum viable required directories. Use --all to materialize optional/conditional slots.",
         "set -euo pipefail",
         *(['ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"'] if destination is None
-          else _root_resolution("mkdirs.sh", destination, "${BASH_SOURCE[0]}", "ROOT", sourced=False, schema_name=data["_schema_name"])),
+          else _root_resolution("mkdirs.sh", destination, "${BASH_SOURCE[0]}", "ROOT", sourced=False, schema_name=data["_schema_name"], fingerprint=data["_semantic_fingerprint"])),
         'case "${1:-}" in',
         '  ""|--required) MODE=required ;;',
         '  --all) MODE=all ;;',
