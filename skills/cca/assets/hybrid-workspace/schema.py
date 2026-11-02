@@ -158,6 +158,28 @@ def _validate_generated_destinations(data: Mapping[str, Any], root: Path) -> Non
             raise ValueError(f"generated artifact {destination!r} escapes workspace via symlink/path resolution")
 
 
+def workspace_schema_path(root: str | Path) -> Path:
+    """Discover the single bootstrap manifest without guessing its capitalization.
+
+    New v3 workspaces use workspace.yaml; existing uppercase workspaces remain
+    supported. Reject duplicate case variants, including on case-insensitive
+    filesystems where listing exposes one spelling.
+    """
+    directory = Path(root)
+    if not directory.is_dir():
+        raise ValueError(f"workspace root does not exist: {directory}")
+    entries = [entry for entry in directory.iterdir() if entry.name.casefold() == "workspace.yaml"]
+    if len(entries) != 1 or entries[0].name not in {"workspace.yaml", "WORKSPACE.yaml"}:
+        raise ValueError(
+            f"expected exactly one workspace.yaml or WORKSPACE.yaml in {directory}; "
+            f"found {[entry.name for entry in entries]}"
+        )
+    path = entries[0]
+    if not path.is_file() or path.is_symlink() or not resolves_within(directory, path.name):
+        raise ValueError(f"workspace manifest must be a regular file inside {directory}: {path}")
+    return path
+
+
 def load_schema(path: str | Path) -> dict[str, Any]:
     """Load WORKSPACE.yaml safely and reject duplicate keys/path escapes."""
     p = Path(path)
