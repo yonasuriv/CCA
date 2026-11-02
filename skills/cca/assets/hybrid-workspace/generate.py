@@ -15,7 +15,7 @@ from typing import Any
 
 import yaml
 
-from schema import compact_ops, effective_agent_operations, generated_outputs, load_schema, semantic_role_for_slot, workspace_schema_path
+from schema import compact_ops, effective_agent_operations, generated_outputs, load_schema, resolves_within, semantic_role_for_slot, validate_binding_text, workspace_schema_path
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
 TEMPLATE_SCHEMA = PACKAGE_ROOT / "WORKSPACE.yaml"
@@ -68,7 +68,7 @@ def resolve_target(raw: str, *, init: bool) -> Path:
 
 
 def initialize_target(target: Path) -> list[str]:
-    """Seed a lowercase v3 manifest; preserve an existing case-exact bootstrap."""
+    """Scaffold the bootstrap and declared human control file without overwrites."""
     created: list[str] = []
     existing = [p for p in target.iterdir() if p.name.casefold() == "workspace.yaml"]
     if len(existing) > 1 or (existing and existing[0].name not in {"workspace.yaml", "WORKSPACE.yaml"}):
@@ -82,15 +82,48 @@ def initialize_target(target: Path) -> list[str]:
         contents = TEMPLATE_SCHEMA.read_text(encoding="utf-8")
         if name == "workspace.yaml":
             contents = contents.replace("WORKSPACE.yaml", name)
-        manifest.write_text(contents, encoding="utf-8")
+        with manifest.open("x", encoding="utf-8") as output:
+            output.write(contents)
         created.append(name)
-    agents_path = target / "AGENTS.md"
-    if not agents_path.exists():
-        agents_text = TEMPLATE_AGENTS.read_text(encoding="utf-8")
-        if manifest.name == "workspace.yaml":
-            agents_text = agents_text.replace("WORKSPACE.yaml", manifest.name)
-        agents_path.write_text(agents_text, encoding="utf-8")
-        created.append("AGENTS.md")
+
+    data = load_schema(manifest)
+    if manifest.name == "workspace.yaml" and data.get("schema_version") != 3:
+        raise ValueError("lowercase workspace.yaml is supported only for schema v3")
+
+    # V2 preserves its original AGENTS.md target. V3 resolves the slot rather
+    # than assuming the human-authored control file stays at the workspace root.
+    instructions_binding = "AGENTS.md"
+    if data.get("schema_version") == 3:
+        instructions = next(
+            (slot for slot in data.get("slots", [])
+             if isinstance(slot, dict) and slot.get("key") == "agent.instructions"),
+            None,
+        )
+        if not instructions or instructions.get("arity") != "file":
+            raise ValueError("schema v3 requires a file binding for agent.instructions")
+        instructions_binding = instructions.get("binding")
+    error = validate_binding_text(instructions_binding)
+    if error or not resolves_within(target, instructions_binding):
+        raise ValueError(f"invalid agent.instructions binding: {error or instructions_binding!r}")
+    if instructions_binding.casefold() == manifest.name.casefold():
+        raise ValueError("agent.instructions must not overwrite the workspace manifest")
+    instructions_path = target / instructions_binding
+    if instructions_path.is_symlink():
+        raise ValueError(f"agent.instructions must not be a symlink: {instructions_binding}")
+    if instructions_path.exists():
+        if not instructions_path.is_file():
+            raise ValueError(f"agent.instructions must be a regular file: {instructions_binding}")
+        return created
+
+    text = TEMPLATE_AGENTS.read_text(encoding="utf-8")
+    if manifest.name == "workspace.yaml":
+        text = text.replace("WORKSPACE.yaml", manifest.name)
+    instructions_path.parent.mkdir(parents=True, exist_ok=True)
+    if not resolves_within(target, instructions_binding):
+        raise ValueError(f"agent.instructions escapes workspace: {instructions_binding}")
+    with instructions_path.open("x", encoding="utf-8") as output:
+        output.write(text)
+    created.append(instructions_binding)
     return created
 
 
