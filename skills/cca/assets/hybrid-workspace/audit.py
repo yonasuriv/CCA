@@ -637,7 +637,7 @@ def _validate_reference_filesystem_v3(data: dict[str, Any], by_key: dict[str, di
                 fail("provenance", f"{obj.path.relative_to(root)}: {problem}")
 
 
-def validate_schema(data: dict[str, Any], root: Path = PACKAGE_ROOT) -> tuple[list[str], list[str]]:
+def validate_schema(data: dict[str, Any], root: Path = PACKAGE_ROOT, *, check_filesystem: bool = True) -> tuple[list[str], list[str]]:
     fails: list[str] = []
     warns: list[str] = []
 
@@ -860,11 +860,13 @@ def validate_schema(data: dict[str, Any], root: Path = PACKAGE_ROOT) -> tuple[li
                 fail("bootstrap", f"workspace.schema binding must name the actual root bootstrap manifest ({expected_manifest})")
         _validate_identity_v3(data, fail)
         _validate_reference_contract_v3(data, by_key, fail)
-        _validate_reference_filesystem_v3(data, by_key, root, fail)
-        _validate_archive_filesystem_v3(data, by_key, root, fail)
+        if check_filesystem:
+            _validate_reference_filesystem_v3(data, by_key, root, fail)
+            _validate_archive_filesystem_v3(data, by_key, root, fail)
     else:
         _validate_reference_contract(data, by_key, fail)
-        _validate_reference_filesystem(data, by_key, root, fail)
+        if check_filesystem:
+            _validate_reference_filesystem(data, by_key, root, fail)
 
     return fails, warns
 
@@ -988,6 +990,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     )
     parser.add_argument("--target", help="Target workspace root. Required for workspace audits; never defaults to the installed tool directory.")
     parser.add_argument("--self-test", action="store_true", help="Mutation-test the frozen contract. Without --target, self-tests the bundled template only.")
+    parser.add_argument("--structure-only", action="store_true", help="Validate the manifest and bindings without traversing source/archive contents; not a full provenance audit.")
     args = parser.parse_args(argv)
     if not args.target and not args.self_test:
         parser.error("--target is required for workspace audit (or use --self-test for package contract tests)")
@@ -1018,14 +1021,15 @@ def main(argv: list[str] | None = None) -> int:
         print(f"✗ {exc}")
         return 1
 
-    fails, warns = validate_schema(data, root)
+    fails, warns = validate_schema(data, root, check_filesystem=not args.structure_only)
     self_test_count = 0
     if args.self_test:
         self_test_failures, self_test_count = run_self_test(data, root)
         fails.extend(f"[self-test] {msg}" for msg in self_test_failures)
 
     print("=" * 72)
-    print(f"PROFILE AUDIT — {len(data.get('slots', []))} slots — schema v{data.get('schema_version', '?')}")
+    mode = "PROFILE STRUCTURE CHECK" if args.structure_only else "PROFILE AUDIT"
+    print(f"{mode} — {len(data.get('slots', []))} slots — schema v{data.get('schema_version', '?')}")
     print("=" * 72)
     if fails:
         print(f"\nFAIL ({len(fails)}):")
@@ -1036,6 +1040,8 @@ def main(argv: list[str] | None = None) -> int:
             print("\n✓ frozen-v1 baseline + v2 reference classes + v3 extension checks passed")
         else:
             print("\n✓ frozen-v1 baseline + v2 reference-admission extension checks passed")
+    if args.structure_only:
+        print("Note: source provenance and archive contents were not scanned; run the full audit separately.")
     if warns:
         print(f"\nWARN ({len(warns)}):")
         for item in warns:
