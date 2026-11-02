@@ -101,6 +101,9 @@ class WorkspaceResolverTests(unittest.TestCase):
     def test_ambiguous_manifest_fails_closed(self) -> None:
         target = make_target()
         (target / "WORKSPACE.yaml").write_text("schema_version: 3\n", encoding="utf-8")
+        variants = [p for p in target.iterdir() if p.name.casefold() == "workspace.yaml"]
+        if len(variants) == 1:
+            self.skipTest("case-insensitive filesystem cannot represent both spellings")
         with self.assertRaises(ValueError):
             workspace_schema_path(target)
 
