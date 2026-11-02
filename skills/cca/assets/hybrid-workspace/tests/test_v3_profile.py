@@ -643,11 +643,21 @@ class ReReviewRegressionTests(unittest.TestCase):
         self.assertIn("regenerate", result.stderr)
         self.assertFalse((other / "00-wiki").exists())
 
-    def test_stale_helper_after_schema_edit_fails_until_regenerated(self) -> None:
+    def test_schema_comment_does_not_invalidate_helper_or_generated_output(self) -> None:
         target = make_target()
         self.assertEqual(generate(target).returncode, 0)
         with (target / "WORKSPACE.yaml").open("a", encoding="utf-8") as handle:
             handle.write("\n# owner edit\n")
+        live = run("bash", "-c", f'source "{target}/_runtime/operations/paths.sh" && echo "$WS_ROOT"')
+        self.assertEqual(Path(live.stdout.strip()), target.resolve())
+        self.assertEqual(generate(target, "--check").returncode, 0)
+
+    def test_semantic_schema_edit_invalidates_stale_helper(self) -> None:
+        target = make_target()
+        self.assertEqual(generate(target).returncode, 0)
+        data = load(target)
+        data["identity"] = {"endpoint": "brain://changed", "owner": "human"}
+        save(target, data)
         stale = run("bash", "-c", f'source "{target}/_runtime/operations/paths.sh"; echo "rc=$?"')
         self.assertIn("rc=1", stale.stdout)
         self.assertNotEqual(generate(target, "--check").returncode, 0)
