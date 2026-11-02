@@ -803,7 +803,7 @@ slots:
     link_target: none
     requirement: conditional
     description: >
-      Generated operational helpers (shell binding map, materialization helper,
+      Generated operational helpers (binding map, materialization helper,
       host index adapter) declared in generation_contract.outputs. Derived from
       this schema; regenerate rather than hand-edit. Helpers locate the
       workspace root through their encoded relationship to this binding.
