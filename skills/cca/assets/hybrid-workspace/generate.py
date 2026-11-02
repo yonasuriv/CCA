@@ -22,13 +22,35 @@ TEMPLATE_SCHEMA = PACKAGE_ROOT / "WORKSPACE.yaml"
 TEMPLATE_AGENTS = PACKAGE_ROOT / "AGENTS.md"
 
 
+# One canonical form of the parsed manifest, used verbatim by the generator and
+# by generated helpers at runtime: deterministic for sets and mixed-type keys,
+# independent of comments, whitespace, key order, and YAML spelling.
+CANONICAL_SOURCE = (
+    "def _c(o):\n"
+    " if isinstance(o,bool) or o is None or isinstance(o,(int,float,str)): return o\n"
+    " if isinstance(o,dict): return ['m',sorted([[_c(k),_c(v)] for k,v in o.items()],key=lambda kv: json.dumps(kv[0],sort_keys=True))]\n"
+    " if isinstance(o,(list,tuple)): return ['l',[_c(x) for x in o]]\n"
+    " if isinstance(o,(set,frozenset)): return ['s',sorted([_c(x) for x in o],key=lambda x: json.dumps(x,sort_keys=True))]\n"
+    " return ['o',type(o).__name__,str(o)]\n"
+    "def fingerprint(d): return hashlib.sha256(json.dumps(_c(d),separators=(',',':'),ensure_ascii=True).encode('utf-8')).hexdigest()\n"
+)
+_canonical_ns: dict[str, Any] = {"json": json, "hashlib": hashlib}
+exec(CANONICAL_SOURCE, _canonical_ns)  # noqa: S102 - fixed, package-owned source
+semantic_fingerprint = _canonical_ns["fingerprint"]
+
+
+def manifest_name(data: dict[str, Any]) -> str:
+    return data.get("_schema_name", "WORKSPACE.yaml")
+
+
 def schema(target: Path) -> dict[str, Any]:
     manifest = workspace_schema_path(target)
     data = load_schema(manifest)
+    if manifest.name == "workspace.yaml" and data.get("schema_version") != 3:
+        raise ValueError("lowercase workspace.yaml is a schema v3 bootstrap; schema v2 workspaces use WORKSPACE.yaml")
     if data.get("schema_version") == 3:
         # Hash parsed semantics, not raw YAML bytes or comments.
-        canonical = json.dumps(data, sort_keys=True, separators=(",", ":"), ensure_ascii=True, default=str).encode("utf-8")
-        data["_semantic_fingerprint"] = hashlib.sha256(canonical).hexdigest()
+        data["_semantic_fingerprint"] = semantic_fingerprint(data)
     data["_schema_name"] = manifest.name
     return data
 
@@ -97,10 +119,11 @@ def _root_resolution(helper: str, destination: str, self_var: str, root_var: str
     failure = f"unset {root_var} _ws_link _ws_here; return 1 2>/dev/null || exit 1" if sourced else "exit 1"
     quoted_dest = shlex.quote(destination)
     canonicalize = (
-        "import hashlib,json,sys,yaml; "
-        "d=yaml.safe_load(open(sys.argv[1],encoding='utf-8')); "
-        "c=json.dumps(d,sort_keys=True,separators=(',',':'),ensure_ascii=True,default=str).encode('utf-8'); "
-        "print(hashlib.sha256(c).hexdigest())"
+        "import hashlib,json,sys\n"
+        "try:\n import yaml\nexcept ImportError:\n sys.exit(3)\n"
+        + CANONICAL_SOURCE
+        + "try:\n d=yaml.safe_load(open(sys.argv[1],encoding='utf-8'))\nexcept Exception:\n sys.exit(4)\n"
+        "print(fingerprint(d))\n"
     )
     return [
         f"# Workspace root = generated helper location, {destination}",
@@ -116,7 +139,16 @@ def _root_resolution(helper: str, destination: str, self_var: str, root_var: str
         f"  {failure}",
         "fi",
         "# A semantic fingerprint detects changed bindings without treating YAML whitespace as drift.",
-        f'_ws_fingerprint="$(python3 -c {shlex.quote(canonicalize)} "${{{root_var}}}/{schema_name}" 2>/dev/null)" || {{ echo "{helper}: verifying {schema_name} needs python3 with PyYAML" >&2; {failure}; }}',
+        f'if [ "$(ls -A "${{{root_var}}}" | grep -ci \'^workspace\\.yaml$\')" != 1 ]; then',
+        f'  echo "{helper}: expected exactly one workspace.yaml/WORKSPACE.yaml in ${{{root_var}}}" >&2',
+        f"  {failure}",
+        "fi",
+        f'_ws_fingerprint="$(python3 -c {shlex.quote(canonicalize)} "${{{root_var}}}/{schema_name}" 2>/dev/null)"',
+        'case $? in',
+        '  0) ;;',
+        f'  3) echo "{helper}: verifying {schema_name} needs python3 with PyYAML" >&2; {failure} ;;',
+        f'  *) echo "{helper}: cannot read or parse {schema_name}" >&2; {failure} ;;',
+        "esac",
         f'if [ "$_ws_fingerprint" != "{fingerprint}" ]; then',
         f'  echo "{helper}: workspace semantics changed; regenerate derived artifacts" >&2',
         f"  unset _ws_fingerprint; {failure}",
@@ -127,7 +159,7 @@ def _root_resolution(helper: str, destination: str, self_var: str, root_var: str
 
 def gen_paths(data: dict[str, Any], destination: str | None = None) -> str:
     lines = [
-        "# GENERATED from WORKSPACE.yaml — do not edit. Source this file (bash or zsh).",
+        f"# GENERATED from {manifest_name(data)} — do not edit. Source this file (bash or zsh).",
         "# WS_BINDING contains canonical relative bindings; WS contains absolute paths.",
         'if [ -n "${BASH_SOURCE:-}" ]; then',
         '  _ws_self="${BASH_SOURCE[0]}"',
@@ -177,7 +209,7 @@ def gen_mkdirs(data: dict[str, Any], destination: str | None = None) -> str:
     ]
     lines = [
         "#!/usr/bin/env bash",
-        "# GENERATED from WORKSPACE.yaml — idempotent, workspace-root anchored.",
+        f"# GENERATED from {manifest_name(data)} — idempotent, workspace-root anchored.",
         "# Default: minimum viable required directories. Use --all to materialize optional/conditional slots.",
         "set -euo pipefail",
         *(['ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"'] if destination is None
@@ -213,7 +245,7 @@ def gen_excludes(data: dict[str, Any]) -> str:
         elif policy == "disabled":
             disabled.add(path)
     lines = [
-        "# GENERATED from WORKSPACE.yaml indexed policy.",
+        f"# GENERATED from {manifest_name(data)} indexed policy.",
         "# Obsidian adapter: both excluded and disabled are placed in Excluded Files.",
         "# This deliberately degrades disabled to exclusion because the host cannot",
         "# represent runtime-only disabled as a stronger semantic state.",
@@ -265,8 +297,8 @@ def _reference_curation_lines_v3(data: dict[str, Any]) -> list[str]:
 def _identity_lines(data: dict[str, Any]) -> list[str]:
     identity = data.get("identity")
     if not isinstance(identity, dict):
-        return ["## Workspace identity", "", "No external identity is declared (`identity` is absent from `WORKSPACE.yaml`).", ""]
-    lines = ["## Workspace identity", "", "Canonical source: the `identity` block of `WORKSPACE.yaml`. It is system identity, not durable knowledge.", ""]
+        return ["## Workspace identity", "", f"No external identity is declared (`identity` is absent from `{manifest_name(data)}`).", ""]
+    lines = ["## Workspace identity", "", f"Canonical source: the `identity` block of `{manifest_name(data)}`. It is system identity, not durable knowledge.", ""]
     lines.append(f"- endpoint: `{identity['endpoint']}`")
     lines.append(f"- owner authority: `{identity['owner']}`")
     if identity.get("description"):
@@ -318,7 +350,7 @@ def gen_context(data: dict[str, Any]) -> str:
     lines = [
         "# Context router",
         "",
-        "> GENERATED from `WORKSPACE.yaml`. Do not hand-edit; regenerate.",
+        f"> GENERATED from `{manifest_name(data)}`. Do not hand-edit; regenerate.",
         "",
         f"Schema version {data['schema_version']}, status **{data['status']}**. Downstream references use immutable keys; bindings may move.",
         "",
@@ -385,7 +417,7 @@ def resolved_derived_names(data: dict[str, Any]) -> tuple[str, ...]:
 def _spec_intro_v3(data: dict[str, Any]) -> list[str]:
     outputs = generated_outputs(data)
     return [
-        "`WORKSPACE.yaml` at the target root is the **only** fixed bootstrap path. Every generated artifact resolves its destination through a declared slot binding in `generation_contract.outputs`: " + ", ".join(f"`{name}` → `{path}`" for name, path in outputs.items()) + ". Generated helpers locate the workspace root from that encoded relationship and verify it by finding `WORKSPACE.yaml`; they never assume their own directory is the root.", "",
+        f"`{manifest_name(data)}` at the target root is the **only** fixed bootstrap path. Every generated artifact resolves its destination through a declared slot binding in `generation_contract.outputs`: " + ", ".join(f"`{name}` → `{path}`" for name, path in outputs.items()) + ". Generated helpers locate the workspace root from that encoded relationship and verify it by finding `" + manifest_name(data) + "`; they never assume their own directory is the root.", "",
         "Schema v3 preserves the complete frozen-v1 semantic/policy baseline and the v2 reference classification keys, and adds: relocatable generated outputs, an optional machine-readable workspace `identity`, the `state.hotset` operational hotset, `system.operations` and `system.documentation`, the human/editor-facing `asset.*` bindings with the `asset` category, actor-independent curation semantics with representation-aware provenance, and scoped archive manifests. Schema v2 workspaces continue to validate under the unchanged v2 rules.", "",
         *_identity_lines(data),
     ]
@@ -397,8 +429,8 @@ def gen_spec(data: dict[str, Any]) -> str:
     router_binding = b["context.router"]
     lines = [
         "# Workspace Schema — Specification", "",
-        "> **Generated from `WORKSPACE.yaml`. Do not hand-edit.** Edit the YAML and regenerate.", "",
-        "Within the CCA Hybrid Workspace Profile, `WORKSPACE.yaml` is the canonical machine-readable bootstrap anchor. Stable keys carry declared meaning; bindings are workspace-local implementations and may move without changing that meaning.", "",
+        f"> **Generated from `{manifest_name(data)}`. Do not hand-edit.** Edit the YAML and regenerate.", "",
+        f"Within the CCA Hybrid Workspace Profile, `{manifest_name(data)}` is the canonical machine-readable bootstrap anchor. Stable keys carry declared meaning; bindings are workspace-local implementations and may move without changing that meaning.", "",
         *(_spec_intro_v3(data) if is_v3(data) else [
         f"The generated context router is the `context.router` binding (`{router_binding}`), not a hardcoded filename. Helper artifacts such as `paths.sh`, `mkdirs.sh`, `SPEC.md`, and host adapters are derived tooling. `AGENTS.md` remains human-authored and is validated, not regenerated.", "",
         "Schema v2 preserves the complete frozen-v1 semantic/policy baseline and adds only the two reference-admission classification keys required by the v1 evolution contract. No new knowledge role, axis, authority vocabulary, or mutability vocabulary was introduced.", ""]),
@@ -466,7 +498,7 @@ def gen_spec(data: dict[str, Any]) -> str:
     lines.extend(["", "## Minimum viable workspace", "", ", ".join(f"`{key}`" for key in required) + ".", "", "## Evolution contract", "", "| change | treatment |", "|---|---|"])
     for change, treatment in data["evolution_contract"].items():
         lines.append(f"| `{change}` | `{treatment}` |")
-    lines.extend(["", "## System crosswalk", "", "> Adaptation/inspiration only; mappings are not semantic equivalence and do not redefine or claim conformance with upstream methods.", "", "| source | concept | mapping |", "|---|---|---|", *_crosswalk_rows(data), "", "## Generation contract", "", "Resolved derived outputs: " + ", ".join(f"`{name}`" for name in resolved_derived_names(data)) + ".", "", "Human-authored: " + ", ".join(f"`{name}`" for name in data["generation_contract"]["human_authored"]) + ".", "", "## Generation pipeline", "", "```text", "WORKSPACE.yaml  (canonical profile bootstrap; human-authored)", "      │"])
+    lines.extend(["", "## System crosswalk", "", "> Adaptation/inspiration only; mappings are not semantic equivalence and do not redefine or claim conformance with upstream methods.", "", "| source | concept | mapping |", "|---|---|---|", *_crosswalk_rows(data), "", "## Generation contract", "", "Resolved derived outputs: " + ", ".join(f"`{name}`" for name in resolved_derived_names(data)) + ".", "", "Human-authored: " + ", ".join(f"`{name}`" for name in data["generation_contract"]["human_authored"]) + ".", "", "## Generation pipeline", "", "```text", f"{manifest_name(data)}  (canonical profile bootstrap; human-authored)", "      │"])
     if is_v3(data):
         outputs = generated_outputs(data)
         lines.extend(f"      ├── generate ──► {path}  ({name})" for name, path in outputs.items())
@@ -486,10 +518,6 @@ def render_all(data: dict[str, Any]) -> dict[str, str]:
             outputs["context.router"]: gen_context(data),
             outputs["spec"]: gen_spec(data),
         }
-        # Existing uppercase workspaces retain their previous generated text.
-        schema_name = data.get("_schema_name", "WORKSPACE.yaml")
-        if schema_name == "workspace.yaml":
-            rendered = {path: content.replace("WORKSPACE.yaml", schema_name) for path, content in rendered.items()}
         return rendered
     router = slots_by_key(data)["context.router"]["binding"].rstrip("/")
     rendered = {

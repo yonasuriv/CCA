@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from pathlib import Path
+import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -136,6 +138,69 @@ class WorkspaceResolverTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertTrue((target / "workspace.yaml").is_file())
         self.assertFalse((target / "WORKSPACE.yaml").exists())
+
+
+class QAFindingRegressionTests(unittest.TestCase):
+    def _v3(self) -> Path:
+        target = Path(tempfile.mkdtemp(prefix="cca-qa-"))
+        run_ok = subprocess.run([sys.executable, str(ROOT / "generate.py"), "--target", str(target), "--init"], capture_output=True, text=True)
+        self.assertEqual(run_ok.returncode, 0, run_ok.stdout + run_ok.stderr)
+        return target
+
+    def _gen(self, target: Path, *extra: str) -> subprocess.CompletedProcess[str]:
+        return subprocess.run([sys.executable, str(ROOT / "generate.py"), "--target", str(target), *extra], capture_output=True, text=True)
+
+    def test_manifest_name_is_never_rewritten_inside_user_content(self) -> None:
+        target = self._v3()
+        path = target / "workspace.yaml"
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        slot = next(s for s in data["slots"] if s["key"] == "output.artifact")
+        slot["description"] = "Deliverables, including a file named WORKSPACE.yaml-archive."
+        slot["binding"] = "WORKSPACE.yaml.d/"
+        path.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
+        self.assertEqual(self._gen(target).returncode, 0)
+        spec = (target / "_runtime/docs/SPEC.md").read_text(encoding="utf-8")
+        paths = (target / "_runtime/operations/paths.sh").read_text(encoding="utf-8")
+        self.assertIn("WORKSPACE.yaml-archive", spec)
+        self.assertIn("[output.artifact]=WORKSPACE.yaml.d/", paths)
+
+    def test_lowercase_manifest_requires_schema_v3_in_every_tool(self) -> None:
+        target = Path(tempfile.mkdtemp(prefix="cca-qa-v2lower-"))
+        shutil.copy2(ROOT / "profiles" / "v2" / "WORKSPACE.yaml", target / "workspace.yaml")
+        shutil.copy2(ROOT / "profiles" / "v2" / "AGENTS.md", target / "AGENTS.md")
+        audit = subprocess.run([sys.executable, str(ROOT / "audit.py"), "--target", str(target)], capture_output=True, text=True)
+        self.assertNotEqual(audit.returncode, 0)
+        self.assertNotEqual(self._gen(target).returncode, 0)
+
+    def test_helper_rejects_two_manifest_spellings(self) -> None:
+        target = self._v3()
+        (target / "WORKSPACE.yaml").write_bytes((target / "workspace.yaml").read_bytes())
+        if len([p for p in target.iterdir() if p.name.casefold() == "workspace.yaml"]) < 2:
+            self.skipTest("case-insensitive filesystem")
+        result = subprocess.run(["bash", "-c", f'source "{target}/_runtime/operations/paths.sh"'], capture_output=True, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("exactly one", result.stderr)
+
+    def test_fingerprint_is_deterministic_for_sets_and_mixed_keys(self) -> None:
+        target = self._v3()
+        with (target / "workspace.yaml").open("a", encoding="utf-8") as handle:
+            handle.write("\nx_extension:\n  tags: !!set {b, a, c}\n  1: one\n  two: 2\n")
+        first = self._gen(target)
+        self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+        for seed in ("1", "2", "3"):
+            env = dict(os.environ, PYTHONHASHSEED=seed)
+            check = subprocess.run([sys.executable, str(ROOT / "generate.py"), "--target", str(target), "--check"], capture_output=True, text=True, env=env)
+            self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
+            src = subprocess.run(["bash", "-c", f'source "{target}/_runtime/operations/paths.sh"'], capture_output=True, text=True, env=env)
+            self.assertEqual(src.returncode, 0, src.stderr)
+
+    def test_unparseable_manifest_is_reported_as_such(self) -> None:
+        target = self._v3()
+        with (target / "workspace.yaml").open("a", encoding="utf-8") as handle:
+            handle.write("\nbroken: [unclosed\n")
+        result = subprocess.run(["bash", "-c", f'source "{target}/_runtime/operations/paths.sh"'], capture_output=True, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("cannot read or parse", result.stderr)
 
 
 if __name__ == "__main__":

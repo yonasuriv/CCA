@@ -1013,7 +1013,10 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(sys.argv[1:] if argv is None else argv)
     try:
         root = resolve_audit_root(args)
-        data = load_schema(workspace_schema_path(root))
+        manifest = workspace_schema_path(root)
+        data = load_schema(manifest)
+        if manifest.name == "workspace.yaml" and data.get("schema_version") != 3:
+            raise ValueError("lowercase workspace.yaml is a schema v3 bootstrap; schema v2 workspaces use WORKSPACE.yaml")
     except (yaml.YAMLError, ValueError, OSError) as exc:
         print("=" * 72)
         print("PROFILE AUDIT — SCHEMA LOAD FAILURE")
