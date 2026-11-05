@@ -138,7 +138,7 @@ class WorkspaceResolverTests(unittest.TestCase):
         result = run(sys.executable, str(ROOT / "generate.py"), "--target", str(target), "--init")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertTrue((target / "workspace.yaml").is_file())
-        self.assertFalse((target / "WORKSPACE.yaml").exists())
+        self.assertNotIn("WORKSPACE.yaml", {entry.name for entry in target.iterdir()})
 
 
 class QAFindingRegressionTests(unittest.TestCase):
