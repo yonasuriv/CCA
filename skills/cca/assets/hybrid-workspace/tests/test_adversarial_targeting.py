@@ -53,7 +53,10 @@ class AdversarialTargetingTests(unittest.TestCase):
         outside = Path(tempfile.mkdtemp(prefix="cca-hybrid-outside-"))
         escaped = outside / "SPEC.md"
         escaped.write_text("DO NOT TOUCH\n", encoding="utf-8")
-        (target / "SPEC.md").symlink_to(escaped)
+        try:
+            (target / "SPEC.md").symlink_to(escaped)
+        except OSError as exc:
+            self.skipTest(f"symlink creation unavailable on this host: {exc}")
 
         result = run(sys.executable, str(PACKAGE / "generate.py"), "--target", str(target))
         self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
