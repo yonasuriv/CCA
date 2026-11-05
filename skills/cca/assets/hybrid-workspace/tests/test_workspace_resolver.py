@@ -254,7 +254,12 @@ class PythonHelperTests(unittest.TestCase):
         copied = self.run_py(stray / "paths.py", "--list")
         self.assertEqual(copied.returncode, 1)
         outer = Path(tempfile.mkdtemp(prefix="cca-outer-"))
-        os.symlink(self.paths, outer / "paths.py")
+        try:
+            os.symlink(self.paths, outer / "paths.py")
+        except OSError as exc:
+            if getattr(exc, "winerror", None) == 1314:
+                self.skipTest("Windows symlink privilege unavailable")
+            raise
         linked = self.run_py(outer / "paths.py", "workspace.schema")
         self.assertEqual(Path(linked.stdout.strip()), self.target.resolve() / "workspace.yaml")
 
