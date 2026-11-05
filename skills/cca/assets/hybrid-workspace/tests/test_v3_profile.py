@@ -80,6 +80,16 @@ def failures(result: subprocess.CompletedProcess[str]) -> str:
     return result.stdout + result.stderr
 
 
+def symlink_or_skip(test: unittest.TestCase, source: str | Path, destination: Path, *, directory: bool = False) -> None:
+    """Skip only when Windows denies symlink privileges, not for other errors."""
+    try:
+        os.symlink(source, destination, target_is_directory=directory)
+    except OSError as exc:
+        if getattr(exc, "winerror", None) == 1314:
+            test.skipTest("Windows symlink privilege unavailable")
+        raise
+
+
 class V3TemplateAndGenerationTests(unittest.TestCase):
     def test_bundled_template_is_v3_and_passes_audit_and_check(self) -> None:
         target = make_target()
@@ -113,6 +123,7 @@ class V3TemplateAndGenerationTests(unittest.TestCase):
         self.assertIn("ops/generated/paths.sh", spec)
         self.assertNotIn("_runtime/operations", spec)
 
+    @unittest.skipUnless(os.name == "posix" and shutil.which("bash"), "requires POSIX Bash")
     def test_helpers_resolve_actual_root_not_their_own_directory(self) -> None:
         target = make_target()
         set_binding(target, "system.operations", "a/b/c/")
@@ -138,6 +149,7 @@ class V3TemplateAndGenerationTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, failures(result))
         self.assertEqual(Path(result.stdout.strip()), target.resolve())
 
+    @unittest.skipUnless(os.name == "posix" and shutil.which("bash"), "requires POSIX Bash")
     def test_copied_helper_fails_closed_instead_of_guessing_a_root(self) -> None:
         target = make_target()
         self.assertEqual(generate(target).returncode, 0)
@@ -154,7 +166,7 @@ class V3TemplateAndGenerationTests(unittest.TestCase):
         target = make_target()
         outside = Path(tempfile.mkdtemp(prefix="cca-outside-"))
         (target / "_runtime").mkdir()
-        os.symlink(outside, target / "_runtime" / "operations")
+        symlink_or_skip(self, outside, target / "_runtime" / "operations", directory=True)
         result = generate(target)
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(list(outside.iterdir()), [])
@@ -305,8 +317,9 @@ class V3SourceModelTests(unittest.TestCase):
         manifest.write_text(yaml.safe_dump({"provenance": {**base, "content_identity": provenance.tree_identity(corpus)}}), encoding="utf-8")
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
         # coreutils recipe reproduces the identity
-        recipe = run("bash", "-c", "find . -type f ! -path ./.source.yaml -printf '%P\\0' | LC_ALL=C sort -z | xargs -0 sha256sum | sha256sum", cwd=corpus)
-        self.assertEqual("sha256-tree:" + recipe.stdout.split()[0], provenance.tree_identity(corpus))
+        if os.name == "posix" and all(shutil.which(cmd) for cmd in ("bash", "find", "sort", "xargs", "sha256sum")):
+            recipe = run("bash", "-c", "find . -type f ! -path ./.source.yaml -printf '%P\\0' | LC_ALL=C sort -z | xargs -0 sha256sum | sha256sum", cwd=corpus)
+            self.assertEqual("sha256-tree:" + recipe.stdout.split()[0], provenance.tree_identity(corpus))
         (corpus / "sub" / "b.png").write_bytes(b"changed")
         self.assertNotEqual(audit(target).returncode, 0)
         files = {rel: "sha256:" + hashlib.sha256((corpus / rel).read_bytes()).hexdigest() for rel in provenance.tree_files(corpus, ".source.yaml")}
@@ -331,7 +344,7 @@ class V3SourceModelTests(unittest.TestCase):
         (collected / "gone.pdf.source.yaml").write_text("provenance: {}\n", encoding="utf-8")
         self.assertNotEqual(audit(target).returncode, 0)
         (collected / "gone.pdf.source.yaml").unlink()
-        os.symlink("/etc/hostname", collected / "linked.md")
+        symlink_or_skip(self, Path(tempfile.mkdtemp(prefix="cca-external-source-")) / "untrusted.md", collected / "linked.md")
         self.assertNotEqual(audit(target).returncode, 0)
 
     def test_curated_requires_provenance_and_curation_record(self) -> None:
@@ -510,7 +523,7 @@ class ReviewRegressionTests(unittest.TestCase):
         outside = Path(tempfile.mkdtemp(prefix="cca-outside-"))
         (outside / "x.md").write_text("---\nprovenance:\n  origin: o\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n---\nb\n", encoding="utf-8")
         (target / "20-sources").mkdir()
-        os.symlink(outside, target / "20-sources" / "collected")
+        symlink_or_skip(self, outside, target / "20-sources" / "collected", directory=True)
         self.assertNotEqual(self.stamp(target, "20-sources/collected/x.md").returncode, 0)
         self.assertNotIn("content_hash", (outside / "x.md").read_text(encoding="utf-8"))
 
@@ -553,6 +566,7 @@ class ReviewRegressionTests(unittest.TestCase):
                 set_binding(target, "system.operations", binding)
                 self.assertNotEqual(audit(target).returncode, 0)
 
+    @unittest.skipUnless(os.name == "posix" and shutil.which("bash"), "requires POSIX Bash")
     def test_helper_copied_into_another_anchored_workspace_fails_closed(self) -> None:
         target = make_target()
         self.assertEqual(generate(target).returncode, 0)
@@ -564,16 +578,18 @@ class ReviewRegressionTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertFalse((victim / "00-wiki").exists())
 
+    @unittest.skipUnless(os.name == "posix" and shutil.which("bash"), "requires POSIX Bash")
     def test_symlinked_helper_resolves_its_own_workspace(self) -> None:
         inner = make_target()
         self.assertEqual(generate(inner).returncode, 0)
         outer = make_target()
         (outer / "projects" / "inner").mkdir(parents=True)
-        os.symlink(inner / "_runtime/operations/paths.sh", outer / "projects" / "inner" / "paths.sh")
+        symlink_or_skip(self, inner / "_runtime/operations/paths.sh", outer / "projects" / "inner" / "paths.sh")
         result = run("bash", "-c", f'source "{outer}/projects/inner/paths.sh" && echo "$WS_ROOT"')
         self.assertEqual(result.returncode, 0, failures(result))
         self.assertEqual(Path(result.stdout.strip()), inner.resolve())
 
+    @unittest.skipUnless(os.name == "posix" and shutil.which("bash"), "requires POSIX Bash")
     def test_failed_source_leaves_no_wrong_root(self) -> None:
         target = make_target()
         self.assertEqual(generate(target).returncode, 0)
@@ -648,6 +664,7 @@ class ReReviewRegressionTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertNotIn("content_hash", (collected / "x.md").read_text(encoding="utf-8"))
 
+    @unittest.skipUnless(os.name == "posix" and shutil.which("bash"), "requires POSIX Bash")
     def test_helper_copied_to_the_same_path_in_another_workspace_fails(self) -> None:
         source = make_target()
         self.assertEqual(generate(source).returncode, 0)
@@ -662,6 +679,7 @@ class ReReviewRegressionTests(unittest.TestCase):
         self.assertIn("regenerate", result.stderr)
         self.assertFalse((other / "00-wiki").exists())
 
+    @unittest.skipUnless(os.name == "posix" and shutil.which("bash"), "requires POSIX Bash")
     def test_schema_comment_does_not_invalidate_helper_or_generated_output(self) -> None:
         target = make_target()
         self.assertEqual(generate(target).returncode, 0)
@@ -671,6 +689,7 @@ class ReReviewRegressionTests(unittest.TestCase):
         self.assertEqual(Path(live.stdout.strip()), target.resolve())
         self.assertEqual(generate(target, "--check").returncode, 0)
 
+    @unittest.skipUnless(os.name == "posix" and shutil.which("bash"), "requires POSIX Bash")
     def test_semantic_schema_edit_invalidates_stale_helper(self) -> None:
         target = make_target()
         self.assertEqual(generate(target).returncode, 0)
