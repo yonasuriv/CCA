@@ -40,7 +40,7 @@ def make_target(source: Path = PACKAGE, *, helpers: str = "sh") -> Path:
     if helpers == "sh":
         text = (target / "WORKSPACE.yaml").read_text(encoding="utf-8")
         text = text.replace("file: paths.py}", "file: paths.sh}").replace("file: mkdirs.py}", "file: mkdirs.sh}")
-        (target / "WORKSPACE.yaml").write_text(text, encoding="utf-8")
+        (target / "WORKSPACE.yaml").write_bytes((text).encode("utf-8"))
     return target
 
 
@@ -49,7 +49,7 @@ def load(target: Path) -> dict:
 
 
 def save(target: Path, data: dict) -> None:
-    (target / "WORKSPACE.yaml").write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True), encoding="utf-8")
+    (target / "WORKSPACE.yaml").write_bytes((yaml.safe_dump(data, sort_keys=False, allow_unicode=True)).encode("utf-8"))
 
 
 def set_binding(target: Path, key: str, binding: str) -> None:
@@ -248,17 +248,17 @@ class V3SourceModelTests(unittest.TestCase):
         target = make_target()
         note = self.collected(target) / "clippings" / "ai" / "article.md"
         note.parent.mkdir(parents=True)
-        note.write_text(clip(), encoding="utf-8")
+        note.write_bytes((clip()).encode("utf-8"))
         result = audit(target)
         self.assertEqual(result.returncode, 0, failures(result))
 
     def test_body_mutation_is_detected_but_frontmatter_edits_are_not_identity(self) -> None:
         target = make_target()
         note = self.collected(target) / "article.md"
-        note.write_text(clip(), encoding="utf-8")
-        note.write_text(note.read_text(encoding="utf-8").replace("tags:\n- clippings", "tags:\n- clippings\n- reviewed"), encoding="utf-8")
+        note.write_bytes((clip()).encode("utf-8"))
+        note.write_bytes((note.read_text(encoding="utf-8").replace("tags:\n- clippings", "tags:\n- clippings\n- reviewed")).encode("utf-8"))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
-        note.write_text(note.read_text(encoding="utf-8").replace("Article body.", "Rewritten body."), encoding="utf-8")
+        note.write_bytes((note.read_text(encoding="utf-8").replace("Article body.", "Rewritten body.")).encode("utf-8"))
         result = audit(target)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("content hash mismatch (body)", failures(result))
@@ -271,7 +271,7 @@ class V3SourceModelTests(unittest.TestCase):
         body = "Body.\n"
         prov = {"acquired_by": "human:owner", "acquisition_method": "obsidian-web-clipper", "acquired_at": "2026-10-30T12:00:00Z", "content_hash": body_hash(body)}
         front = yaml.safe_dump({"title": "T", "source": "https://example.com/x", "provenance": prov}, sort_keys=False)
-        (self.collected(target) / "x.md").write_text(f"---\n{front}---\n{body}", encoding="utf-8")
+        (self.collected(target) / "x.md").write_bytes((f"---\n{front}---\n{body}").encode("utf-8"))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
 
     def test_missing_or_dishonest_provenance_fails(self) -> None:
@@ -286,12 +286,12 @@ class V3SourceModelTests(unittest.TestCase):
         for label, text in cases.items():
             with self.subTest(label):
                 target = make_target()
-                (self.collected(target) / "x.md").write_text(text, encoding="utf-8")
+                (self.collected(target) / "x.md").write_bytes((text).encode("utf-8"))
                 self.assertNotEqual(audit(target).returncode, 0)
 
     def test_honest_import_basis_passes(self) -> None:
         target = make_target()
-        (self.collected(target) / "x.md").write_text(clip(acquired_at_basis="import", original_acquisition_time="unknown"), encoding="utf-8")
+        (self.collected(target) / "x.md").write_bytes((clip(acquired_at_basis="import", original_acquisition_time="unknown")).encode("utf-8"))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
 
     def test_binary_requires_sidecar_and_byte_hash(self) -> None:
@@ -301,7 +301,7 @@ class V3SourceModelTests(unittest.TestCase):
         pdf.write_bytes(b"%PDF evidence")
         self.assertNotEqual(audit(target).returncode, 0)
         meta = {"provenance": {"origin": "https://example.com/p.pdf", "acquired_by": "agent:crawler", "acquisition_method": "http-get", "acquired_at": "2026-10-30T12:00:00Z", "content_hash": "sha256:" + hashlib.sha256(b"%PDF evidence").hexdigest()}}
-        (pdf.parent / "paper.pdf.source.yaml").write_text(yaml.safe_dump(meta), encoding="utf-8")
+        (pdf.parent / "paper.pdf.source.yaml").write_bytes((yaml.safe_dump(meta)).encode("utf-8"))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
         pdf.write_bytes(b"%PDF tampered")
         self.assertNotEqual(audit(target).returncode, 0)
@@ -310,11 +310,11 @@ class V3SourceModelTests(unittest.TestCase):
         target = make_target()
         corpus = self.collected(target) / "upstream" / "corpus"
         (corpus / "sub").mkdir(parents=True)
-        (corpus / "a.md").write_text("A [[link]]\n", encoding="utf-8")
+        (corpus / "a.md").write_bytes(("A [[link]]\n").encode("utf-8"))
         (corpus / "sub" / "b.png").write_bytes(b"\x89PNG")
         base = {"origin": "https://example.com/corpus", "acquired_by": "human:owner", "acquisition_method": "vault import", "acquired_at": "2026-09-26T15:04:42+02:00", "acquired_at_basis": "import", "original_acquisition_time": "unknown"}
         manifest = corpus / ".source.yaml"
-        manifest.write_text(yaml.safe_dump({"provenance": {**base, "content_identity": provenance.tree_identity(corpus)}}), encoding="utf-8")
+        manifest.write_bytes((yaml.safe_dump({"provenance": {**base, "content_identity": provenance.tree_identity(corpus)}})).encode("utf-8"))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
         # coreutils recipe reproduces the identity
         if os.name == "posix" and all(shutil.which(cmd) for cmd in ("bash", "find", "sort", "xargs", "sha256sum")):
@@ -323,25 +323,25 @@ class V3SourceModelTests(unittest.TestCase):
         (corpus / "sub" / "b.png").write_bytes(b"changed")
         self.assertNotEqual(audit(target).returncode, 0)
         files = {rel: "sha256:" + hashlib.sha256((corpus / rel).read_bytes()).hexdigest() for rel in provenance.tree_files(corpus, ".source.yaml")}
-        manifest.write_text(yaml.safe_dump({"provenance": {**base, "files": files}}), encoding="utf-8")
+        manifest.write_bytes((yaml.safe_dump({"provenance": {**base, "files": files}})).encode("utf-8"))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
-        (corpus / "extra.md").write_text("unlisted\n", encoding="utf-8")
+        (corpus / "extra.md").write_bytes(("unlisted\n").encode("utf-8"))
         self.assertNotEqual(audit(target).returncode, 0)
 
     def test_unverifiable_directory_identity_fails(self) -> None:
         target = make_target()
         corpus = self.collected(target) / "corpus"
         corpus.mkdir()
-        (corpus / "a.md").write_text("A\n", encoding="utf-8")
-        (corpus / ".source.yaml").write_text(yaml.safe_dump({"provenance": {"origin": "o", "acquired_by": "a", "acquisition_method": "m", "acquired_at": "2026-01-01T00:00:00Z", "content_identity": "sha256:abc recipe text"}}), encoding="utf-8")
+        (corpus / "a.md").write_bytes(("A\n").encode("utf-8"))
+        (corpus / ".source.yaml").write_bytes((yaml.safe_dump({"provenance": {"origin": "o", "acquired_by": "a", "acquisition_method": "m", "acquired_at": "2026-01-01T00:00:00Z", "content_identity": "sha256:abc recipe text"}})).encode("utf-8"))
         self.assertNotEqual(audit(target).returncode, 0)
 
     def test_orphan_sidecar_symlink_and_gitkeep(self) -> None:
         target = make_target()
         collected = self.collected(target)
-        (collected / ".gitkeep").write_text("", encoding="utf-8")
+        (collected / ".gitkeep").write_bytes(("").encode("utf-8"))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
-        (collected / "gone.pdf.source.yaml").write_text("provenance: {}\n", encoding="utf-8")
+        (collected / "gone.pdf.source.yaml").write_bytes(("provenance: {}\n").encode("utf-8"))
         self.assertNotEqual(audit(target).returncode, 0)
         (collected / "gone.pdf.source.yaml").unlink()
         symlink_or_skip(self, Path(tempfile.mkdtemp(prefix="cca-external-source-")) / "untrusted.md", collected / "linked.md")
@@ -351,18 +351,18 @@ class V3SourceModelTests(unittest.TestCase):
         target = make_target()
         curated = target / "20-sources" / "curated"
         curated.mkdir(parents=True)
-        (curated / "ref.md").write_text(clip(), encoding="utf-8")
+        (curated / "ref.md").write_bytes((clip()).encode("utf-8"))
         result = audit(target)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("curated_by", failures(result))
-        (curated / "ref.md").write_text(clip(curated_by="human:owner", curated_at="2026-11-01T10:00:00+01:00"), encoding="utf-8")
+        (curated / "ref.md").write_bytes((clip(curated_by="human:owner", curated_at="2026-11-01T10:00:00+01:00")).encode("utf-8"))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
 
     def test_classification_is_actor_independent(self) -> None:
         for actor in ("human:owner", "agent:symbiont", "crawler:vacuum", "integration:rss"):
             with self.subTest(actor):
                 target = make_target()
-                (self.collected(target) / "x.md").write_text(clip(acquired_by=actor), encoding="utf-8")
+                (self.collected(target) / "x.md").write_bytes((clip(acquired_by=actor)).encode("utf-8"))
                 self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
 
     def test_stamp_adds_body_hash_once_and_never_overwrites(self) -> None:
@@ -371,14 +371,14 @@ class V3SourceModelTests(unittest.TestCase):
         front = yaml.safe_dump({"title": "T", "provenance": {"origin": "https://e.x/a", "acquired_by": "human:owner", "acquisition_method": "obsidian-web-clipper", "acquired_at": "2026-10-30T12:00:00+01:00"}}, sort_keys=False)
         note = self.collected(target) / "clippings" / "a.md"
         note.parent.mkdir()
-        note.write_text(f"---\n{front}---\n{body}", encoding="utf-8")
+        note.write_bytes((f"---\n{front}---\n{body}").encode("utf-8"))
         self.assertNotEqual(audit(target).returncode, 0)
         stamped = run(sys.executable, str(PACKAGE / "provenance.py"), "--target", str(target), "stamp", "20-sources/collected/clippings")
         self.assertEqual(stamped.returncode, 0, failures(stamped))
         self.assertIn("stamped: 1", stamped.stdout)
         self.assertTrue(note.read_text(encoding="utf-8").endswith(body))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
-        note.write_text(note.read_text(encoding="utf-8").replace("literal", "edited"), encoding="utf-8")
+        note.write_bytes((note.read_text(encoding="utf-8").replace("literal", "edited")).encode("utf-8"))
         again = run(sys.executable, str(PACKAGE / "provenance.py"), "--target", str(target), "stamp", "20-sources/collected/clippings")
         self.assertIn("already-stamped: 1", again.stdout)
         self.assertNotEqual(audit(target).returncode, 0, "stamping must never launder a body mutation")
@@ -422,17 +422,17 @@ class V3StateAssetArchiveTests(unittest.TestCase):
         target = make_target()
         archive = target / "90-archive"
         (archive / "Old Meetings").mkdir(parents=True)
-        (archive / "Old Meetings" / "notes.md").write_text("cold\n", encoding="utf-8")
+        (archive / "Old Meetings" / "notes.md").write_bytes(("cold\n").encode("utf-8"))
         (archive / "dump.7z").write_bytes(b"7z")
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
         retired = archive / "project-x"
         retired.mkdir()
         manifest = {"source_key": "project.notes", "semantic_role": "work.project", "boundary": "project-x", "boundary_class": "project.notes", "original_binding": "40-projects/notes/project-x/", "archived_at": "2026-11-01T10:00:00+01:00", "archived_by": "human:owner"}
-        (retired / ".archive.yaml").write_text(yaml.safe_dump(manifest), encoding="utf-8")
+        (retired / ".archive.yaml").write_bytes((yaml.safe_dump(manifest)).encode("utf-8"))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
         for field, value in (("archived_at", "yesterday"), ("source_key", "not.a.key"), ("archived_by", "")):
             with self.subTest(field):
-                (retired / ".archive.yaml").write_text(yaml.safe_dump({**manifest, field: value}), encoding="utf-8")
+                (retired / ".archive.yaml").write_bytes((yaml.safe_dump({**manifest, field: value})).encode("utf-8"))
                 self.assertNotEqual(audit(target).returncode, 0)
 
 
@@ -449,7 +449,7 @@ class V2CompatibilityTests(unittest.TestCase):
     def test_v2_keeps_v2_reference_semantics(self) -> None:
         target = make_target(V2)
         (target / "20-sources" / "collected").mkdir(parents=True)
-        (target / "20-sources" / "collected" / "clip.md").write_text(clip(), encoding="utf-8")
+        (target / "20-sources" / "collected" / "clip.md").write_bytes((clip()).encode("utf-8"))
         # v2 requires a .source.yaml sidecar even for Markdown; frontmatter provenance is a v3 feature.
         result = audit(target)
         self.assertNotEqual(result.returncode, 0)
@@ -486,7 +486,7 @@ class ReviewRegressionTests(unittest.TestCase):
         curated = target / "20-sources" / "curated"
         curated.mkdir(parents=True)
         text = "---\nprovenance:\n  origin: o\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n---\nbody\n"
-        (curated / "c.md").write_text(text, encoding="utf-8")
+        (curated / "c.md").write_bytes((text).encode("utf-8"))
         self.assertNotEqual(self.stamp(target).returncode, 0)
         refused = self.stamp(target, "20-sources/curated")
         self.assertNotEqual(refused.returncode, 0)
@@ -496,7 +496,7 @@ class ReviewRegressionTests(unittest.TestCase):
         target = make_target()
         body = "Body.\n"
         note = self.collected(target) / "flat.md"
-        note.write_text("---\ntitle: T\norigin: https://e.x/a\nacquired_by: human:owner\nacquisition_method: obsidian-web-clipper\nacquired_at: 2026-10-30T12:00:00+01:00\ntags:\n  - clippings\n---\n" + body, encoding="utf-8")
+        note.write_bytes(("---\ntitle: T\norigin: https://e.x/a\nacquired_by: human:owner\nacquisition_method: obsidian-web-clipper\nacquired_at: 2026-10-30T12:00:00+01:00\ntags:\n  - clippings\n---\n" + body).encode("utf-8"))
         self.assertEqual(self.stamp(target, "20-sources/collected/flat.md").returncode, 0)
         self.assertTrue(note.read_text(encoding="utf-8").endswith(body))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
@@ -504,7 +504,7 @@ class ReviewRegressionTests(unittest.TestCase):
     def test_stamp_handles_nested_mappings_and_refuses_unsafe_layouts(self) -> None:
         target = make_target()
         nested = self.collected(target) / "nested.md"
-        nested.write_text("---\nprovenance:\n  origin: o\n  extra:\n    sub: 1\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n---\nbody\n", encoding="utf-8")
+        nested.write_bytes(("---\nprovenance:\n  origin: o\n  extra:\n    sub: 1\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n---\nbody\n").encode("utf-8"))
         self.assertEqual(self.stamp(target, "20-sources/collected/nested.md").returncode, 0)
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
         for label, front in (("flow", "provenance: {origin: o, acquired_by: a, acquisition_method: m, acquired_at: '2026-01-01T00:00:00Z'}"),
@@ -513,7 +513,7 @@ class ReviewRegressionTests(unittest.TestCase):
             with self.subTest(label):
                 note = self.collected(target) / f"{label}.md"
                 original = f"---\n{front}\n---\nbody\n"
-                note.write_text(original, encoding="utf-8")
+                note.write_bytes((original).encode("utf-8"))
                 result = self.stamp(target, f"20-sources/collected/{label}.md")
                 self.assertNotEqual(result.returncode, 0)
                 self.assertEqual(note.read_text(encoding="utf-8"), original)
@@ -521,7 +521,7 @@ class ReviewRegressionTests(unittest.TestCase):
     def test_stamp_refuses_collected_binding_that_escapes(self) -> None:
         target = make_target()
         outside = Path(tempfile.mkdtemp(prefix="cca-outside-"))
-        (outside / "x.md").write_text("---\nprovenance:\n  origin: o\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n---\nb\n", encoding="utf-8")
+        (outside / "x.md").write_bytes(("---\nprovenance:\n  origin: o\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n---\nb\n").encode("utf-8"))
         (target / "20-sources").mkdir()
         symlink_or_skip(self, outside, target / "20-sources" / "collected", directory=True)
         self.assertNotEqual(self.stamp(target, "20-sources/collected/x.md").returncode, 0)
@@ -540,7 +540,7 @@ class ReviewRegressionTests(unittest.TestCase):
         data["generation_contract"]["outputs"]["spec"] = {"slot": "system.documentation", "file": "HOW-TO.md"}
         save(target, data)
         (target / "_runtime" / "docs").mkdir(parents=True)
-        (target / "_runtime" / "docs" / "HOW-TO.md").write_text("# Human guide\n", encoding="utf-8")
+        (target / "_runtime" / "docs" / "HOW-TO.md").write_bytes(("# Human guide\n").encode("utf-8"))
         result = generate(target)
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual((target / "_runtime" / "docs" / "HOW-TO.md").read_text(encoding="utf-8"), "# Human guide\n")
@@ -614,7 +614,7 @@ class ReviewRegressionTests(unittest.TestCase):
         target = make_target()
         corpus = self.collected(target) / "c"
         (corpus / ".source.yaml").mkdir(parents=True)
-        (corpus / ".source.yaml" / "hidden.md").write_text("x\n", encoding="utf-8")
+        (corpus / ".source.yaml" / "hidden.md").write_bytes(("x\n").encode("utf-8"))
         self.assertNotEqual(audit(target).returncode, 0)
         shutil.rmtree(corpus)
         (self.collected(target) / ".DS_Store").write_bytes(b"\x00")
@@ -622,18 +622,18 @@ class ReviewRegressionTests(unittest.TestCase):
 
     def test_original_time_precision_and_bare_date_acquired_at(self) -> None:
         target = make_target()
-        (self.collected(target) / "d.md").write_text(clip(original_acquisition_time="2025-07-05"), encoding="utf-8")
+        (self.collected(target) / "d.md").write_bytes((clip(original_acquisition_time="2025-07-05")).encode("utf-8"))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
-        (self.collected(target) / "d.md").write_text(clip(acquired_at="2025-07-05"), encoding="utf-8")
+        (self.collected(target) / "d.md").write_bytes((clip(acquired_at="2025-07-05")).encode("utf-8"))
         self.assertIn("a bare date is not a timestamp", failures(audit(target)))
 
     def test_curated_migration_basis_is_honest_and_validated(self) -> None:
         target = make_target()
         curated = target / "20-sources" / "curated"
         curated.mkdir(parents=True)
-        (curated / "r.md").write_text(clip(curated_by="human:owner", curated_at="2026-11-01T10:00:00+01:00", curated_at_basis="migration"), encoding="utf-8")
+        (curated / "r.md").write_bytes((clip(curated_by="human:owner", curated_at="2026-11-01T10:00:00+01:00", curated_at_basis="migration")).encode("utf-8"))
         self.assertEqual(audit(target).returncode, 0, failures(audit(target)))
-        (curated / "r.md").write_text(clip(curated_by="human:owner", curated_at="2026-11-01T10:00:00+01:00", curated_at_basis="guess"), encoding="utf-8")
+        (curated / "r.md").write_bytes((clip(curated_by="human:owner", curated_at="2026-11-01T10:00:00+01:00", curated_at_basis="guess")).encode("utf-8"))
         self.assertNotEqual(audit(target).returncode, 0)
 
     def test_v3_requires_cca_1_3_0(self) -> None:
@@ -659,7 +659,7 @@ class ReReviewRegressionTests(unittest.TestCase):
         target = make_target()
         collected = target / "20-sources" / "collected"
         collected.mkdir(parents=True)
-        (collected / "x.md").write_text("---\nprovenance:\n  origin: o\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n---\nTAMPERED\n", encoding="utf-8")
+        (collected / "x.md").write_bytes(("---\nprovenance:\n  origin: o\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n---\nTAMPERED\n").encode("utf-8"))
         result = run(sys.executable, str(PACKAGE / "provenance.py"), "--target", str(target), "stamp", "20-sources/collected")
         self.assertNotEqual(result.returncode, 0)
         self.assertNotIn("content_hash", (collected / "x.md").read_text(encoding="utf-8"))
@@ -708,7 +708,7 @@ class ReReviewRegressionTests(unittest.TestCase):
         docs = target / "_runtime" / "docs"
         docs.mkdir(parents=True)
         human = "# My notes\n\nThis was generated from WORKSPACE.yaml by hand.\n"
-        (docs / "SPEC.md").write_text(human, encoding="utf-8")
+        (docs / "SPEC.md").write_bytes((human).encode("utf-8"))
         self.assertNotEqual(generate(target).returncode, 0)
         self.assertEqual((docs / "SPEC.md").read_text(encoding="utf-8"), human)
         (docs / "SPEC.md").unlink()
@@ -721,9 +721,9 @@ class ReReviewRegressionTests(unittest.TestCase):
         target = make_target()
         collected = target / "20-sources" / "collected"
         collected.mkdir(parents=True)
-        (collected / "d.md").write_text(clip(original_acquisition_time="2024-13-45"), encoding="utf-8")
+        (collected / "d.md").write_bytes((clip(original_acquisition_time="2024-13-45")).encode("utf-8"))
         self.assertNotEqual(audit(target).returncode, 0)
-        (collected / "d.md").write_text("---\nprovenance:\n  origin: o\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n  original_acquisition_time: 2026-02-30\n---\nb\n", encoding="utf-8")
+        (collected / "d.md").write_bytes(("---\nprovenance:\n  origin: o\n  acquired_by: a\n  acquisition_method: m\n  acquired_at: '2026-01-01T00:00:00Z'\n  original_acquisition_time: 2026-02-30\n---\nb\n").encode("utf-8"))
         result = audit(target)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("d.md: invalid provenance metadata", failures(result))
