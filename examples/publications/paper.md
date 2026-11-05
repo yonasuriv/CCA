@@ -222,9 +222,9 @@ The CCA Hybrid Workspace Profile is a CCA-owned optional profile for a recurring
 
 It is not CCA itself.
 
-The **current bundled profile schema is v2**. V2 preserves the complete frozen-v1 semantic-role, policy, authority, vocabulary, generation, and invariant baseline. The version bump exists because frozen v1 itself declared semantic-key additions to require a schema-version bump.
+The **current bundled profile schema is v3**. V3 preserves the complete frozen-v1 semantic-role, policy, authority, and invariant baseline and the two v2 source classifications; schema v2 remains supported unchanged. Each bump exists because the profile's own evolution contract declares key additions and meaning/policy changes to require a schema-version bump.
 
-The v2 extension adds two filesystem-visible source-admission classifications beneath the existing semantic role `knowledge.reference`:
+V2 added two filesystem-visible source classifications beneath the existing semantic role `knowledge.reference`; v3 defines them as curation state rather than acquisition actor:
 
 ```text
 20-sources/
@@ -235,7 +235,8 @@ The v2 extension adds two filesystem-visible source-admission classifications be
 The core rule is:
 
 ```text
-source provenance/admission
+acquisition (who/how/when/origin/identity)
+!= curation state
 != content authorship
 != semantic role
 ```
@@ -244,17 +245,17 @@ Both classes remain preserved source/evidence. They do not become separate knowl
 
 ### 8.1 Curated evidence
 
-`reference.curated` means the source was explicitly admitted by a human. It composes with `knowledge.reference` and remains human-authoritative. Agents may read curated evidence but may not add, edit, replace, rename, relocate, or delete it under normal profile operation.
+`reference.curated` means deliberately human-admitted, maintained reference, entered by explicit human-authorized promotion from collected or by direct human admission, with a curation record. It composes with `knowledge.reference` and remains human-authoritative. Agents may read curated evidence but may not add, edit, replace, rename, relocate, or delete it under normal profile operation.
 
-“Curated” records how the source entered the corpus. It does not mean the source is correct, high quality, or endorsed.
+“Curated” records an explicit curation decision. It does not mean the source is correct, high quality, or endorsed, and it says nothing about who acquired the bytes.
 
 ### 8.2 Collected evidence
 
-`reference.collected` means an agent, crawler, integration, workflow, API, or equivalent tool automatically acquired the source. Agents may deposit **new** source objects using the profile's existing append/add-child semantics. Existing collected objects remain unchanged by normal agent operation.
+`reference.collected` means preserved raw/reference material that has not been explicitly promoted. A human clipping an article or saving a transcript, an agent, a crawler, an integration, or a workflow may all acquire it. New source objects are deposited using append/add-child semantics; existing collected objects remain unchanged by normal agent operation. Collected is a legitimate permanent home, not a queue.
 
-Automatically collected evidence preserves acquisition provenance and content identity. The current profile requires sufficient metadata to identify the acquisition actor/method, origin, timestamp, and content hash or durable identity as applicable.
+Every source object preserves acquisition provenance and verifiable content identity: origin, acquisition actor/method, timestamp, and a content hash. The representation fits the object — Markdown frontmatter with a hash of the body, a sidecar for other files, a directory manifest for a batch or corpus — so ordinary note capture stays cheap without weakening the guarantee.
 
-A collected source does not move to curated merely because a human later reviews it. Review is metadata; the classification preserves original admission provenance.
+A collected source does not move to curated merely because a human later reviews it. Only an explicit, human-authorized promotion does. (Under schema v2 the classes record the acquisition actor instead.)
 
 ### 8.3 Evidence is not truth
 
@@ -269,7 +270,7 @@ knowledge.reference
   = what the material IS: preserved evidence
 
 reference.curated | reference.collected
-  = HOW the evidence entered the workspace
+  = whether the evidence has been explicitly CURATED
 
 knowledge.durable
   = what the workspace LEARNED from evidence
@@ -288,7 +289,7 @@ The parent `knowledge.reference` binding cannot widen or erase the policies of t
 
 The reference implementation requires an explicit target workspace. It must not use the installed skill directory as the workspace merely because the scripts live there. Bindings and generated destinations remain beneath the target after path and symlink resolution.
 
-The profile distinguishes semantic outputs from implementation filenames. `context.router` is the semantic identity; `CONTEXT.md` is its current default binding in this profile and may relocate where the profile permits. `SPEC.md`, `paths.sh`, `mkdirs.sh`, and editor-exclusion files are derived artifacts rather than canonical knowledge.
+The profile distinguishes semantic outputs from implementation filenames. `context.router` is the semantic identity; `CONTEXT.md` is its current default binding in this profile and may relocate where the profile permits. `SPEC.md`, `paths.sh`, `mkdirs.sh`, and editor-exclusion files are derived artifacts rather than canonical knowledge. In v3 each of them is itself placed by a declared binding, so `WORKSPACE.yaml` is the only file a consumer may assume at the root, and generated helpers locate the root independently instead of assuming their own directory is it.
 
 ## 9. Independent implementation test
 

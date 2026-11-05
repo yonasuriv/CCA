@@ -52,7 +52,7 @@ Preserve declared PARA/Zettelkasten/BASB or other organization. Scaffold routing
 
 ## CCA Hybrid Workspace Profile
 
-Use this path only after `architect` selected the optional profile or the target already matches the current bundled **v2** contract. V2 preserves the frozen-v1 baseline and adds only `reference.curated` and `reference.collected` admission classifications beneath `knowledge.reference`. Load `../architect/hybrid-workspace.md` before acting.
+Use this path only after `architect` selected the optional profile or the target already matches the bundled **v3** contract (or the supported v2 contract). `--init` seeds the v3 template. Load `../architect/hybrid-workspace.md` before acting.
 
 The implementation lives inside the installed skill at `../../assets/hybrid-workspace/` relative to this reference's skill package. Resolve the actual installed skill root; do not depend on a repository-global path.
 
@@ -73,22 +73,22 @@ Rules:
 5. Do not copy the Python implementation into the target merely to execute it.
 6. Required reference materialization creates the parent `knowledge.reference` binding plus its `reference.curated` and `reference.collected` child bindings. Do not create loose source objects at the parent.
 
-### Source admission
+### Source curation
 
-Scaffold does not reinterpret source admission as content authorship or a new knowledge role.
+Scaffold does not reinterpret curation state as content authorship, acquisition actor, or a new knowledge role.
 
-- Human-admitted raw/reference evidence goes through `reference.curated` and remains agent-read-only.
-- Automatically acquired raw/reference evidence goes through `reference.collected`; agents/tools may add new child objects only under the existing append/additive policy.
+- Preserved raw/reference material goes through `reference.collected`, whoever acquired it; any actor may add new child objects only under the append/additive policy.
+- Explicitly human-curated, maintained reference goes through `reference.curated` and remains agent-read-only.
 - Existing collected sources are not edited, replaced, renamed, relocated, or deleted by normal agent operation.
-- Collected sources require the provenance/content-identity metadata declared by `reference_contract`.
-- Human review does not move collected evidence to curated; review is metadata because the classification records original admission provenance.
+- Source objects require the provenance/content-identity metadata declared by `reference_contract`.
+- Review does not move collected evidence to curated; only an explicit human-authorized promotion does.
 - Agent-authored synthesis routes to `knowledge.durable`; deliverables route to `output.artifact`; finite research work routes to `work.project`.
 
 ### Existing profile target
 
 Do not use `--init` as a reset mechanism. Read the target's existing `WORKSPACE.yaml`, preserve human-authored `AGENTS.md`, and use `sync`/`lint` for reconciliation or validation.
 
-A v1 target is not silently rewritten as though its frozen schema had always contained the new keys. The current bundled profile is v2 because v1's own evolution contract requires a schema-version bump for key additions. Treat an upgrade as an explicit profile-version migration.
+A v1 or v2 target is not silently rewritten as though its frozen schema had always contained the new keys or meanings. The current bundled profile is v3 because the profile's own evolution contract requires a schema-version bump for key additions and meaning/policy changes. Treat an upgrade as an explicit, human-authorized profile-version migration.
 
 ## Change safety
 

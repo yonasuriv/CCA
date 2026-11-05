@@ -13,6 +13,9 @@ import tempfile
 import unittest
 
 PACKAGE = Path(__file__).resolve().parents[1]
+# The generic version-compatibility mechanism is exercised on the frozen v2 fixture;
+# schema v3 additionally requires cca.specification >= 1.3.0 (see test_v3_profile).
+V2 = PACKAGE / "profiles" / "v2"
 SKILL_MD = PACKAGE.parent.parent / "SKILL.md"
 
 
@@ -27,12 +30,12 @@ def run(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
 
 def make_target(cca_block: str | None) -> Path:
     target = Path(tempfile.mkdtemp(prefix="cca-version-target-"))
-    text = (PACKAGE / "WORKSPACE.yaml").read_text(encoding="utf-8")
+    text = (V2 / "WORKSPACE.yaml").read_text(encoding="utf-8")
     text = re.sub(r"(?m)^cca:\n(?:^ {2}.*\n)*", "", text)
     if cca_block is not None:
         text = cca_block + "\n" + text
     (target / "WORKSPACE.yaml").write_text(text, encoding="utf-8")
-    shutil.copy2(PACKAGE / "AGENTS.md", target / "AGENTS.md")
+    shutil.copy2(V2 / "AGENTS.md", target / "AGENTS.md")
     return target
 
 
@@ -47,7 +50,7 @@ class CcaContractVersionTests(unittest.TestCase):
     def test_default_template_declares_a_version_compatible_with_itself(self) -> None:
         # audit.py forbids the installed package dir as a target; use a copy instead.
         target = make_target(None)
-        shutil.copy2(PACKAGE / "WORKSPACE.yaml", target / "WORKSPACE.yaml")
+        shutil.copy2(V2 / "WORKSPACE.yaml", target / "WORKSPACE.yaml")
         result = run(cwd=target)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertNotIn("cca-version", result.stdout)

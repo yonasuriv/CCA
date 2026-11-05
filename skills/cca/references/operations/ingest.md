@@ -17,7 +17,7 @@ If no maintained-knowledge structure exists, stop and explain what minimum struc
 ## Procedure
 
 1. **Establish source identity.** Determine the durable source artifact and a stable way to cite it. Do not overwrite source evidence while synthesizing.
-2. **Resolve admission policy.** If the current target is the CCA Hybrid Workspace Profile, determine whether the source is human-admitted (`reference.curated`), automatically acquired (`reference.collected`), or still unclassified (`context.capture`). Do not infer this from content authorship.
+2. **Resolve curation policy.** If the current target is the CCA Hybrid Workspace Profile (v3), preserved raw/reference material is `reference.collected` whoever acquired it; only an explicit human-authorized curation puts it in `reference.curated`; material whose role is still unclear stays in `context.capture`. Do not infer this from content authorship or acquisition actor. (Schema v2 targets: human-admitted → curated, automatically acquired → collected.)
 3. **Read the source.** Extract material claims, entities, concepts, dates, relationships, and uncertainty. Keep source statements distinct from your inference.
 4. **Navigate existing synthesis using the workspace's own router/index/schema.** Read only pages relevant to the new material.
 5. **Respect authority boundaries.** Do not treat Zettelkasten notes, PARA resources, curated source evidence, or other human-maintained material as writable synthesis unless the workspace explicitly permits it.
@@ -31,13 +31,13 @@ If no maintained-knowledge structure exists, stop and explain what minimum struc
 9. **Verify references.** Every newly introduced source-backed assertion that the workspace promises to trace must resolve to the underlying evidence.
 10. **Report** what changed, what evidence was added, which contradictions or uncertainties remain, and which files contain the durable result.
 
-## Hybrid Workspace source admission
+## Hybrid Workspace source curation
 
-When the active target is the current CCA Hybrid Workspace Profile:
+When the active target is the current CCA Hybrid Workspace Profile (v3):
 
 ```text
-human-admitted source       -> reference.curated   -> knowledge.reference
-automatically acquired      -> reference.collected -> knowledge.reference
+explicitly curated (human)  -> reference.curated   -> knowledge.reference
+preserved raw, any acquirer -> reference.collected -> knowledge.reference
 unclassified incoming       -> context.capture
 agent-authored synthesis    -> knowledge.durable
 external deliverable        -> output.artifact

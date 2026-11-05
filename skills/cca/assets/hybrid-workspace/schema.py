@@ -65,8 +65,11 @@ def validate_binding_text(binding: str) -> str | None:
     p = PurePosixPath(binding.rstrip("/"))
     if p.is_absolute():
         return "binding must be workspace-relative"
-    if any(part in (".", "..") for part in p.parts):
-        return "binding may not contain . or .. path segments"
+    # Inspect the raw segments: PurePosixPath silently drops "." segments, which
+    # would let "./" or "a/./b" alias the workspace root or another binding.
+    raw_segments = binding.rstrip("/").split("/")
+    if any(part in ("", ".", "..") for part in raw_segments):
+        return "binding may not contain empty, . or .. path segments"
     return None
 
 
@@ -91,6 +94,11 @@ def _generated_destinations(data: Mapping[str, Any]) -> list[str]:
     router = slots.get("context.router", {})
     router_binding = router.get("binding") if isinstance(router, Mapping) else None
 
+    outputs = data.get("generation_contract", {}).get("outputs")
+    if isinstance(outputs, Mapping):
+        # Schema v3: every output resolves through a declared slot binding.
+        return list(generated_outputs(data).values())
+
     destinations: list[str] = []
     for entry in data.get("generation_contract", {}).get("derived", []):
         # `CONTEXT.md` is the historical/default declaration. Newer contracts
@@ -103,6 +111,43 @@ def _generated_destinations(data: Mapping[str, Any]) -> list[str]:
     return destinations
 
 
+def generated_outputs(data: Mapping[str, Any]) -> dict[str, str]:
+    """Resolve schema-v3 generation_contract.outputs to target-relative files.
+
+    `{slot: <file key>}` uses that file binding; `{slot: <dir key>, file: <name>}`
+    places a single filename segment inside that directory binding. Unknown
+    slots or unsafe names raise ValueError; nothing defaults to the target root.
+    """
+    slots = {
+        slot.get("key"): slot
+        for slot in data.get("slots", [])
+        if isinstance(slot, Mapping) and isinstance(slot.get("key"), str)
+    }
+    resolved: dict[str, str] = {}
+    outputs = data.get("generation_contract", {}).get("outputs", {})
+    if not isinstance(outputs, Mapping):
+        raise ValueError("generation_contract.outputs must be a mapping")
+    for name, spec in outputs.items():
+        if not isinstance(spec, Mapping) or not isinstance(spec.get("slot"), str):
+            raise ValueError(f"generated output {name!r} must name a slot")
+        slot = slots.get(spec["slot"])
+        if not isinstance(slot, Mapping) or not isinstance(slot.get("binding"), str):
+            raise ValueError(f"generated output {name!r} references undeclared slot {spec['slot']!r}")
+        binding = slot["binding"]
+        file_name = spec.get("file")
+        if file_name is None:
+            if slot.get("arity") != "file":
+                raise ValueError(f"generated output {name!r} needs a file name inside directory slot {spec['slot']!r}")
+            resolved[str(name)] = binding
+            continue
+        if not isinstance(file_name, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", file_name):
+            raise ValueError(f"generated output {name!r} file must be one safe filename segment, got {file_name!r}")
+        if slot.get("arity") != "dir":
+            raise ValueError(f"generated output {name!r} file requires a directory slot")
+        resolved[str(name)] = binding.rstrip("/") + "/" + file_name
+    return resolved
+
+
 def _validate_generated_destinations(data: Mapping[str, Any], root: Path) -> None:
     """Reject generated outputs whose text or existing symlinks escape the target."""
     for destination in _generated_destinations(data):
@@ -111,6 +156,28 @@ def _validate_generated_destinations(data: Mapping[str, Any], root: Path) -> Non
             raise ValueError(f"generated artifact binding {destination!r}: {error}")
         if not resolves_within(root, destination):
             raise ValueError(f"generated artifact {destination!r} escapes workspace via symlink/path resolution")
+
+
+def workspace_schema_path(root: str | Path) -> Path:
+    """Discover the single bootstrap manifest without guessing its capitalization.
+
+    New v3 workspaces use workspace.yaml; existing uppercase workspaces remain
+    supported. Reject duplicate case variants, including on case-insensitive
+    filesystems where listing exposes one spelling.
+    """
+    directory = Path(root)
+    if not directory.is_dir():
+        raise ValueError(f"workspace root does not exist: {directory}")
+    entries = [entry for entry in directory.iterdir() if entry.name.casefold() == "workspace.yaml"]
+    if len(entries) != 1 or entries[0].name not in {"workspace.yaml", "WORKSPACE.yaml"}:
+        raise ValueError(
+            f"expected exactly one workspace.yaml or WORKSPACE.yaml in {directory}; "
+            f"found {[entry.name for entry in entries]}"
+        )
+    path = entries[0]
+    if not path.is_file() or path.is_symlink() or not resolves_within(directory, path.name):
+        raise ValueError(f"workspace manifest must be a regular file inside {directory}: {path}")
+    return path
 
 
 def load_schema(path: str | Path) -> dict[str, Any]:

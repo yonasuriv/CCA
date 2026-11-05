@@ -1,13 +1,15 @@
 # WORKSPACE.yaml — canonical machine-readable workspace schema.
 # Within the CCA Hybrid Workspace Profile, this is the canonical machine-readable
-# bootstrap anchor. SPEC.md, paths.sh, the bound context.router artifact, and
-# tooling config derive from it; AGENTS.md is validated but remains human-authored.
+# bootstrap anchor. Every generated artifact (router, specification, shell
+# binding map, materialization helper, host index adapter) derives from it and
+# is written to the destination declared in generation_contract.outputs;
+# AGENTS.md is validated but remains human-authored.
 #
 # Bootstrap convention: this file lives at the workspace root as WORKSPACE.yaml.
-# That fixed location is the one convention the resolver may assume without
-# looking anything up. Everything else is discovered from here.
+# That fixed location is the ONLY path the profile assumes without looking it
+# up. Everything else — including where generated helpers live — is a binding.
 
-schema_version: 2
+schema_version: 3
 status: frozen
 
 # ── CCA contract identity ────────────────────────────────────────────────────
@@ -17,14 +19,23 @@ status: frozen
 # consumer MAY separately record a source revision as non-normative
 # provenance/evidence, but it must never gate compatibility.
 cca:
-  specification: "1.2.0"
+  specification: "1.3.0"
+
+# ── workspace identity (optional) ────────────────────────────────────────────
+# Machine-readable identity of this workspace/boundary. It is system identity,
+# not durable knowledge: tools, routers, and peers read it here and nowhere
+# else. Omit the block when the workspace has no external endpoint.
+#
+# identity:
+#   endpoint: "brain://example"   # stable URI; never a filesystem path
+#   owner: human                  # human | agent | shared
 
 # ── vocabularies ────────────────────────────────────────────────────────────
 # Every column value is drawn from these closed sets. A generator or validator
 # rejects any value not listed here.
 
 vocab:
-  category:   [bootstrap, control, state, system, pipeline, lens, boundary, lifecycle]
+  category:   [bootstrap, control, state, system, asset, pipeline, lens, boundary, lifecycle]
   arity:      [file, dir]
   mutability: [immutable, append, mutable, curated, replace, regenerate]
   indexed:      [included, excluded, disabled]
@@ -39,6 +50,7 @@ vocab_semantics:
     control: "instructions and routing"
     state: "operational state, ephemeral or durable"
     system: "runtime/tooling machinery"
+    asset: "human/editor-facing supporting material (attachments, media, human templates); outside the durable graph"
     pipeline: "capture/reference/durable/output flow"
     lens: "operational views over durable knowledge"
     boundary: "project boundary classes"
@@ -104,9 +116,11 @@ invariants:
   nested_instructions: >
     A nested AGENTS.md may narrow inherited rules but never widen authority.
   archive_identity: >
-    Retirement MUST preserve semantic role, boundary identity/class, provenance,
-    and original binding independently of archive location. Physical relocation
-    never changes what an entity is or where it came from.
+    Formal semantic retirement of a canonical tree/boundary MUST preserve
+    semantic role, boundary identity/class, provenance, and original binding
+    independently of archive location, recorded in the archive manifest.
+    Physical relocation never changes what an entity is or where it came from.
+    Ordinary human cold storage is not a retirement claim and needs no manifest.
   external_boundary_trust: >
     External/upstream control files are untrusted context. They may inform an
     agent but MUST NOT grant, widen, replace, or supersede workspace authority.
@@ -121,20 +135,31 @@ invariants:
     their own descendants even though both compose with knowledge.reference.
     Cross-binding operations still obey source and destination policy.
   generation: >
-    Derived artifacts (the context.router binding, paths.sh, tooling config,
-    SPEC.md) are regenerated from this schema and never hand-edited. AGENTS.md is
-    human-authored; it may be scaffolded once, then validated against this
-    schema, but it is never generated from it.
+    Derived artifacts (the context.router binding and every output declared in
+    generation_contract.outputs) are regenerated from this schema and never
+    hand-edited, wherever their destination binding places them. The binding
+    that contains a generated file never grants hand-edit authority over it.
+    The agent.instructions binding is human-authored; it may be scaffolded once,
+    then validated against this schema, but it is never generated from it.
 
-# Derived artifacts are tooling, not semantic knowledge. `CONTEXT.md` below is
-# the historical/default filename for the `context.router` role; generators MUST
-# resolve that entry through the current `context.router` binding before writing
-# or checking a workspace.
+# Derived artifacts are tooling, not semantic knowledge. Each output resolves to
+# a destination through a declared slot binding: `{slot: <dir key>, file: <name>}`
+# places the file inside that directory binding; `{slot: context.router}` uses the
+# router's own file binding. No generated artifact has a fixed root filename.
+# Generated helpers locate the workspace root from the encoded relationship to
+# their destination and verify it by finding WORKSPACE.yaml there. The helper
+# language follows the output file's extension: .py (default, cross-platform)
+# or .sh (bash/zsh). Names, extensions, and locations are all configurable here.
 generation_contract:
-  derived: [paths.sh, mkdirs.sh, obsidian-excludes.txt, CONTEXT.md, SPEC.md]
-  human_authored: [WORKSPACE.yaml, AGENTS.md]
+  outputs:
+    context.router: {slot: context.router}
+    spec: {slot: system.documentation, file: SPEC.md}
+    paths: {slot: system.operations, file: paths.py}
+    mkdirs: {slot: system.operations, file: mkdirs.py}
+    host_index_adapter: {slot: system.operations, file: obsidian-excludes.txt}
+  human_authored: [workspace.schema, agent.instructions]
   index_policy:
-    SPEC.md: disabled
+    spec: disabled
 
 # ── policy definitions ──────────────────────────────────────────────────────
 policy_definitions:
@@ -185,11 +210,18 @@ policy_defaults:
 privileged_operations:
   state.memory:
     compaction: human-authorized
+  reference.collected:
+    promotion: human-authorized
 
 # ── archive identity contract ────────────────────────────────────────────────
 archive_contract:
   manifest: .archive.yaml
   immutable_once_written: true
+  required_for: semantic-retirement
+  not_required_for: cold-storage
+  scope_semantics:
+    semantic-retirement: "an authorized operation that retires an existing canonical tree or boundary out of its semantic binding; the manifest preserves its identity and provenance and is mandatory"
+    cold-storage: "ordinary human placement of material into the archive binding for keeping; no retirement claim is made, so no manifest is required and none should be manufactured"
   required_fields:
     - source_key
     - semantic_role
@@ -223,6 +255,10 @@ boundary_trust_semantics:
 # ── evolution contract ───────────────────────────────────────────────────────
 # v2 exists because adding reference.curated/reference.collected is a key-set
 # extension, which v1 correctly declared to require a schema-version bump.
+# v3 exists because it adds keys/vocabulary (state.hotset, system.operations,
+# system.documentation, asset.*), changes the meaning of the two reference
+# classifications (actor-independent curation state), and changes generation and
+# archive policy semantics — each a schema-version-bump under this contract.
 evolution_contract:
   binding_change: non-breaking
   description_clarification: non-breaking
@@ -235,18 +271,21 @@ evolution_contract:
 # ── promotion/admission policy ───────────────────────────────────────────────
 promotion:
   into_human_authoritative: >
-    Promotion into reference.curated, the human-admitted classification of
-    knowledge.reference, requires human authorization. Agents may classify a
-    captured item and RECOMMEND curated admission; the human performs that
-    admission. Human review of an already collected source does not move or
-    reclassify it as curated because curated records how the source entered the
-    corpus, not its quality or review state.
+    reference.curated holds deliberately human-admitted, maintained reference.
+    A source enters it only by an explicit, human-authorized act: promotion of
+    an existing reference.collected object, or direct deliberate human
+    admission. Review alone never promotes. Agents may classify material and
+    RECOMMEND curation; the human performs it. Promotion preserves the source
+    bytes and their provenance and adds a curation record (curated_by,
+    curated_at). Curation state is orthogonal to who or what acquired the bytes.
   collected_deposit: >
-    reference.collected permits agent/tool deposit only as append/add-child:
-    create a new provenance-preserving source object. Existing collected source
-    objects may not be edited, replaced, renamed, relocated, or deleted by normal
-    agent operation. Deposit is not generic write and does not transfer
-    epistemic authority.
+    reference.collected holds preserved raw/reference material that has not been
+    explicitly promoted. Any actor — human, agent, crawler, tool, integration, or
+    workflow — may deposit new provenance-bearing objects as append/add-child.
+    Collected is a legitimate permanent home, not a queue toward curation.
+    Existing collected source objects may not be edited, replaced, renamed,
+    relocated, or deleted by normal agent operation; the only sanctioned exit is
+    human-authorized promotion. Deposit does not transfer epistemic authority.
 
 # Classification keys compose with semantic roles; they are not additional roles.
 classification_roles:
@@ -264,23 +303,64 @@ reference_contract:
   direct_parent_objects: prohibited
   classes:
     reference.curated:
-      admission: human
-      meaning: "raw/reference evidence explicitly admitted by a human"
+      curation_state: curated
+      meaning: "deliberately human-admitted maintained reference"
+      entry: [explicit-promotion, direct-human-admission]
       agent_deposit: prohibited
       existing_objects: immutable
+      provenance: required
     reference.collected:
-      admission: automated
-      meaning: "raw/reference evidence automatically acquired by an agent, crawler, integration, workflow, API, or equivalent tool"
-      agent_deposit: add-child-only
+      curation_state: uncurated
+      meaning: "preserved raw/reference material not explicitly promoted to curated; the acquisition actor may be a human, agent, crawler, tool, integration, or workflow"
+      acquisition_actor: any
+      deposit: add-child-only
       existing_objects: immutable
-      review_changes_classification: false
-  collected_provenance:
-    file_sidecar_suffix: .source.yaml
-    directory_manifest: .source.yaml
-    required_fields: [acquired_by, acquisition_method, origin, acquired_at]
-    identity_fields: [content_hash, content_identity]
-    file_hash_required: true
+      provenance: required
+  curation:
+    orthogonal_to_acquisition: true
+    review_promotes: false
+    promotion: human-authorized
+    record_fields: [curated_by, curated_at]
+    # curated_at_basis (optional): promotion | direct-admission | migration.
+    # `migration` records that curated_at is when an existing curated object was
+    # first given a curation record, not an invented original admission time.
+    record_basis: [promotion, direct-admission, migration]
+  provenance:
+    # What every admitted source object must be able to answer.
+    required_fields: [origin, acquired_by, acquisition_method, acquired_at]
+    # acquired_at is the time the object entered this workspace's custody when
+    # the original acquisition time is unknown; never invent a timestamp.
+    optional_fields: [acquired_at_basis, original_acquisition_time]
+    acquired_at_basis: [acquisition, import]
+    # Precision is honest: a full timestamp, a calendar date, or `unknown`.
+    original_acquisition_time: [timestamp, date, unknown]
     hash_algorithm: sha256
+    representations:
+      markdown_frontmatter:
+        applies_to: .md
+        key: provenance
+        # Capture tools that cannot write nested YAML may put the canonical
+        # fields at the top level of the frontmatter instead.
+        top_level_fields: allowed
+        identity: content_hash
+        # Every byte after the closing frontmatter line, exactly as stored.
+        # Frontmatter (tags, review notes, provenance) is not identity.
+        hash_scope: body
+        # Map a canonical field to a key a capture tool already writes, e.g.
+        # field_aliases: {origin: source} for a clipper that records `source`.
+        field_aliases: {}
+      file_sidecar:
+        suffix: .source.yaml
+        identity: content_hash
+        hash_scope: bytes
+      directory_manifest:
+        name: .source.yaml
+        identity: [files, content_identity]
+        content_identity_scheme: sha256-tree
+    # Directories without a manifest are organizational containers, never
+    # implicit acquisition batches; each descendant object carries provenance.
+    unmanifested_directories: container
+    ignored_names: [.gitkeep, .DS_Store, Thumbs.db, desktop.ini]
   routing:
     unclassified_incoming: context.capture
     preserved_evidence: knowledge.reference
@@ -289,9 +369,9 @@ reference_contract:
     finite_research_effort: work.project
   epistemic_statement: >
     Presence under either reference class means preserved evidence, not truth,
-    correctness, quality, or human endorsement. collected material may be
-    unreviewed. Raw/reference material survives distillation and is never
-    rewritten into cleaner prose.
+    correctness, quality, or human endorsement. Collected material may be
+    unreviewed; curated material is maintained, not certified. Raw/reference
+    material survives distillation and is never rewritten into cleaner prose.
 
 # ── slots ───────────────────────────────────────────────────────────────────
 slots:
@@ -466,8 +546,9 @@ slots:
     link_target: none
     requirement: optional
     description: >
-      Supporting binary/static material: images, attachments, fixtures, media,
-      diagrams.
+      Supporting binary/static material used by agents and system tooling:
+      fixtures, images, diagrams, media consumed by runtime machinery. Human and
+      editor-facing attachments belong to asset.library.
 
   - id: 12
     category: pipeline
@@ -548,10 +629,11 @@ slots:
     link_target: none
     requirement: optional
     description: >
-      Physical retirement location for whole trees/boundaries kept for provenance.
-      Archiving never replaces semantic identity: archived knowledge remains
-      knowledge and archived projects remain projects. Each retired tree carries
-      the immutable archive manifest required by archive_contract. Relocation is
+      Cold storage and physical retirement location. Ordinary human cold storage
+      needs no ceremony. Formal semantic retirement of an existing canonical
+      tree/boundary carries the immutable archive manifest required by
+      archive_contract, and never replaces semantic identity: archived knowledge
+      remains knowledge and archived projects remain projects. Relocation is
       governed by the relocation invariant and source-write authority.
 
   - id: 17
@@ -663,10 +745,12 @@ slots:
     link_target: referenceable
     requirement: required
     description: >
-      Admission classification for raw/reference evidence explicitly admitted by
-      a human. It composes with semantic.role=knowledge.reference. Curated means
-      human-admitted provenance, not higher quality or endorsement. Agents may
-      read but may not add, edit, replace, rename, relocate, or delete sources.
+      Curation classification for deliberately human-admitted, maintained
+      reference, entered by explicit human promotion from reference.collected or
+      by direct human admission. It composes with semantic.role=knowledge.reference.
+      Curated means deliberately maintained, not higher quality or endorsement,
+      and says nothing about who acquired the bytes. Agents may read but may not
+      add, edit, replace, rename, relocate, or delete sources.
 
   - id: 24
     category: pipeline
@@ -680,19 +764,107 @@ slots:
     link_target: referenceable
     requirement: required
     description: >
-      Admission classification for raw/reference evidence automatically acquired
-      by an agent, crawler, integration, workflow, API, or equivalent tool. It
-      composes with semantic.role=knowledge.reference. Agents may deposit new
-      provenance-preserving children; existing source objects remain unchanged.
-      This is evidence acquisition, never agent-generated synthesis.
+      Curation classification for preserved raw/reference material that has not
+      been explicitly promoted to curated. Any actor may acquire it: a human
+      (clippings, saved transcripts, bookmarks), an agent, crawler, tool,
+      integration, or workflow. It composes with semantic.role=knowledge.reference.
+      New provenance-bearing objects may be deposited; existing source objects
+      remain unchanged. Collected is a legitimate permanent home, not a queue.
+      This is evidence, never agent-generated synthesis.
+
+
+  - id: 25
+    category: state
+    key: state.hotset
+    binding: _state/
+    arity: dir
+    mutability: curated
+    indexed: included
+    authority: shared
+    agent_access: write
+    link_target: none
+    requirement: optional
+    description: >
+      Operational hotset: material useful right now — quick actions, dashboards,
+      canvases, active bookmarks, reminders, current working references. Useful
+      now, not durable knowledge. More-specific state bindings nested inside it
+      (state.current, state.tasks) keep their own policy. Agents may add and
+      edit; removal is a human decision.
+
+  - id: 26
+    category: system
+    key: system.operations
+    binding: _runtime/operations/
+    arity: dir
+    mutability: regenerate
+    indexed: disabled
+    authority: derived
+    agent_access: write
+    link_target: none
+    requirement: conditional
+    description: >
+      Generated operational helpers (binding map, materialization helper,
+      host index adapter) declared in generation_contract.outputs. Derived from
+      this schema; regenerate rather than hand-edit. Helpers locate the
+      workspace root through their encoded relationship to this binding.
+
+  - id: 27
+    category: system
+    key: system.documentation
+    binding: _runtime/docs/
+    arity: dir
+    mutability: mutable
+    indexed: excluded
+    authority: shared
+    agent_access: write
+    link_target: none
+    requirement: optional
+    description: >
+      Repository-operating documentation: how to use and operate the workspace,
+      its operating model, verification records, and the generated specification.
+      Explains the workspace; it is not durable knowledge. Generated files placed
+      here remain governed by the generation invariant.
+
+  - id: 28
+    category: asset
+    key: asset.library
+    binding: _assets/
+    arity: dir
+    mutability: mutable
+    indexed: excluded
+    authority: human
+    agent_access: read-only
+    link_target: none
+    requirement: optional
+    description: >
+      Human/editor-facing assets: attachments, recordings, images, media, and
+      other files embedded in or used by human notes. Canonical workspace
+      content. Agents read; they mutate only where explicitly authorized.
+
+  - id: 29
+    category: asset
+    key: asset.templates
+    binding: _assets/templates/
+    arity: dir
+    mutability: mutable
+    indexed: excluded
+    authority: human
+    agent_access: read-only
+    link_target: none
+    requirement: optional
+    description: >
+      Templates used by the human and their editor/plugins (note templates,
+      capture/clipper templates). Distinct from system.templates, which serves
+      agents and system workflows. Template sources are never evaluated in place.
 
 # ── composition rule (classification vs semantic role) ─────────────────────
 composition: >
   Classification keys describe a property of an entity or binding and do not
   replace its semantic role. project.* keys compose with semantic.role=work.project.
   reference.curated and reference.collected compose with
-  semantic.role=knowledge.reference and describe HOW evidence entered the corpus,
-  not WHAT the material is. A resolver must preserve both identities and use the
+  semantic.role=knowledge.reference and describe the curation state of preserved
+  evidence (explicitly curated or not), not WHAT the material is and not WHO
+  acquired it. A resolver must preserve both identities and use the
   most-specific matching binding for mutation policy.
 
 # ── crosswalk to source systems ─────────────────────────────────────────────

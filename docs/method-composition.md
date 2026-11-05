@@ -36,9 +36,9 @@ Likewise:
 - an LLM Wiki page is not automatically a PARA Resource merely because it is informative;
 - an ICM workflow can live inside a PARA Project without becoming PARA internally.
 
-## Source admission is another independent classification
+## Source curation is another independent classification
 
-The current Hybrid Workspace Profile v2 makes an additional distinction inside preserved evidence:
+The Hybrid Workspace Profile makes an additional distinction inside preserved evidence:
 
 ```text
 reference.curated   ─┐
@@ -49,9 +49,9 @@ reference.collected ─┘
 This does **not** split `knowledge.reference` into two knowledge roles.
 
 - `knowledge.reference` answers **what the material is**: preserved source/evidence.
-- `reference.curated` vs `reference.collected` answers **how that source entered the workspace**.
+- `reference.curated` vs `reference.collected` answers **whether that source has been explicitly curated** (v3); who acquired it is recorded separately in provenance.
 - content authorship is separate again: an agent may acquire a human-authored/arXiv/vendor source without becoming its author.
-- review/approval is metadata and does not retroactively change admission provenance.
+- review alone never promotes; promotion is an explicit human-authorized act.
 - presence in either source class means evidence, not truth or endorsement.
 
 The default Hybrid bindings make this visible as:
@@ -62,7 +62,7 @@ The default Hybrid bindings make this visible as:
 └── collected/
 ```
 
-The paths are profile defaults/bindings; the semantic distinction is carried by the classification/role contract. Automatically collected evidence remains raw evidence; agent-authored conclusions belong to `knowledge.durable`, deliberate external deliverables to `output.artifact`, and finite research work to `work.project`.
+The paths are profile defaults/bindings; the semantic distinction is carried by the classification/role contract. Collected evidence remains raw evidence; agent-authored conclusions belong to `knowledge.durable`, deliberate external deliverables to `output.artifact`, and finite research work to `work.project`.
 
 This also means the PARA crosswalk remains deliberately partial. A PARA Resource is not automatically `knowledge.reference`, and a `reference.collected` object does not become a distinct PARA category.
 
@@ -100,7 +100,7 @@ A CCA-owned profile may adopt ICM-proven navigation behavior without claiming na
 
 CCA ships an optional Hybrid Workspace Profile for a recurring case: a filesystem-native environment containing projects, preserved sources, human notes/research, maintained knowledge, tasks/state, reusable capabilities, and human + agent operation.
 
-The current bundled schema is v2. V2 preserves the frozen-v1 semantic/policy baseline and adds only the two reference-admission classification keys required to distinguish human admission from automated acquisition without changing the meaning of `knowledge.reference`.
+The current bundled schema is v3 (v2 remains supported). It preserves the frozen-v1 semantic/policy baseline, keeps the two reference classifications as actor-independent curation state without changing the meaning of `knowledge.reference`, and makes every generated artifact a declared binding.
 
 It is:
 

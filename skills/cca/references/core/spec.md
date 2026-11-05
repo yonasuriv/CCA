@@ -1,6 +1,6 @@
 # CCA Specification
 
-**Version 1.2.1** — Status: Stable, tracking ICM, LLM Wiki, AGENTS.md, Agent Skills, and other directly supported upstreams.
+**Version 1.3.0** — Status: Stable, tracking ICM, LLM Wiki, AGENTS.md, Agent Skills, and other directly supported upstreams.
 
 Normative. CCA runtime behavior and CCA-conformant examples must conform to this document. Contract identity and SemVer evolution are governed by [`versioning.md`](versioning.md); compatibility details by [`compatibility.md`](compatibility.md); method composition by [`method-composition.md`](method-composition.md).
 
@@ -336,12 +336,12 @@ The profile:
 - uses stable semantic keys with configurable bindings;
 - uses ICM-proven navigation principles where useful without claiming native ICM;
 - may contain nested upstream-native boundaries;
-- preserves the complete frozen-v1 semantic/policy/authority baseline and its adversarial tests, while the current v2 schema adds only the `reference.curated` and `reference.collected` admission classifications beneath `knowledge.reference` plus the provenance/routing contract required to enforce that distinction;
+- preserves the complete frozen-v1 semantic/policy/authority baseline and its adversarial tests; schema v2 (still supported unchanged) added the `reference.curated` and `reference.collected` classifications beneath `knowledge.reference`; the current schema v3 makes those classifications record actor-independent curation state with representation-aware provenance, makes every generated artifact a declared binding so `WORKSPACE.yaml` is the only fixed bootstrap path, and adds optional workspace identity, the operational state hotset, operating documentation, human/editor asset bindings, and scoped archive manifests;
 - requires generation/audit operations to use an explicit **target workspace**;
 - MUST NOT materialize a workspace inside the installed skill/tool directory;
-- resolves the generated `context.router` artifact through its current binding rather than a hardcoded filename.
+- resolves the generated `context.router` artifact through its current binding rather than a hardcoded filename, and (v3) resolves every other generated artifact through `generation_contract.outputs`.
 
-The two reference classifications describe **how preserved evidence entered the corpus**, not new semantic knowledge roles. Their detailed current contract is normative for the profile and lives in [`../architect/hybrid-workspace.md`](../architect/hybrid-workspace.md).
+The two reference classifications describe the **curation state** of preserved evidence (v3; under v2, how it was admitted), not new semantic knowledge roles and not who acquired it. Their detailed current contract is normative for the profile and lives in [`../architect/hybrid-workspace.md`](../architect/hybrid-workspace.md).
 
 ## 14. Profile-aware linting
 

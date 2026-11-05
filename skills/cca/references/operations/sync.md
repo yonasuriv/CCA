@@ -36,9 +36,18 @@ Do not create missing CCA-preferred catalogs merely because sync knows about the
 
 ## CCA Hybrid Workspace Profile
 
-Load `../architect/hybrid-workspace.md` when the target matches the current bundled **v2** profile. V2 preserves the frozen-v1 baseline and adds only the two `knowledge.reference` admission classifications.
+Load `../architect/hybrid-workspace.md` when the target matches the bundled **v3** profile or the supported **v2** profile.
 
-After an authorized edit to `WORKSPACE.yaml`, reconcile derived artifacts with the installed skill's bundled implementation:
+Consumers should resolve semantic keys, not maintain independent path tables. The shared CLI exposes a stable interface:
+
+```bash
+python <cca-skill>/assets/hybrid-workspace/resolve.py --target <workspace> --key knowledge.durable
+python <cca-skill>/assets/hybrid-workspace/resolve.py --target <workspace> --output paths --format relative
+```
+
+This resolves only the manifest, not the vault contents. An unrecognized key, unsafe binding, ambiguous manifest filename, or path escaping the workspace fails explicitly.
+
+After an authorized edit to the root workspace manifest (`workspace.yaml` on new v3 workspaces, `WORKSPACE.yaml` on existing workspaces), reconcile derived artifacts with the installed skill's bundled implementation:
 
 ```bash
 python <cca-skill>/assets/hybrid-workspace/generate.py --target <workspace>
@@ -55,11 +64,11 @@ Rules:
 - the command MUST receive an explicit target;
 - never invoke generation against `skills/cca/` or `assets/hybrid-workspace/` itself;
 - `binding_change` remains non-breaking, so all generated consumers MUST follow the new binding;
-- `context.router` MUST be generated at its current binding, not hardcoded as `CONTEXT.md`;
+- `context.router` MUST be generated at its current binding, not hardcoded as `CONTEXT.md`; under v3 every other generated artifact MUST be generated at its declared `generation_contract.outputs` destination, never at an assumed root filename;
 - if `_state/`, `_runtime/`, `20-sources/`, or any other default binding is moved, obsolete defaults MUST NOT remain in regenerated routing/spec/path artifacts;
 - `reference.curated` and `reference.collected` bindings move as children of the current `knowledge.reference` binding; their semantic role remains `knowledge.reference`;
-- a binding move MUST NOT change admission provenance, effective child policy, or review state;
-- `sync` never moves a reviewed collected source into curated merely because review status changed;
+- a binding move MUST NOT change provenance, curation state, effective child policy, or review state;
+- `sync` never moves a reviewed collected source into curated; promotion is an explicit human-authorized operation;
 - `sync` does not silently change frozen semantic keys/policies/authorities to make a binding move easier.
 
 ## Production rules
@@ -85,3 +94,5 @@ After edits:
 4. no upstream-native rule or method boundary was replaced with a CCA preference;
 5. for the Hybrid Workspace Profile, `generate.py --target <workspace> --check` passes and no obsolete binding leaks remain;
 6. reference classification still resolves both curated and collected evidence to `knowledge.reference`, with collected provenance/integrity intact.
+
+For schema v3, generation uses the structural audit so routine edits do not scan the entire source corpus. Run `python <cca-skill>/assets/hybrid-workspace/audit.py --target <workspace>` to separately verify all preserved evidence, provenance, and archive records. Generated helpers validate a parsed-schema fingerprint; YAML comments, key ordering, and formatting do not invalidate them, but meaningful configuration changes do until regeneration. This check requires Python 3 and PyYAML on the shell host.
