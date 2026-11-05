@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -151,6 +152,7 @@ class ReferenceAdmissionContractTests(unittest.TestCase):
         self.assertNotEqual(mutated.returncode, 0, mutated.stdout + mutated.stderr)
         self.assertIn("hash", (mutated.stdout + mutated.stderr).lower())
 
+    @unittest.skipUnless(os.name == "posix" and shutil.which("bash"), "requires POSIX Bash")
     def test_required_materialization_creates_both_reference_classes(self) -> None:
         target = make_target()
         generated = run(sys.executable, str(PACKAGE / "generate.py"), "--target", str(target))
