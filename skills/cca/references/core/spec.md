@@ -1,6 +1,6 @@
 # CCA Specification
 
-**Version 1.3.0** — Status: Stable, tracking ICM, LLM Wiki, AGENTS.md, Agent Skills, and other directly supported upstreams.
+**Version 1.4.0** — Status: Stable, tracking ICM, LLM Wiki, AGENTS.md, Agent Skills, and other directly supported upstreams.
 
 Normative. CCA runtime behavior and CCA-conformant examples must conform to this document. Contract identity and SemVer evolution are governed by [`versioning.md`](versioning.md); compatibility details by [`compatibility.md`](compatibility.md); method composition by [`method-composition.md`](method-composition.md).
 

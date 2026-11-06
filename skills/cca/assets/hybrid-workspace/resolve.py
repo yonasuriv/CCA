@@ -7,7 +7,9 @@ import json
 from pathlib import Path
 import sys
 
-from schema import generated_outputs, load_schema, resolves_within, validate_binding_text, workspace_schema_path
+import yaml
+
+from schema import contract_fingerprint, generated_outputs, load_manifest, load_schema, minimize_manifest, resolves_within, validate_binding_text, workspace_schema_path
 
 
 def resolve(root: str | Path, *, key: str | None = None, output: str | None = None) -> tuple[str, Path]:
@@ -61,12 +63,37 @@ def resolve(root: str | Path, *, key: str | None = None, output: str | None = No
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Resolve a semantic CCA binding without duplicating paths.")
-    parser.add_argument("--target", required=True, help="Workspace root containing the sole bootstrap manifest")
+    parser.add_argument("--target", help="Workspace root containing the sole bootstrap manifest")
     name = parser.add_mutually_exclusive_group(required=True)
     name.add_argument("--key", help="Semantic slot key, e.g. knowledge.durable")
     name.add_argument("--output", help="Generated output key, e.g. paths")
+    name.add_argument("--contract-fingerprint", metavar="PROFILE@VERSION",
+                      help="print the fingerprint a minimal manifest pins, e.g. hybrid-workspace@3")
+    name.add_argument("--minimize", action="store_true",
+                      help="print the target's full manifest as an equivalent minimal (extends) manifest")
     parser.add_argument("--format", choices=("absolute", "relative", "json"), default="absolute")
     args = parser.parse_args(argv)
+    if args.contract_fingerprint:
+        profile, _, version = args.contract_fingerprint.partition("@")
+        try:
+            print(contract_fingerprint(profile, int(version)))
+        except ValueError as exc:
+            print(f"CCA contract lookup failed: {exc}", file=sys.stderr)
+            return 1
+        return 0
+    if not args.target:
+        parser.error("--target is required")
+    if args.minimize:
+        try:
+            manifest = workspace_schema_path(Path(args.target).expanduser().resolve())
+            full = load_manifest(manifest)
+            if "extends" in full:
+                raise ValueError("manifest is already minimal")
+            print(yaml.safe_dump(minimize_manifest(full, manifest.name), sort_keys=False, allow_unicode=True, width=1000), end="")
+        except (OSError, ValueError, KeyError) as exc:
+            print(f"CCA manifest minimization failed: {exc}", file=sys.stderr)
+            return 1
+        return 0
     try:
         relative, absolute = resolve(args.target, key=args.key, output=args.output)
     except (OSError, ValueError, KeyError) as exc:
