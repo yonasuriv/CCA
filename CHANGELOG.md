@@ -4,6 +4,18 @@ This changelog records released CCA milestones and pending user-visible changes.
 
 ## Unreleased
 
+## 1.4.0 - 2026-11-06
+
+Minor: adds opt-in minimal v3 manifests. Full v2 and v3 manifests validate and generate unchanged.
+
+### Added
+
+- Minimal v3 manifests: a root `workspace.yaml` may `extends` the bundled Hybrid Workspace contract, pinned by semantic fingerprint, and declare only `cca`, `identity`, `bindings`, `provenance_aliases`, and access narrowing. The shared loader composes it into the full v3 schema, so audit, generation, resolution, and provenance are unchanged; anything that would add keys, change policy, or widen access fails closed. `resolve.py --contract-fingerprint` prints the pin and `resolve.py --minimize` converts a full manifest only when the result composes back to it exactly. `tests/test_minimal_manifest.py` covers composition, fail-closed boundaries, round-tripping, and end-to-end audit/generate/resolve.
+
+### Changed
+
+- The canonical manifest fingerprint source moved from `generate.py` to `schema.py` so the generator, generated helpers, and contract pinning share one definition.
+
 ### Fixed
 
 - `provenance.py` discovers the workspace manifest through the shared bootstrap lookup, so `stamp` and `identity` work on v3 workspaces that use `workspace.yaml`, and a missing or duplicate manifest is reported instead of raising a traceback.

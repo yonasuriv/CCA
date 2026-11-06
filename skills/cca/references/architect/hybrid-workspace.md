@@ -271,7 +271,7 @@ A consumer that knows the profile but does not have the CCA skill installed MUST
 
 For current v3:
 
-1. Discover the single case-exact root manifest (`workspace.yaml` for new v3 workspaces or existing `WORKSPACE.yaml` for legacy workspaces). Reject duplicates and a manifest whose declared `workspace.schema` binding does not match its actual filename. This manifest is the sole bootstrap authority for semantic bindings and policy.
+1. Discover the single case-exact root manifest (`workspace.yaml` for new v3 workspaces or existing `WORKSPACE.yaml` for legacy workspaces). Reject duplicates and a manifest whose declared `workspace.schema` binding does not match its actual filename. This manifest is the sole bootstrap authority for semantic bindings and policy. A minimal manifest is first composed with its pinned contract (see Minimal manifests below) and is authoritative through that composition.
 2. The `agent.instructions` binding (default `AGENTS.md`) is the human/agent control surface and identifies `workspace-contract:v3` (`workspace-contract:v2` for v2 targets).
 3. Semantic resolution starts from the applicable boundary and declared slots; `slots[*].binding` gives the concrete target-local implementation.
 4. `classification_roles` declares when a classification composes with another semantic role instead of replacing it.
@@ -281,6 +281,42 @@ For current v3:
 8. An implementation MUST validate binding text and symlink-resolved containment before reading/writing generated/profile-controlled destinations.
 9. For nested bindings, filesystem policy resolves from the most-specific matching binding; semantic composition remains separately visible.
 10. Derived artifacts are rebuildable views/adapters. They MUST NOT become competing authority over the workspace manifest, human-authored control files, source evidence, or canonical workspace content.
+
+### Minimal manifests (`extends`)
+
+A v3 workspace MAY serialize its root manifest minimally instead of copying the whole contract. A minimal manifest pins a profile contract bundled with the installed CCA and declares only what is local to the workspace:
+
+```yaml
+extends:
+  profile: hybrid-workspace
+  schema_version: 3
+  fingerprint: <semantic SHA-256 of the bundled contract>
+cca:
+  specification: "1.3.0"
+identity:
+  endpoint: "brain://example"
+  owner: human
+bindings:
+  knowledge.durable: wiki/
+  reference.collected: sources/collected/
+provenance_aliases:
+  origin: source
+narrow:
+  agent_access:
+    context.capture: read-only
+```
+
+Composition rules:
+
+1. The bundled contract supplies every semantic: vocabularies, slots, policies, invariants, contracts, and default bindings. A minimal manifest accepts only `extends`, `cca`, `identity`, `bindings`, `provenance_aliases`, and `narrow`; any other top-level key fails closed.
+2. `extends.fingerprint` is the semantic fingerprint of the contract (the same canonical form generated helpers use). A mismatch with the installed contract fails closed; the owner reviews the contract change and updates the pin. The fingerprint is integrity evidence for the composed semantics, not CCA conformance identity, which stays the declared SemVer (see `references/core/versioning.md`).
+3. `bindings` relocates declared keys only. Unknown keys and unsafe binding text fail. `workspace.schema` always resolves to the manifest file that was loaded.
+4. `provenance_aliases` maps canonical provenance fields to frontmatter names, for capture tools that cannot write them.
+5. `narrow.agent_access` may only move a slot from `write` towards `read-only` or `none`. A manifest can never widen authority, mutability, or access.
+6. Consumers load the composed schema, which has the exact shape of a full v3 manifest. Audit, generation, resolution, and provenance therefore apply unchanged.
+7. Generated helpers fingerprint the manifest as written. A minimal manifest's pinned contract fingerprint makes that cover the contract transitively.
+
+`resolve.py --contract-fingerprint hybrid-workspace@3` prints the pin; `resolve.py --target <workspace> --minimize` prints a full manifest as its minimal equivalent and refuses when the manifest diverges from the contract beyond what a minimal manifest can express.
 
 ### Generated artifact semantics
 

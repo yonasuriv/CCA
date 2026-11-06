@@ -15,28 +15,13 @@ from typing import Any
 
 import yaml
 
-from schema import compact_ops, effective_agent_operations, generated_outputs, load_schema, resolves_within, semantic_role_for_slot, validate_binding_text, workspace_schema_path
+from schema import CANONICAL_SOURCE, compact_ops, effective_agent_operations, generated_outputs, load_manifest, load_schema, resolves_within, semantic_fingerprint, semantic_role_for_slot, validate_binding_text, workspace_schema_path
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
 TEMPLATE_SCHEMA = PACKAGE_ROOT / "WORKSPACE.yaml"
 TEMPLATE_AGENTS = PACKAGE_ROOT / "AGENTS.md"
 
 
-# One canonical form of the parsed manifest, used verbatim by the generator and
-# by generated helpers at runtime: deterministic for sets and mixed-type keys,
-# independent of comments, whitespace, key order, and YAML spelling.
-CANONICAL_SOURCE = (
-    "def _c(o):\n"
-    " if isinstance(o,bool) or o is None or isinstance(o,(int,float,str)): return o\n"
-    " if isinstance(o,dict): return ['m',sorted([[_c(k),_c(v)] for k,v in o.items()],key=lambda kv: json.dumps(kv[0],sort_keys=True))]\n"
-    " if isinstance(o,(list,tuple)): return ['l',[_c(x) for x in o]]\n"
-    " if isinstance(o,(set,frozenset)): return ['s',sorted([_c(x) for x in o],key=lambda x: json.dumps(x,sort_keys=True))]\n"
-    " return ['o',type(o).__name__,str(o)]\n"
-    "def fingerprint(d): return hashlib.sha256(json.dumps(_c(d),separators=(',',':'),ensure_ascii=True).encode('utf-8')).hexdigest()\n"
-)
-_canonical_ns: dict[str, Any] = {"json": json, "hashlib": hashlib}
-exec(CANONICAL_SOURCE, _canonical_ns)  # noqa: S102 - fixed, package-owned source
-semantic_fingerprint = _canonical_ns["fingerprint"]
 
 
 def manifest_name(data: dict[str, Any]) -> str:
@@ -49,8 +34,10 @@ def schema(target: Path) -> dict[str, Any]:
     if manifest.name == "workspace.yaml" and data.get("schema_version") != 3:
         raise ValueError("lowercase workspace.yaml is a schema v3 bootstrap; schema v2 workspaces use WORKSPACE.yaml")
     if data.get("schema_version") == 3:
-        # Hash parsed semantics, not raw YAML bytes or comments.
-        data["_semantic_fingerprint"] = semantic_fingerprint(data)
+        # Hash parsed semantics of the manifest as written, not raw YAML bytes or
+        # comments. Generated helpers re-read the same file at runtime; for a
+        # minimal manifest its pinned contract fingerprint covers the contract.
+        data["_semantic_fingerprint"] = semantic_fingerprint(load_manifest(manifest))
     data["_schema_name"] = manifest.name
     return data
 
