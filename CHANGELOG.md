@@ -10,7 +10,7 @@ Minor: adds opt-in minimal v3 manifests. Full v2 and v3 manifests validate and g
 
 ### Added
 
-- Minimal v3 manifests: a root `workspace.yaml` may `extends` the bundled Hybrid Workspace contract, pinned by semantic fingerprint, and declare only `cca`, `identity`, `bindings`, `provenance_aliases`, and access narrowing. The shared loader composes it into the full v3 schema, so audit, generation, resolution, and provenance are unchanged; anything that would add keys, change policy, or widen access fails closed. `resolve.py --contract-fingerprint` prints the pin and `resolve.py --minimize` converts a full manifest only when the result composes back to it exactly. `tests/test_minimal_manifest.py` covers composition, fail-closed boundaries, round-tripping, and end-to-end audit/generate/resolve.
+- Minimal v3 manifests: a root `workspace.yaml` may `extends` the bundled contract `assets/hybrid-workspace/contracts/hybrid-workspace-v3.yaml` (v3 semantics without slot ids, bindings, workspace `cca`/`identity`, or folded prose), pinned by semantic fingerprint. The manifest declares `cca.specification` (>= 1.4.0), `identity`, one binding per slot, `provenance_aliases`, and access narrowing; the shared loader composes it into the full v3 schema, so audit, generation, resolution, and provenance are unchanged. Anything that would add keys, change policy, widen access, or leave a slot unbound fails closed. `resolve.py --contract-fingerprint` prints the pin and `resolve.py --minimize` converts a full manifest only when the result composes back to it. `tests/test_minimal_manifest.py` covers the contract/template equivalence, composition, fail-closed boundaries, round-tripping, and end-to-end audit/generate/resolve.
 
 ### Changed
 

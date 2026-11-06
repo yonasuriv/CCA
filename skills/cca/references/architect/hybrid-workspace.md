@@ -284,7 +284,7 @@ For current v3:
 
 ### Minimal manifests (`extends`)
 
-A v3 workspace MAY serialize its root manifest minimally instead of copying the whole contract. A minimal manifest pins a profile contract bundled with the installed CCA and declares only what is local to the workspace:
+Since CCA 1.4.0 a v3 workspace MAY serialize its root manifest minimally instead of copying the whole contract. The contract ships inside the skill at `assets/hybrid-workspace/contracts/hybrid-workspace-v3.yaml`: the v3 semantics with no slot `id`, no `binding`, no workspace `cca` or `identity`, and single-line prose. The workspace manifest pins it and holds everything local:
 
 ```yaml
 extends:
@@ -292,13 +292,15 @@ extends:
   schema_version: 3
   fingerprint: <semantic SHA-256 of the bundled contract>
 cca:
-  specification: "1.3.0"
+  specification: "1.4.0"
 identity:
   endpoint: "brain://example"
   owner: human
-bindings:
+bindings:            # one entry per slot; workspace.schema is implied
+  agent.instructions: AGENTS.md
   knowledge.durable: wiki/
   reference.collected: sources/collected/
+  # ...
 provenance_aliases:
   origin: source
 narrow:
@@ -308,15 +310,17 @@ narrow:
 
 Composition rules:
 
-1. The bundled contract supplies every semantic: vocabularies, slots, policies, invariants, contracts, and default bindings. A minimal manifest accepts only `extends`, `cca`, `identity`, `bindings`, `provenance_aliases`, and `narrow`; any other top-level key fails closed.
+1. The contract supplies every semantic: vocabularies, slots, policies, invariants, and contracts. It holds no paths. A minimal manifest accepts only `extends`, `cca`, `identity`, `bindings`, `provenance_aliases`, and `narrow`; any other top-level key fails closed.
 2. `extends.fingerprint` is the semantic fingerprint of the contract (the same canonical form generated helpers use). A mismatch with the installed contract fails closed; the owner reviews the contract change and updates the pin. The fingerprint is integrity evidence for the composed semantics, not CCA conformance identity, which stays the declared SemVer (see `references/core/versioning.md`).
-3. `bindings` relocates declared keys only. Unknown keys and unsafe binding text fail. `workspace.schema` always resolves to the manifest file that was loaded.
-4. `provenance_aliases` maps canonical provenance fields to frontmatter names, for capture tools that cannot write them.
-5. `narrow.agent_access` may only move a slot from `write` towards `read-only` or `none`. A manifest can never widen authority, mutability, or access.
-6. Consumers load the composed schema, which has the exact shape of a full v3 manifest. Audit, generation, resolution, and provenance therefore apply unchanged.
-7. Generated helpers fingerprint the manifest as written. A minimal manifest's pinned contract fingerprint makes that cover the contract transitively.
+3. `cca.specification` is required and must be at least `1.4.0`, the first release that reads minimal manifests.
+4. `bindings` binds every slot except `workspace.schema`, which always resolves to the manifest file that was loaded. Missing bindings, unknown keys, and unsafe binding text fail. There are no default paths: the manifest is the single place a path is written.
+5. Slot ids are display ordinals assigned in contract order; nothing references them.
+6. `provenance_aliases` maps canonical provenance fields to frontmatter names, for capture tools that cannot write them.
+7. `narrow.agent_access` may only move a slot from `write` towards `read-only` or `none`. A manifest can never widen authority, mutability, or access.
+8. Consumers load the composed schema, which has the exact shape of a full v3 manifest. Audit, generation, resolution, and provenance therefore apply unchanged.
+9. Generated helpers fingerprint the manifest as written. A minimal manifest's pinned contract fingerprint makes that cover the contract transitively.
 
-`resolve.py --contract-fingerprint hybrid-workspace@3` prints the pin; `resolve.py --target <workspace> --minimize` prints a full manifest as its minimal equivalent and refuses when the manifest diverges from the contract beyond what a minimal manifest can express.
+`resolve.py --contract-fingerprint hybrid-workspace@3` prints the pin; `resolve.py --target <workspace> --minimize` prints a full manifest as its minimal equivalent (lifting `cca.specification` to at least `1.4.0`) and refuses when the manifest diverges from the contract beyond what a minimal manifest can express. Prose is compared with whitespace collapsed, so folded and single-line descriptions are equivalent. A test keeps the contract file semantically identical to the bundled v3 template minus workspace-local data.
 
 ### Generated artifact semantics
 

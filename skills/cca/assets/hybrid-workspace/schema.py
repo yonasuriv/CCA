@@ -38,10 +38,11 @@ semantic_fingerprint = _canonical_ns["fingerprint"]
 # Minimal manifests (`extends`) compose with a profile contract shipped inside
 # this package. Only these top-level keys are accepted; anything else fails
 # closed so a manifest cannot smuggle in policy, vocab, or slot changes.
-EXTENDS_PROFILES = {("hybrid-workspace", 3): PACKAGE_ROOT / "WORKSPACE.yaml"}
+EXTENDS_PROFILES = {("hybrid-workspace", 3): PACKAGE_ROOT / "contracts" / "hybrid-workspace-v3.yaml"}
 EXTENDS_KEYS = {"extends", "cca", "identity", "bindings", "provenance_aliases", "narrow"}
 # Ordered from widest to narrowest; a manifest may only move a slot rightwards.
 AGENT_ACCESS_ORDER = ("write", "read-only", "none")
+MINIMAL_MANIFEST_SINCE = (1, 4, 0)
 
 
 class StrictSafeLoader(yaml.SafeLoader):
@@ -243,8 +244,19 @@ def contract_path(profile: str, schema_version: int) -> Path:
 
 
 def _pinned_fingerprint(contract: Mapping[str, Any]) -> str:
-    """Fingerprint contract semantics; the template's own cca version is not semantics."""
-    return semantic_fingerprint({key: value for key, value in contract.items() if key != "cca"})
+    """Semantic fingerprint of a contract file as parsed."""
+    return semantic_fingerprint(contract)
+
+
+def normalize_prose(value: Any) -> Any:
+    """Collapse whitespace in every string, so folded and single-line prose compare equal."""
+    if isinstance(value, str):
+        return " ".join(value.split())
+    if isinstance(value, Mapping):
+        return {key: normalize_prose(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [normalize_prose(item) for item in value]
+    return value
 
 
 def contract_fingerprint(profile: str, schema_version: int) -> str:
@@ -255,10 +267,11 @@ def contract_fingerprint(profile: str, schema_version: int) -> str:
 def compose_manifest(manifest: Mapping[str, Any], manifest_name: str) -> dict[str, Any]:
     """Compose a minimal manifest with its pinned contract into a full schema.
 
-    The contract supplies every semantic: vocab, slots, policies, invariants,
-    and default bindings. The manifest may only relocate bindings, declare
-    identity and the targeted CCA version, alias provenance fields, and narrow
-    agent access. It can never widen authority or add, remove, or redefine keys.
+    The contract supplies every semantic: vocab, slots, policies and invariants,
+    but no paths. The manifest binds every slot, declares identity and the
+    targeted CCA version, aliases provenance fields, and may narrow agent access.
+    It can never widen authority or add, remove, or redefine keys. Slot ids are
+    display ordinals assigned in contract order.
     """
     unknown = set(manifest) - EXTENDS_KEYS
     if unknown:
@@ -282,10 +295,17 @@ def compose_manifest(manifest: Mapping[str, Any], manifest_name: str) -> dict[st
             "review the contract change, then update extends.fingerprint"
         )
     data = copy.deepcopy(contract)
+    for ordinal, slot in enumerate(data["slots"], start=1):
+        slot["id"] = ordinal
     slots = {slot["key"]: slot for slot in data["slots"]}
 
-    if "cca" in manifest:
-        data["cca"] = copy.deepcopy(manifest["cca"])
+    # Minimal manifests first exist in CCA 1.4.0; an older declared target could not read this file.
+    cca = manifest.get("cca")
+    declared = cca.get("specification") if isinstance(cca, Mapping) else None
+    match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", declared) if isinstance(declared, str) else None
+    if not match or tuple(int(part) for part in match.groups()) < MINIMAL_MANIFEST_SINCE:
+        raise ValueError(f"a minimal manifest must declare cca.specification >= {'.'.join(map(str, MINIMAL_MANIFEST_SINCE))}, got {declared!r}")
+    data["cca"] = copy.deepcopy(dict(cca))
     data.pop("identity", None)
     if "identity" in manifest:
         data["identity"] = copy.deepcopy(manifest["identity"])
@@ -304,6 +324,9 @@ def compose_manifest(manifest: Mapping[str, Any], manifest_name: str) -> dict[st
         slots[key]["binding"] = binding
     # The bootstrap slot always names the file that was actually loaded.
     slots["workspace.schema"]["binding"] = manifest_name
+    unbound = [key for key, slot in slots.items() if "binding" not in slot]
+    if unbound:
+        raise ValueError(f"bindings missing for {unbound}; a minimal manifest binds every slot of {profile}@{version}")
 
     aliases = manifest.get("provenance_aliases", {})
     if not isinstance(aliases, Mapping):
@@ -334,6 +357,12 @@ def compose_manifest(manifest: Mapping[str, Any], manifest_name: str) -> dict[st
         if AGENT_ACCESS_ORDER.index(level) < AGENT_ACCESS_ORDER.index(current):
             raise ValueError(f"narrow.agent_access.{key}: {level!r} would widen the contract's {current!r}")
         slots[key]["agent_access"] = level
+    # Re-insert binding after key so the composed slot reads like a full manifest slot.
+    data["slots"] = [
+        {"id": slot["id"], "key": slot["key"], "binding": slot["binding"],
+         **{field: value for field, value in slot.items() if field not in ("id", "key", "binding")}}
+        for slot in data["slots"]
+    ]
     return data
 
 
@@ -444,23 +473,26 @@ def minimize_manifest(full: Mapping[str, Any], manifest_name: str, profile: str 
     """
     version = full.get("schema_version")
     contract = load_manifest(contract_path(profile, version))
-    defaults = {slot["key"]: slot for slot in contract["slots"]}
+    contract_slots = {slot["key"]: slot for slot in contract["slots"]}
     minimal: dict[str, Any] = {
         "extends": {"profile": profile, "schema_version": version, "fingerprint": _pinned_fingerprint(contract)},
     }
-    if "cca" in full:
-        minimal["cca"] = copy.deepcopy(full["cca"])
+    declared = (full.get("cca") or {}).get("specification")
+    match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", declared) if isinstance(declared, str) else None
+    floor = ".".join(map(str, MINIMAL_MANIFEST_SINCE))
+    keep = match and tuple(int(part) for part in match.groups()) >= MINIMAL_MANIFEST_SINCE
+    minimal["cca"] = {"specification": declared if keep else floor}
     if full.get("identity") is not None:
         minimal["identity"] = copy.deepcopy(full["identity"])
     bindings: dict[str, str] = {}
     access: dict[str, str] = {}
     for slot in full.get("slots", []):
-        default = defaults.get(slot.get("key"))
-        if default is None:
+        declared = contract_slots.get(slot.get("key"))
+        if declared is None:
             raise ValueError(f"slot {slot.get('key')!r} is not part of {profile}@{version}; it cannot be expressed minimally")
-        if slot["key"] != "workspace.schema" and slot.get("binding") != default.get("binding"):
+        if slot["key"] != "workspace.schema":
             bindings[slot["key"]] = slot["binding"]
-        if slot.get("agent_access") != default.get("agent_access"):
+        if slot.get("agent_access") != declared.get("agent_access"):
             access[slot["key"]] = slot["agent_access"]
     if bindings:
         minimal["bindings"] = bindings
@@ -473,8 +505,9 @@ def minimize_manifest(full: Mapping[str, Any], manifest_name: str, profile: str 
         minimal["provenance_aliases"] = extra_aliases
     if access:
         minimal["narrow"] = {"agent_access": access}
-    composed = compose_manifest(minimal, manifest_name)
-    expected = copy.deepcopy(dict(full))
+    composed = normalize_prose(compose_manifest(minimal, manifest_name))
+    expected = normalize_prose(copy.deepcopy(dict(full)))
+    expected["cca"] = composed["cca"]  # the only intended difference: the version that can read the result
     if expected != composed:
         differing = sorted(k for k in set(expected) | set(composed) if expected.get(k) != composed.get(k))
         raise ValueError(f"manifest diverges from {profile}@{version} beyond what a minimal manifest can express: {differing}")

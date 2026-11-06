@@ -18,14 +18,19 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from schema import (  # noqa: E402
-    compose_manifest, contract_fingerprint, load_manifest, load_schema, minimize_manifest,
+    compose_manifest, contract_fingerprint, contract_path, load_manifest, load_schema, minimize_manifest, normalize_prose,
 )
 
 PIN = contract_fingerprint("hybrid-workspace", 3)
+TEMPLATE = load_manifest(ROOT / "WORKSPACE.yaml")
+# The template's bindings serve as a complete, valid binding set for fixtures.
+DEFAULT_BINDINGS = {s["key"]: s["binding"] for s in TEMPLATE["slots"] if s["key"] != "workspace.schema"}
 
 
 def minimal(**extra) -> dict:
-    data = {"extends": {"profile": "hybrid-workspace", "schema_version": 3, "fingerprint": PIN}}
+    bindings = {**DEFAULT_BINDINGS, **extra.pop("bindings", {})}
+    data = {"extends": {"profile": "hybrid-workspace", "schema_version": 3, "fingerprint": PIN},
+            "cca": {"specification": "1.4.0"}, "bindings": bindings}
     data.update(extra)
     return data
 
@@ -43,32 +48,66 @@ def run(tool: str, *args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run([sys.executable, str(ROOT / tool), *args], text=True, capture_output=True, check=False)
 
 
+class ContractFileTests(unittest.TestCase):
+    def test_contract_has_no_ids_bindings_or_workspace_blocks(self) -> None:
+        contract = load_manifest(contract_path("hybrid-workspace", 3))
+        self.assertNotIn("cca", contract)
+        self.assertNotIn("identity", contract)
+        for slot in contract["slots"]:
+            self.assertNotIn("id", slot)
+            self.assertNotIn("binding", slot)
+        self.assertNotIn(": >", contract_path("hybrid-workspace", 3).read_text(encoding="utf-8"), "prose must be single-line")
+
+    def test_contract_matches_the_v3_template_semantics(self) -> None:
+        # One fact, one home: the contract is the template minus workspace-local data.
+        template = load_manifest(ROOT / "WORKSPACE.yaml")
+        template.pop("cca", None)
+        template.pop("identity", None)
+        for slot in template["slots"]:
+            slot.pop("id")
+            slot.pop("binding")
+        self.assertEqual(normalize_prose(load_manifest(contract_path("hybrid-workspace", 3))), normalize_prose(template))
+
+
 class CompositionTests(unittest.TestCase):
     def slot(self, data: dict, key: str) -> dict:
         return next(s for s in data["slots"] if s["key"] == key)
 
-    def test_empty_overlay_composes_the_contract_defaults(self) -> None:
-        contract = load_manifest(ROOT / "WORKSPACE.yaml")
+    def test_composition_assigns_ordinals_and_bootstrap_binding(self) -> None:
         composed = compose_manifest(minimal(), "workspace.yaml")
-        self.assertEqual([s["key"] for s in composed["slots"]], [s["key"] for s in contract["slots"]])
-        self.assertEqual(self.slot(composed, "knowledge.durable")["binding"], self.slot(contract, "knowledge.durable")["binding"])
+        self.assertEqual([s["key"] for s in composed["slots"]], [s["key"] for s in TEMPLATE["slots"]])
+        self.assertEqual([s["id"] for s in composed["slots"]], list(range(1, len(TEMPLATE["slots"]) + 1)))
         self.assertEqual(self.slot(composed, "workspace.schema")["binding"], "workspace.yaml")
         self.assertNotIn("identity", composed)
+        self.assertEqual(composed["cca"], {"specification": "1.4.0"})
+
+    def test_cca_version_must_be_able_to_read_minimal_manifests(self) -> None:
+        for declared in (None, "1.3.0", "one"):
+            data = minimal()
+            data["cca"] = {"specification": declared} if declared else {}
+            with self.assertRaisesRegex(ValueError, "cca.specification >= 1.4.0"):
+                compose_manifest(data, "workspace.yaml")
+
+    def test_every_slot_needs_a_binding(self) -> None:
+        data = minimal()
+        del data["bindings"]["knowledge.durable"]
+        with self.assertRaisesRegex(ValueError, "bindings missing for \\['knowledge.durable'\\]"):
+            compose_manifest(data, "workspace.yaml")
 
     def test_bindings_identity_and_cca_overlay(self) -> None:
         composed = compose_manifest(minimal(
             bindings={"knowledge.durable": "wiki/"},
             identity={"endpoint": "brain://example", "owner": "human"},
-            cca={"specification": "1.4.0"},
+            cca={"specification": "1.5.0"},
         ), "workspace.yaml")
         self.assertEqual(self.slot(composed, "knowledge.durable")["binding"], "wiki/")
         self.assertEqual(composed["identity"]["endpoint"], "brain://example")
-        self.assertEqual(composed["cca"], {"specification": "1.4.0"})
+        self.assertEqual(composed["cca"], {"specification": "1.5.0"})
 
     def test_contract_is_not_mutated_by_composition(self) -> None:
-        before = load_manifest(ROOT / "WORKSPACE.yaml")
+        before = load_manifest(contract_path("hybrid-workspace", 3))
         compose_manifest(minimal(bindings={"knowledge.durable": "wiki/"}), "workspace.yaml")
-        self.assertEqual(load_manifest(ROOT / "WORKSPACE.yaml"), before)
+        self.assertEqual(load_manifest(contract_path("hybrid-workspace", 3)), before)
 
     def test_pinned_fingerprint_must_match_installed_contract(self) -> None:
         stale = minimal()
@@ -128,8 +167,11 @@ class MinimizeTests(unittest.TestCase):
     def test_minimize_round_trips_exactly(self) -> None:
         full = self.full_manifest()
         small = minimize_manifest(full, "workspace.yaml")
-        self.assertEqual(small["bindings"], {"knowledge.durable": "wiki/"})
-        self.assertEqual(compose_manifest(small, "workspace.yaml"), full)
+        self.assertEqual(small["bindings"], {**DEFAULT_BINDINGS, "knowledge.durable": "wiki/"})
+        # The declared CCA version is lifted to the first release that reads minimal manifests.
+        self.assertEqual(small["cca"], {"specification": "1.4.0"})
+        full["cca"] = small["cca"]
+        self.assertEqual(normalize_prose(compose_manifest(small, "workspace.yaml")), normalize_prose(full))
 
     def test_minimize_refuses_semantic_divergence(self) -> None:
         full = self.full_manifest()
