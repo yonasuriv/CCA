@@ -4,6 +4,21 @@ This changelog records released CCA milestones and pending user-visible changes.
 
 ## Unreleased
 
+## 1.5.0 - 2026-11-06
+
+Minor: adds opt-in Hybrid Workspace Profile **schema v4** through minimal manifests. Schema v2 and v3 targets validate and generate unchanged.
+
+### Added
+
+- `assets/hybrid-workspace/contracts/hybrid-workspace-v4.yaml`: v3 plus `system.schemas` (human-owned schemas, taxonomies, vocabularies used by tooling) and `agent.rules` (human-authored rules loaded on demand from `agent.instructions`), both frozen as human/read-only.
+- `boundary_context`: a human-authored `CONTEXT.md` at the root of any directory binding explains what the binding is and is not; it is exempt from loose-object and provenance checks at the reference parent and class roots only, agents treat it as read-only, and it may only narrow authority. Rejected outside v4.
+- The generated router and specification describe v4 additions and tell agents to read a binding's `CONTEXT.md` before working inside it.
+- `tests/test_v4_profile.py`: contract equivalence to v3 plus additions, CCA floor, required bindings, end-to-end audit/generate/resolve, boundary-context exemptions and their limits, v4 self-test mutations.
+
+### Changed
+
+- Audit, generation, resolution, and provenance treat schema 3 and 4 as one family; v4 targets need `cca.specification >= 1.5.0` and `workspace-contract:v4` in `agent.instructions`.
+
 ## 1.4.0 - 2026-11-06
 
 Minor: adds opt-in minimal v3 manifests. Full v2 and v3 manifests validate and generate unchanged.

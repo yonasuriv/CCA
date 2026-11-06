@@ -15,7 +15,7 @@ from typing import Any, Iterator
 
 import yaml
 
-from schema import StrictSafeLoader, load_schema, resolves_within, workspace_schema_path
+from schema import V3_FAMILY, StrictSafeLoader, load_schema, resolves_within, workspace_schema_path
 
 HASH_RE = re.compile(r"^sha256:([0-9a-fA-F]{64})$")
 TREE_RE = re.compile(r"^sha256-tree:([0-9a-fA-F]{64})$")
@@ -106,8 +106,11 @@ def _load_yaml_mapping(text: str) -> Any:
     return yaml.load(text, Loader=StrictSafeLoader)
 
 
-def iter_source_objects(root_dir: Path, contract: dict[str, Any]) -> Iterator[SourceObject]:
+def iter_source_objects(root_dir: Path, contract: dict[str, Any], *, root_context: set[str] | frozenset[str] = frozenset()) -> Iterator[SourceObject]:
     """Walk a reference-class binding and yield every provenance-bearing object.
+
+    `root_context` names human-authored boundary context files (schema v4) that may
+    sit directly at the binding root; they describe the binding and are not sources.
 
     Directories carrying a directory manifest are acquisition objects (batches or
     corpora). Directories without one are organizational containers: their
@@ -127,6 +130,8 @@ def iter_source_objects(root_dir: Path, contract: dict[str, Any]) -> Iterator[So
                 yield SourceObject(entry, "missing", problems=["symlinked source objects are not admissible"])
                 continue
             if entry.name in ignored and entry.is_file():
+                continue
+            if directory == root_dir and entry.name in root_context and entry.is_file():
                 continue
             if entry.name == manifest:
                 if not entry.is_file():
@@ -404,8 +409,8 @@ def main(argv: list[str] | None = None) -> int:
     except ValueError as exc:
         print(f"provenance.py: {exc}", file=sys.stderr)
         return 2
-    if data.get("schema_version") != 3:
-        print("provenance.py requires a schema v3 workspace", file=sys.stderr)
+    if data.get("schema_version") not in V3_FAMILY:
+        print("provenance.py requires a schema v3 or v4 workspace", file=sys.stderr)
         return 2
     contract = data["reference_contract"]["provenance"]
     slots = {slot["key"]: slot for slot in data["slots"]}

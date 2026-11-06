@@ -2,7 +2,7 @@
 name: cca
 description: Use to design or restructure context systems, audit workspace context/routing architecture, create or set up native or hybrid workspaces, scaffold portable routing, synchronize navigation, ingest or query maintained knowledge, validate CCA/ICM/LLM-Wiki compatibility, or advise on engineering judgment, software engineering principle/framework/methodology/process trade-offs, and security, autonomy, model, and context decisions. Supports existing code repositories, human knowledge systems, ICM, LLM Wiki, PARA, Zettelkasten, BASB/CODE, delivery methods, and hybrid workspaces without replacing their native authorities. Trigger whenever a request touches how context, knowledge, or navigation is structured for humans and agents together, even when the user never names CCA. Do not use for ordinary implementation, coding, editing, or project work when no context, knowledge, compatibility, routing, or advisory operation is involved.
 metadata:
-  version: "1.4.0"
+  version: "1.5.0"
 ---
 
 # CCA
@@ -58,7 +58,7 @@ These files are inside the installable skill so runtime behavior never depends o
 
 ## Contract version
 
-The installed CCA skill and normative CCA interoperability contract share one SemVer identity. The canonical contract version is `metadata.version` in this file; current version is **1.4.0**. Consumer CCA identity is version-based. Repository/source revisions are optional provenance and never substitute for the CCA contract version; see `references/core/versioning.md`.
+The installed CCA skill and normative CCA interoperability contract share one SemVer identity. The canonical contract version is `metadata.version` in this file; current version is **1.5.0**. Consumer CCA identity is version-based. Repository/source revisions are optional provenance and never substitute for the CCA contract version; see `references/core/versioning.md`.
 
 ## Portable distribution boundary
 

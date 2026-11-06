@@ -282,6 +282,16 @@ For current v3:
 9. For nested bindings, filesystem policy resolves from the most-specific matching binding; semantic composition remains separately visible.
 10. Derived artifacts are rebuildable views/adapters. They MUST NOT become competing authority over the workspace manifest, human-authored control files, source evidence, or canonical workspace content.
 
+### Schema v4 (opt-in)
+
+Since CCA 1.5.0 the profile also ships schema **v4**, available through a minimal manifest that extends `assets/hybrid-workspace/contracts/hybrid-workspace-v4.yaml`. v4 is v3 with every v3 rule unchanged, plus:
+
+- `system.schemas` — human-owned machine-readable schemas, taxonomies, and controlled vocabularies that workspace tooling validates content against (`system`, `dir`, `mutable`, `disabled`, `human`, `read-only`, `none`, `optional`).
+- `agent.rules` — human-authored agent rules loaded on demand, routed to from `agent.instructions` instead of being inlined there; rules may narrow, never widen, its authority (`control`, `dir`, `mutable`, `disabled`, `human`, `read-only`, `none`, `optional`).
+- `boundary_context` — exactly `{name: CONTEXT.md, placement: directory-binding-root, authority: human, agent_access: read-only, precedence: narrow-only}`. A human-authored `CONTEXT.md` may sit at the root of any directory binding to say what the binding is and is not. It is not a source object (the reference parent and class roots admit it without provenance; deeper files with that name are still sources), not a Wiki note, and not a generated artifact. Agents read it and never edit it; it may only narrow workspace authority.
+
+A v4 target declares `cca.specification >= 1.5.0`, and its `agent.instructions` carries `workspace-contract:v4`. The generated router tells agents to read a binding's boundary context before working inside it. v3 targets are unaffected; `boundary_context` is rejected outside v4.
+
 ### Minimal manifests (`extends`)
 
 Since CCA 1.4.0 a v3 workspace MAY serialize its root manifest minimally instead of copying the whole contract. The contract ships inside the skill at `assets/hybrid-workspace/contracts/hybrid-workspace-v3.yaml`: the v3 semantics with no slot `id`, no `binding`, no workspace `cca` or `identity`, and single-line prose. The workspace manifest pins it and holds everything local:

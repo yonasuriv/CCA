@@ -465,9 +465,9 @@ class V2CompatibilityTests(unittest.TestCase):
     def test_unsupported_schema_version_fails(self) -> None:
         target = make_target()
         data = load(target)
-        data["schema_version"] = 4
+        data["schema_version"] = 5
         save(target, data)
-        self.assertIn("schema_version must be 2 or 3", failures(audit(target)))
+        self.assertIn("schema_version must be 2, 3 or 4", failures(audit(target)))
 
 
 class ReviewRegressionTests(unittest.TestCase):
