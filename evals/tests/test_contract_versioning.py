@@ -23,12 +23,12 @@ class ContractVersioningTests(unittest.TestCase):
 
     def test_spec_is_versioned_and_routes_to_versioning_authority(self) -> None:
         spec = self.read("skills/cca/references/core/spec.md")
-        self.assertIn("**Version 1.4.0**", spec)
+        self.assertIn("**Version 1.5.0**", spec)
         self.assertIn("versioning.md", spec)
 
     def test_skill_exposes_and_routes_contract_version(self) -> None:
         skill = self.read("skills/cca/SKILL.md")
-        self.assertIn('version: "1.4.0"', skill)
+        self.assertIn('version: "1.5.0"', skill)
         self.assertIn("versioning.md", skill)
         self.assertIn("contract version", skill.lower())
         self.assertIn("semver", skill.lower())

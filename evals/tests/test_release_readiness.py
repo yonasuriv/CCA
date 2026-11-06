@@ -14,15 +14,15 @@ class ReleaseReadinessTests(unittest.TestCase):
 
     def test_normative_spec_is_1_2_1_stable(self) -> None:
         spec = self.read("skills/cca/references/core/spec.md")
-        self.assertIn("**Version 1.4.0**", spec)
+        self.assertIn("**Version 1.5.0**", spec)
         self.assertRegex(spec, r"\bStatus:\s*Stable\b")
         self.assertNotIn("Status: Draft", spec)
 
-    def test_installed_skill_exposes_1_4_0_contract_version(self) -> None:
+    def test_installed_skill_exposes_1_5_0_contract_version(self) -> None:
         skill = self.read("skills/cca/SKILL.md")
         frontmatter = skill.split("---", 2)[1]
         self.assertRegex(frontmatter, r"(?m)^metadata:\s*$")
-        self.assertRegex(frontmatter, r'(?m)^\s+version:\s*["\']1\.4\.0["\']\s*$')
+        self.assertRegex(frontmatter, r'(?m)^\s+version:\s*["\']1\.5\.0["\']\s*$')
 
     def test_public_readme_has_no_release_placeholder(self) -> None:
         readme = self.read("README.md")
@@ -151,7 +151,7 @@ class ReleaseReadinessTests(unittest.TestCase):
         root_cff = self.read("CITATION.cff")
         skill_cff = self.read("skills/cca/CITATION.cff")
         for text in (root_cff, skill_cff):
-            self.assertIn("version: '1.4.0'", text)
+            self.assertIn("version: '1.5.0'", text)
             self.assertIn("date-released: '2026-11-06'", text)
             self.assertIn("CCA is an agent-agnostic interoperability architecture", text)
             self.assertIn("title: 'CCA: Convergent Context Architecture'", text)
@@ -162,6 +162,7 @@ class ReleaseReadinessTests(unittest.TestCase):
         self.assertTrue(changelog.is_file(), "CHANGELOG.md is required for released CCA versions")
         text = changelog.read_text(encoding="utf-8")
         self.assertIn("## Unreleased", text)
+        self.assertIn("## 1.5.0 - 2026-11-06", text)
         self.assertIn("## 1.4.0 - 2026-11-06", text)
         self.assertIn("## 1.3.0 - 2026-11-01", text)
         self.assertIn("## 1.2.1 - 2026-09-08", text)

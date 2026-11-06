@@ -38,11 +38,19 @@ semantic_fingerprint = _canonical_ns["fingerprint"]
 # Minimal manifests (`extends`) compose with a profile contract shipped inside
 # this package. Only these top-level keys are accepted; anything else fails
 # closed so a manifest cannot smuggle in policy, vocab, or slot changes.
-EXTENDS_PROFILES = {("hybrid-workspace", 3): PACKAGE_ROOT / "contracts" / "hybrid-workspace-v3.yaml"}
+# Schema v4 is v3 plus the system.schemas and agent.rules keys and declared
+# boundary context files; every v3 rule applies to it unchanged.
+V3_FAMILY = (3, 4)
+EXTENDS_PROFILES = {
+    ("hybrid-workspace", 3): PACKAGE_ROOT / "contracts" / "hybrid-workspace-v3.yaml",
+    ("hybrid-workspace", 4): PACKAGE_ROOT / "contracts" / "hybrid-workspace-v4.yaml",
+}
 EXTENDS_KEYS = {"extends", "cca", "identity", "bindings", "provenance_aliases", "narrow"}
 # Ordered from widest to narrowest; a manifest may only move a slot rightwards.
 AGENT_ACCESS_ORDER = ("write", "read-only", "none")
 MINIMAL_MANIFEST_SINCE = (1, 4, 0)
+# First CCA release able to read each profile schema through a minimal manifest.
+PROFILE_SINCE = {3: MINIMAL_MANIFEST_SINCE, 4: (1, 5, 0)}
 
 
 class StrictSafeLoader(yaml.SafeLoader):
@@ -303,8 +311,9 @@ def compose_manifest(manifest: Mapping[str, Any], manifest_name: str) -> dict[st
     cca = manifest.get("cca")
     declared = cca.get("specification") if isinstance(cca, Mapping) else None
     match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", declared) if isinstance(declared, str) else None
-    if not match or tuple(int(part) for part in match.groups()) < MINIMAL_MANIFEST_SINCE:
-        raise ValueError(f"a minimal manifest must declare cca.specification >= {'.'.join(map(str, MINIMAL_MANIFEST_SINCE))}, got {declared!r}")
+    since = PROFILE_SINCE.get(version, MINIMAL_MANIFEST_SINCE)
+    if not match or tuple(int(part) for part in match.groups()) < since:
+        raise ValueError(f"a minimal {profile}@{version} manifest must declare cca.specification >= {'.'.join(map(str, since))}, got {declared!r}")
     data["cca"] = copy.deepcopy(dict(cca))
     data.pop("identity", None)
     if "identity" in manifest:
@@ -479,8 +488,9 @@ def minimize_manifest(full: Mapping[str, Any], manifest_name: str, profile: str 
     }
     declared = (full.get("cca") or {}).get("specification")
     match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", declared) if isinstance(declared, str) else None
-    floor = ".".join(map(str, MINIMAL_MANIFEST_SINCE))
-    keep = match and tuple(int(part) for part in match.groups()) >= MINIMAL_MANIFEST_SINCE
+    since = PROFILE_SINCE.get(version, MINIMAL_MANIFEST_SINCE)
+    floor = ".".join(map(str, since))
+    keep = match and tuple(int(part) for part in match.groups()) >= since
     minimal["cca"] = {"specification": declared if keep else floor}
     if full.get("identity") is not None:
         minimal["identity"] = copy.deepcopy(full["identity"])
@@ -512,3 +522,10 @@ def minimize_manifest(full: Mapping[str, Any], manifest_name: str, profile: str 
         differing = sorted(k for k in set(expected) | set(composed) if expected.get(k) != composed.get(k))
         raise ValueError(f"manifest diverges from {profile}@{version} beyond what a minimal manifest can express: {differing}")
     return minimal
+
+
+def boundary_context_names(schema: Mapping[str, Any]) -> set[str]:
+    """File names a schema declares as human-authored boundary context at directory-binding roots."""
+    block = schema.get("boundary_context")
+    name = block.get("name") if isinstance(block, Mapping) else None
+    return {name} if isinstance(name, str) and name else set()

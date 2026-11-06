@@ -9,7 +9,7 @@ import sys
 
 import yaml
 
-from schema import contract_fingerprint, generated_outputs, load_manifest, load_schema, minimize_manifest, resolves_within, validate_binding_text, workspace_schema_path
+from schema import V3_FAMILY, contract_fingerprint, generated_outputs, load_manifest, load_schema, minimize_manifest, resolves_within, validate_binding_text, workspace_schema_path
 
 
 def resolve(root: str | Path, *, key: str | None = None, output: str | None = None) -> tuple[str, Path]:
@@ -24,10 +24,10 @@ def resolve(root: str | Path, *, key: str | None = None, output: str | None = No
     manifest = workspace_schema_path(workspace)
     data = load_schema(manifest)
     version = data.get("schema_version")
-    if version not in (2, 3) or isinstance(version, bool):
+    if version not in (2, 3, 4) or isinstance(version, bool):
         raise ValueError(f"unsupported workspace schema version: {version!r}")
-    if manifest.name == "workspace.yaml" and version != 3:
-        raise ValueError("lowercase workspace.yaml is supported for schema v3; v2 uses WORKSPACE.yaml")
+    if manifest.name == "workspace.yaml" and version not in V3_FAMILY:
+        raise ValueError("lowercase workspace.yaml is supported for schema v3 and v4; v2 uses WORKSPACE.yaml")
     slots = data.get("slots")
     if not isinstance(slots, list):
         raise ValueError("slots must be a list")
@@ -48,8 +48,8 @@ def resolve(root: str | Path, *, key: str | None = None, output: str | None = No
             raise KeyError(f"unknown workspace semantic key: {key}")
         binding = bindings[key].get("binding")
     else:
-        if version != 3:
-            raise ValueError("generated output lookup requires schema v3")
+        if version not in V3_FAMILY:
+            raise ValueError("generated output lookup requires schema v3 or v4")
         outputs = generated_outputs(data)
         if output not in outputs:
             raise KeyError(f"unknown generated output: {output}")

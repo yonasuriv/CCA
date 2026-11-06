@@ -21,7 +21,7 @@ from typing import Any
 
 import yaml
 
-from schema import load_schema, resolve_slot_for_path, resolves_within, validate_binding_text, validate_key, workspace_schema_path
+from schema import boundary_context_names, load_schema, resolve_slot_for_path, resolves_within, validate_binding_text, validate_key, workspace_schema_path
 import provenance as provenance_lib
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
@@ -168,7 +168,7 @@ REQUIRED_INVARIANTS = {
 
 HASH_RE = re.compile(r"^sha256:([0-9a-fA-F]{64})$")
 
-SUPPORTED_SCHEMA_VERSIONS = (2, 3)
+SUPPORTED_SCHEMA_VERSIONS = (2, 3, 4)
 
 # ── v3 extension (opt-in) ─────────────────────────────────────────────────────
 FROZEN_V3_EXTENSION: dict[str, dict[str, Any]] = {
@@ -179,6 +179,20 @@ FROZEN_V3_EXTENSION: dict[str, dict[str, Any]] = {
     "asset.templates": dict(category="asset", arity="dir", mutability="mutable", indexed="excluded", authority="human", agent_access="read-only", link_target="none", requirement="optional"),
 }
 EXPECTED_V3 = {**FROZEN_V1, **FROZEN_V2_EXTENSION, **FROZEN_V3_EXTENSION}
+
+# ── v4 extension (opt-in): v3 plus two human-owned bindings and boundary context ──
+FROZEN_V4_EXTENSION: dict[str, dict[str, Any]] = {
+    "system.schemas": dict(category="system", arity="dir", mutability="mutable", indexed="disabled", authority="human", agent_access="read-only", link_target="none", requirement="optional"),
+    "agent.rules": dict(category="control", arity="dir", mutability="mutable", indexed="disabled", authority="human", agent_access="read-only", link_target="none", requirement="optional"),
+}
+EXPECTED_V4 = {**EXPECTED_V3, **FROZEN_V4_EXTENSION}
+EXPECTED_BOUNDARY_CONTEXT = {
+    "name": "CONTEXT.md",
+    "placement": "directory-binding-root",
+    "authority": "human",
+    "agent_access": "read-only",
+    "precedence": "narrow-only",
+}
 V3_CATEGORY_VOCAB = ["bootstrap", "control", "state", "system", "asset", "pipeline", "lens", "boundary", "lifecycle"]
 
 V2_ALLOWED_NESTED = {
@@ -623,18 +637,19 @@ def _validate_reference_filesystem_v3(data: dict[str, Any], by_key: dict[str, di
         return
     parent_path = root / parent_slot["binding"].rstrip("/")
     class_paths = {key: root / slot["binding"].rstrip("/") for key, slot in (("reference.curated", curated_slot), ("reference.collected", collected_slot))}
+    root_context = boundary_context_names(data)
     if parent_path.exists():
-        allowed = {path.name for path in class_paths.values()} | set(prov.get("ignored_names", []))
+        allowed = {path.name for path in class_paths.values()} | set(prov.get("ignored_names", [])) | root_context
         for child in parent_path.iterdir():
             if child.name not in allowed:
                 fail("reference", f"loose/unknown source entry {child.relative_to(root)} is prohibited; raw/reference objects must resolve through reference.curated or reference.collected")
-            elif child.name not in prov.get("ignored_names", []) and not child.is_dir():
+            elif child.name not in prov.get("ignored_names", []) and child.name not in root_context and not child.is_dir():
                 fail("reference", f"reference class binding {child.relative_to(root)} must be a directory")
     curation = contract.get("curation") if isinstance(contract.get("curation"), dict) else V3_CURATION
     for key, path in class_paths.items():
         if not path.is_dir() or path.is_symlink():
             continue
-        for obj in provenance_lib.iter_source_objects(path, prov):
+        for obj in provenance_lib.iter_source_objects(path, prov, root_context=root_context):
             for problem in provenance_lib.validate_object(obj, prov, curated=(key == "reference.curated"), curation=curation):
                 fail("provenance", f"{obj.path.relative_to(root)}: {problem}")
 
@@ -651,9 +666,10 @@ def validate_schema(data: dict[str, Any], root: Path = PACKAGE_ROOT, *, check_fi
 
     version = data.get("schema_version")
     if version not in SUPPORTED_SCHEMA_VERSIONS or isinstance(version, bool):
-        fail("version", f"schema_version must be 2 or 3 for current profile audit, got {data.get('schema_version')!r}")
-    v3 = version == 3
-    expected_current = EXPECTED_V3 if v3 else EXPECTED_CURRENT
+        fail("version", f"schema_version must be 2, 3 or 4 for current profile audit, got {data.get('schema_version')!r}")
+    v3 = version in (3, 4)  # v4 applies every v3 rule plus its own extension
+    v4 = version == 4
+    expected_current = EXPECTED_V4 if v4 else EXPECTED_V3 if v3 else EXPECTED_CURRENT
     if data.get("status") != "frozen":
         fail("version", f"status must be 'frozen', got {data.get('status')!r}")
     if "version" in data:
@@ -855,6 +871,12 @@ def validate_schema(data: dict[str, Any], root: Path = PACKAGE_ROOT, *, check_fi
         declared_cca = (data.get("cca") or {}).get("specification") if isinstance(data.get("cca"), dict) else None
         if not isinstance(declared_cca, str) or not CCA_SEMVER_RE.fullmatch(declared_cca) or cca_semver_tuple(declared_cca) < (1, 3, 0):
             fail("cca-version", "schema v3 requires cca.specification >= 1.3.0, the first CCA contract that defines it")
+        if v4 and isinstance(declared_cca, str) and CCA_SEMVER_RE.fullmatch(declared_cca) and cca_semver_tuple(declared_cca) < (1, 5, 0):
+            fail("cca-version", "schema v4 requires cca.specification >= 1.5.0, the first CCA contract that defines it")
+        if v4 and data.get("boundary_context") != EXPECTED_BOUNDARY_CONTEXT:
+            fail("boundary-context", f"schema v4 boundary_context must be exactly {EXPECTED_BOUNDARY_CONTEXT}, got {data.get('boundary_context')!r}")
+        if not v4 and "boundary_context" in data:
+            fail("boundary-context", "boundary_context is a schema v4 extension")
         schema_slot = by_key.get("workspace.schema")
         if schema_slot:
             expected_manifest = workspace_schema_path(root).name
@@ -877,8 +899,9 @@ def run_self_test(good: dict[str, Any], root: Path) -> tuple[list[str], int]:
     """Mutation-test the frozen baseline for the target's schema version."""
     failures: list[str] = []
     exhaustive_count = 0
-    v3 = good.get("schema_version") == 3
-    expected_current = EXPECTED_V3 if v3 else EXPECTED_CURRENT
+    v3 = good.get("schema_version") in (3, 4)
+    v4 = good.get("schema_version") == 4
+    expected_current = EXPECTED_V4 if v4 else EXPECTED_V3 if v3 else EXPECTED_CURRENT
 
     def must_fail(label: str, mutate) -> None:
         nonlocal exhaustive_count
@@ -935,6 +958,10 @@ def run_self_test(good: dict[str, Any], root: Path) -> tuple[list[str], int]:
 
     must_fail("remove frozen-v1 key", lambda d: d["slots"].__delitem__(0))
     must_fail("remove trailing extension key", lambda d: d["slots"].pop())
+    if v4:
+        must_fail("v4: drop boundary_context", lambda d: d.pop("boundary_context"))
+        must_fail("v4: boundary context may widen authority", lambda d: d["boundary_context"].__setitem__("precedence", "override"))
+        must_fail("v4: agents may write boundary context", lambda d: d["boundary_context"].__setitem__("agent_access", "write"))
     must_fail("add unknown key", lambda d: d["slots"].append({**copy.deepcopy(d["slots"][-1]), "id": len(d["slots"]) + 1, "key": "reference.unknown", "binding": "20-sources/unknown/"}))
     must_fail("allow unspecified operations", lambda d: d["policy_defaults"].__setitem__("unspecified", "allowed"))
     must_fail("remove memory compaction gate", lambda d: d["privileged_operations"].pop("state.memory", None))
@@ -1017,8 +1044,8 @@ def main(argv: list[str] | None = None) -> int:
         root = resolve_audit_root(args)
         manifest = workspace_schema_path(root)
         data = load_schema(manifest)
-        if manifest.name == "workspace.yaml" and data.get("schema_version") != 3:
-            raise ValueError("lowercase workspace.yaml is a schema v3 bootstrap; schema v2 workspaces use WORKSPACE.yaml")
+        if manifest.name == "workspace.yaml" and data.get("schema_version") not in (3, 4):
+            raise ValueError("lowercase workspace.yaml is a schema v3/v4 bootstrap; schema v2 workspaces use WORKSPACE.yaml")
     except (yaml.YAMLError, ValueError, OSError) as exc:
         print("=" * 72)
         print("PROFILE AUDIT — SCHEMA LOAD FAILURE")
@@ -1041,7 +1068,7 @@ def main(argv: list[str] | None = None) -> int:
         for item in fails:
             print("  ✗", item)
     else:
-        if data.get("schema_version") == 3:
+        if data.get("schema_version") in (3, 4):
             print("\n✓ frozen-v1 baseline + v2 reference classes + v3 extension checks passed")
         else:
             print("\n✓ frozen-v1 baseline + v2 reference-admission extension checks passed")

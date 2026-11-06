@@ -11,7 +11,7 @@ cff-version: 1.2.0
 title: 'CCA: Convergent Context Architecture'
 message: 'If you use CCA, please cite it using the metadata below.'
 type: software
-version: '1.4.0'
+version: '1.5.0'
 date-released: '2026-11-06'
 authors:
   - given-names: Jonathan

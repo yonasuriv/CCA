@@ -15,7 +15,7 @@ from typing import Any
 
 import yaml
 
-from schema import CANONICAL_SOURCE, compact_ops, effective_agent_operations, generated_outputs, load_manifest, load_schema, resolves_within, semantic_fingerprint, semantic_role_for_slot, validate_binding_text, workspace_schema_path
+from schema import V3_FAMILY, CANONICAL_SOURCE, compact_ops, effective_agent_operations, generated_outputs, load_manifest, load_schema, resolves_within, semantic_fingerprint, semantic_role_for_slot, validate_binding_text, workspace_schema_path
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
 TEMPLATE_SCHEMA = PACKAGE_ROOT / "WORKSPACE.yaml"
@@ -31,9 +31,9 @@ def manifest_name(data: dict[str, Any]) -> str:
 def schema(target: Path) -> dict[str, Any]:
     manifest = workspace_schema_path(target)
     data = load_schema(manifest)
-    if manifest.name == "workspace.yaml" and data.get("schema_version") != 3:
-        raise ValueError("lowercase workspace.yaml is a schema v3 bootstrap; schema v2 workspaces use WORKSPACE.yaml")
-    if data.get("schema_version") == 3:
+    if manifest.name == "workspace.yaml" and data.get("schema_version") not in V3_FAMILY:
+        raise ValueError("lowercase workspace.yaml is a schema v3/v4 bootstrap; schema v2 workspaces use WORKSPACE.yaml")
+    if data.get("schema_version") in V3_FAMILY:
         # Hash parsed semantics of the manifest as written, not raw YAML bytes or
         # comments. Generated helpers re-read the same file at runtime; for a
         # minimal manifest its pinned contract fingerprint covers the contract.
@@ -74,9 +74,9 @@ def initialize_target(target: Path) -> list[str]:
         created.append(name)
 
     data = load_schema(manifest)
-    if manifest.name == "workspace.yaml" and data.get("schema_version") != 3:
-        raise ValueError("lowercase workspace.yaml is supported only for schema v3")
-    if data.get("schema_version") == 3:
+    if manifest.name == "workspace.yaml" and data.get("schema_version") not in V3_FAMILY:
+        raise ValueError("lowercase workspace.yaml is supported only for schema v3 and v4")
+    if data.get("schema_version") in V3_FAMILY:
         # Refuse unsafe or incoherent bindings before any human-control write.
         rc, output = run_audit(target, structure_only=True)
         if rc != 0:
@@ -85,7 +85,7 @@ def initialize_target(target: Path) -> list[str]:
     # V2 preserves its original AGENTS.md target. V3 resolves the slot rather
     # than assuming the human-authored control file stays at the workspace root.
     instructions_binding = "AGENTS.md"
-    if data.get("schema_version") == 3:
+    if data.get("schema_version") in V3_FAMILY:
         instructions = next(
             (slot for slot in data.get("slots", [])
              if isinstance(slot, dict) and slot.get("key") == "agent.instructions"),
@@ -124,7 +124,7 @@ def slots_by_key(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
 
 def is_v3(data: dict[str, Any]) -> bool:
-    return data.get("schema_version") == 3
+    return data.get("schema_version") in V3_FAMILY
 
 
 def _root_hops(destination: str) -> str:
@@ -392,6 +392,9 @@ def gen_context(data: dict[str, Any]) -> str:
         lines.append(f"| `{slot['key']}` | `{slot['binding']}` | `{role}` | {short} | {ops} |")
     if is_v3(data):
         lines.extend(["", *_identity_lines(data)[:-1]])
+    if data.get("schema_version") == 4:
+        name = data["boundary_context"]["name"]
+        lines.extend(["", f"Before working inside a directory binding, read its `{name}` when present: it says what the binding is and is not, and may only narrow these rules."])
     lines.extend(["", *_reference_admission_lines(data), "## Hard rules", ""])
     for key, value in data["invariants"].items():
         lines.append(f"- **{key}** — {' '.join(value.split())}")
@@ -444,7 +447,19 @@ def _spec_intro_v3(data: dict[str, Any]) -> list[str]:
     return [
         f"`{manifest_name(data)}` at the target root is the **only** fixed bootstrap path. Every generated artifact resolves its destination through a declared slot binding in `generation_contract.outputs`: " + ", ".join(f"`{name}` → `{path}`" for name, path in outputs.items()) + ". Generated helpers locate the workspace root from that encoded relationship and verify it by finding `" + manifest_name(data) + "`; they never assume their own directory is the root.", "",
         "Schema v3 preserves the complete frozen-v1 semantic/policy baseline and the v2 reference classification keys, and adds: relocatable generated outputs, an optional machine-readable workspace `identity`, the `state.hotset` operational hotset, `system.operations` and `system.documentation`, the human/editor-facing `asset.*` bindings with the `asset` category, actor-independent curation semantics with representation-aware provenance, and scoped archive manifests. Schema v2 workspaces continue to validate under the unchanged v2 rules.", "",
+        *_v4_lines(data),
         *_identity_lines(data),
+    ]
+
+
+def _v4_lines(data: dict[str, Any]) -> list[str]:
+    """Schema v4 additions: two human-owned bindings and declared boundary context files."""
+    if data.get("schema_version") != 4:
+        return []
+    block = data.get("boundary_context", {})
+    return [
+        "Schema v4 is schema v3 plus `system.schemas` (human-owned machine-readable schemas and vocabularies used by workspace tooling) and `agent.rules` (human-owned, lazily loaded agent rules that `agent.instructions` routes to), and declared boundary context files.", "",
+        f"**Boundary context:** a human-authored `{block.get('name')}` may sit at the root of any directory binding. It explains what the binding is and is not and may only narrow, never widen, workspace authority. It is not a source, Wiki note, or generated artifact, and agents treat it as read-only.", "",
     ]
 
 
