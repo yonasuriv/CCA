@@ -93,7 +93,7 @@ Stable object identifiers may additionally be used where rename-independent iden
 
 ## What CCA is
 
-CCA is:
+CCA **is**:
 
 - an interoperability and composition architecture for filesystem-native context;
 - a semantic layer for boundaries, roles, bindings, routing, authority, mutation, durability, recovery, and freshness;
