@@ -24,9 +24,6 @@ _In plain English:_ CCA lets different file-based ways of working keep their own
 - [Migration](docs/migration.md)
 - [FAQ](docs/faq.md)
 
-> _Development notes under [docs/_wip.md](docs/_wip.md) are explicitly non-normative._ \
-> _Non-normative publication forms are under [examples/publications/](examples/publications/)._
-
 ## Why CCA exists
 
 AI-assisted work increasingly depends on filesystem-native context: project instructions, routers, source material, maintained knowledge, reusable skills, configuration, working artifacts, human edits, outputs, tasks, decisions, memory, and execution state.
