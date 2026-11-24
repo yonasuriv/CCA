@@ -40,7 +40,7 @@ semantic_fingerprint = _canonical_ns["fingerprint"]
 # closed so a manifest cannot smuggle in policy, vocab, or slot changes.
 # Schema v4 is v3 plus the system.schemas and agent.rules keys and declared
 # boundary context files; every v3 rule applies to it unchanged.
-V3_FAMILY = (3, 4)
+V3_FAMILY = (3, 4, 5)
 EXTENDS_PROFILES = {
     ("hybrid-workspace", 3): PACKAGE_ROOT / "contracts" / "hybrid-workspace-v3.yaml",
     ("hybrid-workspace", 4): PACKAGE_ROOT / "contracts" / "hybrid-workspace-v4.yaml",
@@ -236,7 +236,10 @@ def load_schema(path: str | Path) -> dict[str, Any]:
     """
     p = Path(path)
     data = load_manifest(p)
-    if "extends" in data:
+    if data.get("schema_version") == 5:
+        from configurable import compose
+        data = compose(data, p.parent.resolve(), p.name)
+    elif "extends" in data:
         data = compose_manifest(data, p.name)
     _validate_generated_destinations(data, p.parent.resolve())
     return data

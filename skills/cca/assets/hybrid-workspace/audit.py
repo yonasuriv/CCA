@@ -665,6 +665,15 @@ def validate_schema(data: dict[str, Any], root: Path = PACKAGE_ROOT, *, check_fi
         warns.append(f"[{cat}] {msg}")
 
     version = data.get("schema_version")
+    if version == 5:
+        if cca_semver_tuple(resolve_installed_cca_version()) < (1, 6, 0):
+            fail("cca-version", "configurable profile requires CCA 1.6.0")
+        if check_filesystem:
+            by_role = {s.get("role", s["key"]): s for s in data["slots"]}
+            _validate_reference_filesystem_v3(data, by_role, root, fail)
+            # Retirement records preserve historical keys even after unbinding.
+            _validate_archive_filesystem_v3(data, {**by_role, **{s["key"]: s for s in data["slots"]}}, root, fail)
+        return fails, warns
     if version not in SUPPORTED_SCHEMA_VERSIONS or isinstance(version, bool):
         fail("version", f"schema_version must be 2, 3 or 4 for current profile audit, got {data.get('schema_version')!r}")
     v3 = version in (3, 4)  # v4 applies every v3 rule plus its own extension
@@ -1044,7 +1053,7 @@ def main(argv: list[str] | None = None) -> int:
         root = resolve_audit_root(args)
         manifest = workspace_schema_path(root)
         data = load_schema(manifest)
-        if manifest.name == "workspace.yaml" and data.get("schema_version") not in (3, 4):
+        if manifest.name == "workspace.yaml" and data.get("schema_version") not in (3, 4, 5):
             raise ValueError("lowercase workspace.yaml is a schema v3/v4 bootstrap; schema v2 workspaces use WORKSPACE.yaml")
     except (yaml.YAMLError, ValueError, OSError) as exc:
         print("=" * 72)
@@ -1055,6 +1064,9 @@ def main(argv: list[str] | None = None) -> int:
 
     fails, warns = validate_schema(data, root, check_filesystem=not args.structure_only)
     self_test_count = 0
+    if args.self_test and data.get("schema_version") == 5:
+        print("Use the configurable profile regression tests for v5.")
+        return 1
     if args.self_test:
         self_test_failures, self_test_count = run_self_test(data, root)
         fails.extend(f"[self-test] {msg}" for msg in self_test_failures)
@@ -1068,7 +1080,9 @@ def main(argv: list[str] | None = None) -> int:
         for item in fails:
             print("  ✗", item)
     else:
-        if data.get("schema_version") in (3, 4):
+        if data.get("schema_version") == 5:
+            print("\n✓ configurable workspace validation passed")
+        elif data.get("schema_version") in (3, 4):
             print("\n✓ frozen-v1 baseline + v2 reference classes + v3 extension checks passed")
         else:
             print("\n✓ frozen-v1 baseline + v2 reference-admission extension checks passed")
