@@ -2,8 +2,8 @@
 
 CCA composes several different layers. They are not all the same kind of standard.
 
-```
-flowchart TB
+```mermaid
+flowchart
     subgraph HUMANS["Human knowledge-work methods"]
         BASB["BASB / CODE\nCapture · Organize\nDistill · Express"]
         PARA["PARA\nProjects · Areas\nResources · Archives"]
@@ -30,7 +30,7 @@ flowchart TB
     end
 ```
 
-```
+```mermaid
 flowchart TB
     CCA["CCA\nComposition + interoperability semantics"]
 
