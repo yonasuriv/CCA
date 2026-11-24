@@ -82,6 +82,9 @@ def initialize_target(target: Path) -> list[str]:
         if rc != 0:
             raise ValueError(f"cannot initialize an invalid workspace manifest:\n{output}")
 
+    if data.get("schema_version") == 5:
+        return created  # owner supplies any declared human-authored instructions
+
     # V2 preserves its original AGENTS.md target. V3 resolves the slot rather
     # than assuming the human-authored control file stays at the workspace root.
     instructions_binding = "AGENTS.md"
@@ -711,7 +714,29 @@ def render_helper(kind: str, data: dict[str, Any], destination: str) -> str:
     raise ValueError(f"generated {kind} helper {destination!r} must end in .py or .sh")
 
 
+def gen_configurable_doc(data, kind):
+    title = "Context router" if kind == "context" else "Workspace specification"
+    lines = [f"# {title}", "", f"> GENERATED from {manifest_name(data)}. Do not edit.", "", "| Binding | Role | Path | Agent operations |", "|---|---|---|---|"]
+    for slot in data["slots"]:
+        lines.append(f"| {slot['key']} | {semantic_role_for_slot(slot, data)} | {slot['binding']} | {compact_ops(effective_agent_operations(slot, data))} |")
+    lines += ["", "## Invariants", ""]
+    lines += [f"- {key}: {value}" for key, value in data["invariants"].items()]
+    return "\n".join(lines) + "\n"
+
+
 def render_all(data: dict[str, Any]) -> dict[str, str]:
+    if data.get("schema_version") == 5:
+        outputs = generated_outputs(data)
+        rendered = {}
+        for name, destination in outputs.items():
+            kind = data["generation_contract"]["outputs"][name]["renderer"]
+            if kind in {"paths", "mkdirs"}:
+                rendered[destination] = render_helper(kind, data, destination)
+            elif kind == "host_index_adapter":
+                rendered[destination] = gen_excludes(data)
+            else:
+                rendered[destination] = gen_configurable_doc(data, kind)
+        return rendered
     if is_v3(data):
         outputs = generated_outputs(data)
         rendered = {
@@ -740,6 +765,12 @@ FILE_EXTENSIONS = {"yaml", "yml", "md", "json", "sh", "txt", "py", "toml"}
 
 
 def validate_agents(data: dict[str, Any], target: Path) -> list[str]:
+    if data.get("schema_version") == 5:
+        instructions = next((s for s in data["slots"] if s.get("role") == "agent.instructions"), None)
+        if not instructions:
+            return []
+        path = target / instructions["binding"]
+        return [] if path.is_file() and path.read_text(encoding="utf-8").strip() else [f"{path}: missing or empty human instructions"]
     name = slots_by_key(data)["agent.instructions"]["binding"] if is_v3(data) else "AGENTS.md"
     path = target / name
     if not path.exists():
@@ -867,7 +898,7 @@ def main(argv: list[str] | None = None) -> int:
         path = target / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
-        helpers = {generated_outputs(data)[k] for k in ("paths", "mkdirs")} if is_v3(data) else set()
+        helpers = {p for k, p in generated_outputs(data).items() if data["generation_contract"]["outputs"][k].get("renderer", k) in {"paths", "mkdirs"}} if is_v3(data) else set()
         if name.endswith(".sh") or name in helpers:
             path.chmod(0o755)
     if initialized:

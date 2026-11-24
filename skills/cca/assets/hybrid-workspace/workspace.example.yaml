@@ -1,0 +1,20 @@
+schema_version: 5
+cca:
+  specification: "1.6.0"
+bindings:
+  wiki:
+    role: knowledge.durable
+    path: wiki/
+  tools:
+    role: system.operations
+    path: tools/
+generation:
+  outputs:
+    paths:
+      renderer: paths
+      slot: tools
+      file: paths.py
+    mkdirs:
+      renderer: mkdirs
+      slot: tools
+      file: mkdirs.py

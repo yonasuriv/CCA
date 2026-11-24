@@ -24,7 +24,7 @@ def resolve(root: str | Path, *, key: str | None = None, output: str | None = No
     manifest = workspace_schema_path(workspace)
     data = load_schema(manifest)
     version = data.get("schema_version")
-    if version not in (2, 3, 4) or isinstance(version, bool):
+    if version not in (2, 3, 4, 5) or isinstance(version, bool):
         raise ValueError(f"unsupported workspace schema version: {version!r}")
     if manifest.name == "workspace.yaml" and version not in V3_FAMILY:
         raise ValueError("lowercase workspace.yaml is supported for schema v3 and v4; v2 uses WORKSPACE.yaml")
@@ -44,6 +44,10 @@ def resolve(root: str | Path, *, key: str | None = None, output: str | None = No
         raise ValueError(f"workspace.schema must point to {manifest.name}")
 
     if key is not None:
+        if version == 5 and key not in bindings:
+            matching = [s for s in slots if s.get("role") == key]
+            if len(matching) == 1:
+                key = matching[0]["key"]
         if key not in bindings:
             raise KeyError(f"unknown workspace semantic key: {key}")
         binding = bindings[key].get("binding")
@@ -71,6 +75,7 @@ def main(argv: list[str] | None = None) -> int:
                       help="print the fingerprint a minimal manifest pins, e.g. hybrid-workspace@3")
     name.add_argument("--minimize", action="store_true",
                       help="print the target's full manifest as an equivalent minimal (extends) manifest")
+    name.add_argument("--migrate-v5", action="store_true", help="print a candidate v5 manifest; never writes files")
     parser.add_argument("--format", choices=("absolute", "relative", "json"), default="absolute")
     args = parser.parse_args(argv)
     if args.contract_fingerprint:
@@ -83,6 +88,20 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if not args.target:
         parser.error("--target is required")
+    if args.migrate_v5:
+        try:
+            from configurable import migrate, compose
+            manifest = workspace_schema_path(Path(args.target).expanduser().resolve())
+            data = load_schema(manifest)
+            if data["schema_version"] not in (3, 4):
+                raise ValueError("migration supports v3/v4 manifests")
+            candidate = migrate(data)
+            compose(candidate, manifest.parent, "workspace.yaml")
+            print(yaml.safe_dump(candidate, sort_keys=False, allow_unicode=True), end="")
+        except (OSError, ValueError, KeyError) as exc:
+            print(f"migration failed: {exc}", file=sys.stderr)
+            return 1
+        return 0
     if args.minimize:
         try:
             manifest = workspace_schema_path(Path(args.target).expanduser().resolve())

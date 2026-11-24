@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CCA configurable workspace v5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "cca",
+    "bindings"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 5
+    },
+    "cca": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "specification"
+      ],
+      "properties": {
+        "specification": {
+          "const": "1.6.0"
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "endpoint",
+        "owner"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "endpoint": {
+          "type": "string"
+        },
+        "owner": {
+          "enum": [
+            "human",
+            "agent",
+            "shared"
+          ]
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "bindings": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "role",
+          "path"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "role": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+$"
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arity": {
+            "enum": [
+              "file",
+              "dir"
+            ]
+          },
+          "category": {
+            "enum": [
+              "bootstrap",
+              "control",
+              "state",
+              "system",
+              "asset",
+              "pipeline",
+              "lens",
+              "boundary",
+              "lifecycle"
+            ]
+          },
+          "mutability": {
+            "enum": [
+              "immutable",
+              "append",
+              "mutable",
+              "curated",
+              "replace",
+              "regenerate"
+            ]
+          },
+          "indexed": {
+            "enum": [
+              "included",
+              "excluded",
+              "disabled"
+            ]
+          },
+          "authority": {
+            "enum": [
+              "human",
+              "agent",
+              "shared",
+              "derived",
+              "external"
+            ]
+          },
+          "agent_access": {
+            "enum": [
+              "write",
+              "read-only",
+              "none"
+            ]
+          },
+          "link_target": {
+            "enum": [
+              "graph",
+              "inward",
+              "referenceable",
+              "none"
+            ]
+          },
+          "requirement": {
+            "enum": [
+              "required",
+              "conditional",
+              "optional"
+            ]
+          }
+        }
+      }
+    },
+    "generation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "outputs": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)*$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "renderer",
+              "slot"
+            ],
+            "properties": {
+              "renderer": {
+                "enum": [
+                  "paths",
+                  "mkdirs",
+                  "context",
+                  "spec",
+                  "host_index_adapter"
+                ]
+              },
+              "slot": {
+                "type": "string"
+              },
+              "file": {
+                "type": "string"
+              },
+              "indexed": {
+                "enum": [
+                  "excluded",
+                  "disabled"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "provenance_aliases": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+      }
+    }
+  }
+}
